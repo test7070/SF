@@ -529,7 +529,6 @@
 				$('#lblProductno_s').text('品號');
 				$('#lblProduct_s').text('品名');
 				$('#lblUcolor_s').text('類別');
-				$('#lblStyle_s').text('型');
 				$('#lblSpec_s').text('材質');
 				$('#lblSize_s').text('號數');
 				$('#lblLengthb_s').text('米數');
@@ -537,7 +536,7 @@
 				$('#lblUno_s').text('批號');
 				$('#lblMount_s').text('數量(件)');
 				$('#lblWeight_s').text('重量(KG)');
-				$('#lblStyle_s').text('形狀編號');
+				$('#lblStyle_s').text('加工型式');
 				$('#lblDime_s').text('彎勾');
 				$('#lblWidth_s').text('長度');
 				$('#lblRadius_s').text('彎勾');
