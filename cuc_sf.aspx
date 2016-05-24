@@ -76,8 +76,10 @@
 				q_gt('cucs_vu', t_where, 0, 0, 0,'init', r_accy);
 				
 				q_cmbParse("combSize", ',#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16');
-				q_cmbParse("combOrder",' @ ,memo@備註(標籤)');
+				q_cmbParse("combOrder",' @ ,scolor@分區');
 				q_cmbParse("combMechno2",'1@1剪,2@2剪,3@3剪,7@7辦公室');
+				q_cmbParse("combTypea",',1@裁剪,2@成型,3@板料');
+				
 				$('#combOrder').val('memo');//1124預設
 				
 				if(r_userno.toUpperCase()=='B01'){
@@ -243,6 +245,7 @@
 				var string = "<table id='cuct_table' style='width:1240px;word-break:break-all;'>";
 				string+='<tr id="cuct_header">';
 				string+='<td id="cuct_plut" align="center" style="width:40px; color:black;"><input id="btnPlut" type="button" style="font-size: medium; font-weight: bold;" value="＋"/></td>';
+				string+='<td id="cuct_uno" align="center" style="width:110px; color:black;">批號</td>';
 				string+='<td id="cuct_product" align="center" style="width:110px; color:black;">品名</td>';
 				string+='<td id="cuct_ucolor" align="center" style="width:170px; color:black;">類別</td>';
 				string+='<td id="cuct_spec" align="center" style="width:140px; color:black;">材質</td>';
@@ -265,6 +268,7 @@
 					for(var i=now_count;i<(now_count+bbtaddcount);i++){
 	    				string+='<tr id="cuct_tr'+i+'">';
 	    				string+='<td style="text-align: center;"><input id="btnMinut_'+i+'" class="minut" type="button" style="font-size: medium; font-weight: bold;" value="－"/></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textUno_'+i+'"  type="text" class="txt c1" /></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textProduct_'+i+'"  type="text" class="txt c3" value="鋼筋" /><select id="combProduct_'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textUcolor_'+i+'"  type="text" class="txt c3" value="板料" /><select id="combUcolor_'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textSpec_'+i+'"  type="text" class="txt c3" /><select id="combSpec_'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
@@ -469,6 +473,7 @@
 				string+="<table id='cuct_table2' style='width:1240px;border-bottom: none;'>";
 				string+='<tr id="cuct_header">';
 				string+='<td id="cuct_plut" align="center" style="width:40px; color:black;"><input id="btnPlut2" type="button" style="font-size: medium; font-weight: bold;" value="＋"/></td>';
+				string+='<td id="cuct_uno" align="center" style="width:110px; color:black;">批號</td>';
 				string+='<td id="cuct_product" align="center" style="width:110px; color:black;">品名</td>';
 				string+='<td id="cuct_ucolor" align="center" style="width:170px; color:black;">類別</td>';
 				string+='<td id="cuct_spec" align="center" style="width:140px; color:black;">材質</td>';
@@ -478,7 +483,8 @@
 				string+='<td id="cuct_gmount" align="center" style="width:80px; color:black;">領料件數</td>';
 				string+='<td id="cuct_gweight" align="center" style="width:90px; color:black;">領料重量</td>';
 				string+='<td id="cuct_avgweight" align="center" style="width:90px; color:black;">均重</td>';
-				string+='<td id="cuct_memo" align="center" style="width:220px; color:black;">備註&nbsp;&nbsp;<input id="btnCubt2" type="button" style="font-size: medium; font-weight: bold;" value="領料"/><input type="button" id="btnCub_nouno" value="條碼領料" style="width:80px;font-size: medium; font-weight: bold"/></td>';
+				string+='<td id="cuct_memo" align="center" style="width:220px; color:black;">備註&nbsp;&nbsp;<input id="btnCubt2" type="button" style="font-size: medium; font-weight: bold;" value="領料"/></td>';
+				//<input type="button" id="btnCub_nouno" value="條碼領料" style="width:80px;font-size: medium; font-weight: bold"/>
 				string+='</tr>';
 				string+='</table>';
 				$('#cuct').append(string);
@@ -2539,7 +2545,9 @@
 			<input id="textMech"  type="text" class="txt" style="width: 100px;" disabled="disabled"/>-->
 		<a class="lbl">機　台</a>&nbsp;
 			<select id="combMechno2" class="txt" style="font-size: medium;"> </select>
-		<a class="lbl">生產記錄備註</a>&nbsp;<input id="textMemo"  type="text" class="txt" style="width: 300px;"/>
+		<a class="lbl">裁剪/成型</a>&nbsp;
+		<select id="combTypea" class="txt" style="font-size: medium;"> </select>
+		<a class="lbl">生產記錄備註</a>&nbsp;<input id="textMemo"  type="text" class="txt" style="width: 200px;"/>
 		<input type='button' id='btnCub' style='font-size:16px;' value="入庫"/>
 		<input type='button' id='btnCancels' style='font-size:16px;' value="取消鎖定"/>
 		<input type='button' id='btnClear' style='font-size:16px;' value="畫面刷新"/>
