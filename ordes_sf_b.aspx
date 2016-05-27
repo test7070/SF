@@ -53,8 +53,8 @@
                 $('#lblNotv').text('訂單未出');
                 $('#lblNoa').text('訂單號碼');
                 $('#lblMemo').text('備註');
-                $('#lblStyle').text('加工型式');
-                $('#lblScolor').text('分區');
+                //$('#lblStyle').text('加工型式');
+                //$('#lblScolor').text('分區');
             }
 
             function q_gtPost() {
@@ -94,10 +94,10 @@
 					<td align="center"><a id='lblUcolor'> </a></td>
 					<td align="center"><a id='lblSpec'> </a></td>
 					<td align="center"><a id='lblSize'> </a></td>
-					<td align="center"><a id='lblStyle'> </a></td>
+					<!--<td align="center"><a id='lblStyle'> </a></td>-->
 					<td align="center"><a id='lblLengthb'> </a></td>
 					<td align="center"><a id='lblClass'> </a></td>
-					<td align="center"><a id='lblScolor'> </a></td>
+					<!--<td align="center"><a id='lblScolor'> </a></td>-->
 					<td align="center"><a id='lblUnit'> </a></td>
 					<td align="center"><a id='lblMount'> </a></td>
 					<td align="center"><a id='lblWeight'> </a></td>
@@ -112,10 +112,10 @@
 					<td style="width:8%;"><input class="txt" id="txtUcolor.*" type="text" style="width:98%;" /></td>
 					<td style="width:8%;"><input class="txt" id="txtSpec.*" type="text" style="width:98%;" /></td>
 					<td style="width:8%;"><input class="txt" id="txtSize.*" type="text" style="width:98%;" /></td>
-					<td style="width:8%;"><input class="txt" id="txtStyle.*" type="text" style="width:98%;" /></td>
+					<!--<td style="width:8%;"><input class="txt" id="txtStyle.*" type="text" style="width:98%;" /></td>-->
 					<td style="width:6%;"><input class="txt" id="txtLengthb.*" type="text" style="width:98%;text-align:right;" /></td>
 					<td style="width:8%;"><input class="txt" id="txtClass.*" type="text" style="width:98%;" /></td>
-					<td style="width:8%;"><input class="txt" id="txtScolor.*" type="text" style="width:98%;" /></td>
+					<!--<td style="width:8%;"><input class="txt" id="txtScolor.*" type="text" style="width:98%;" /></td>-->
 					<td style="width:4%;"><input class="txt" id="txtUnit.*" type="text" style="width:94%;"/></td>
 					<td style="width:8%;"><input class="txt" id="txtMount.*" type="text" style="width:94%; text-align:right;"/></td>
 					<td style="width:8%;"><input class="txt" id="txtWeight.*" type="text" style="width:94%; text-align:right;"/></td>

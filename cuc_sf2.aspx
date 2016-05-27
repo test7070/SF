@@ -30,7 +30,10 @@
             brwKey = 'Noa';
             brwCount2 = 6;
             aPop = new Array(
-            	['txtCustno', 'lblCust', 'cust', 'noa,nick', 'txtCustno,txtCust', 'cust_b.aspx']
+            	['txtCustno', 'lblCust', 'cust', 'noa,nick', 'txtCustno,txtCust', 'cust_b.aspx'],
+            	['txtMechno_', '', 'mech', 'noa,mech', 'txtMechno_,txtMech_', 'mech_b.aspx'],
+            	['txtMechno2_', '', 'mech', 'noa,mech', 'txtMechno2_,txtMech2_', 'mech_b.aspx'],
+            	['txtStyle_', '', 'img', 'noa,namea', 'txtStyle_,txtScolor_', 'img_b.aspx']
             );
 
             $(document).ready(function() {
@@ -57,7 +60,8 @@
                 q_getFormat();
                 bbmMask = [['txtDatea', r_picd],['txtBdate', r_picd]];
                 bbsMask = [['txtLengthb', 15, 2, 1], ['txtMount', 15, q_getPara('vcc.mountPrecision'), 1]
-								,['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1],['txtDime', 15, 2, 1], ['txtWidth', 15, 2, 1], ['txtRadius', 15, 2, 1]];
+								,['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]
+								,['txtWeight1', 15, 2, 1], ['txtWeight2', 15, 2, 1], ['txtWeight3', 15, 2, 1], ['txtWeight4', 15, 2, 1], ['txtWeight5', 15, 2, 1]];
                 q_mask(bbmMask);
 				//q_cmbParse("combProduct", q_getPara('vccs_vu.product'),'s');
 				
@@ -101,6 +105,18 @@
 					}
 					
 					q_box("ordes_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'ordes_sf', "95%", "95%", $('#btnOrde').val());
+				});
+				
+				$('#btnPic').click(function() {
+					if($(this).val()=='形狀顯示'){
+						$(this).val('形狀關閉')	
+						$('.pic').show();
+						$('#tbbs').css("width",(dec($('#tbbs')[0].offsetWidth)+700)+"px");
+					}else{
+						$(this).val('形狀顯示')
+						$('.pic').hide();
+						$('#tbbs').css("width",(dec($('#tbbs')[0].offsetWidth)-700)+"px");
+					}
 				});
                 
                 $('#lblNoa').text('案號'); 
@@ -354,18 +370,19 @@
                 $('#lblMount1_s').text('支數');
                 $('#lblMount_s').text('件數');
                 $('#lblWeight_s').text('重量(KG)');
-                $('#lblMemo_s').text('備註');
+                $('#lblMemo_s').text('備註 (標籤)');
                 $('#lblMins_s').text('裁剪完工');
                 $('#lblWaste_s').text('成型完工');
                 $('#vewNoa').text('案號');
                 $('#vewCust').text('客戶');
-                //$('#lblSize2_s').text('工令');
+                $('#lblSize2_s').text('內部工令');
                 $('#lblStyle_s').text('加工型式');
-				$('#lblDime_s').text('彎勾');
-				$('#lblWidth_s').text('長度');
-				$('#lblRadius_s').text('彎勾');
+				$('#lblWeight1_s').text('參數A');
+				$('#lblWeight2_s').text('參數B');
+				$('#lblWeight3_s').text('參數C');
+				$('#lblWeight4_s').text('參數D');
+				$('#lblWeight5_s').text('參數E');
 				$('#lblPic_s').text('形狀');
-				$('#lblScolor_s').text('分區');
             }
             
             function bbsweight(n) {
@@ -655,7 +672,7 @@
                 font-size: medium;
             }
             .dbbs {
-                width: 1750px;
+                width: 1600px;
             }
             .dbbs .tbbs {
                 margin: 0;
@@ -710,25 +727,30 @@
 						<td><input id="txtDatea"  type="text" class="txt c1"/></td>
 						<td> </td>
 						<td><input id="btnOrde" type="button" value="訂單匯入"></td>
-						<td> </td>
+						<td><input id="btnPic" type="button" value="形狀顯示"></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblCust" class="lbl btn"> </a></td>
 						<td><input id="txtCustno"  type="text" class="txt c1"/></td>
 						<td colspan="2"><input id="txtCust"  type="text" class="txt c1"/> </td>
-						<td> </td>
-						<td> </td>
-						<td> </td>
+						<td><span> </span><a id="lblMech" class="lbl"> </a></td>
+						<td colspan="2">
+							<input id="txtMech"  type="text" class="txt c1" style="width: 90%;"/>
+							<select id="combAccount" class="txt" style="width: 20px;"> </select>
+						</td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>
-						<td colspan="5"><input id="txtMemo"  type="text" class="txt c1"/></td>
+						<td colspan="6"><input id="txtMemo"  type="text" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
 						<td><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 						<td><input id="txtWorker2" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblWeight" class="lbl"> </a></td>
+						<td><input id="textWeight" type="text" class="txt num c1"/></td>
+						<td> </td>
 					</tr>
 					<!--<tr>
 						<td><span> </span><a id="lblGen" class="lbl"> </a></td>
@@ -750,20 +772,23 @@
 						<td style="width:150px;"><a id='lblUcolor_s'> </a></td>
 						<td style="width:150px;"><a id='lblSpec_s'> </a></td>
 						<td style="width:85px;"><a id='lblSize_s'> </a></td>
-						<td style="width:100px;"><a id='lblStyle_s'> </a></td>
-						<td style="width:100px;"><a id='lblDime_s'> </a></td>
-						<td style="width:100px;"><a id='lblWidth_s'> </a></td>
-						<td style="width:100px;"><a id='lblRadius_s'> </a></td>
-						<td style="width:200px;"><a id='lblPic_s'> </a></td>
+						<td style="width:120px;"><a id='lblStyle_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblWeight1_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblWeight2_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblWeight3_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblWeight4_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblWeight5_s'> </a></td>
+						<td style="width:200px;display: none;" class="pic"><a id='lblPic_s'> </a></td>
 						<td style="width:85px;"><a id='lblLengthb_s'> </a></td>
 						<!--<td style="width:55px;"><a id='lblUnit_s'> </a></td>-->
-						<!--<td style="width:85px;"><a id='lblMount1_s'> </a></td>-->
+						<td style="width:85px;"><a id='lblMount1_s'> </a></td>
 						<td style="width:85px;"><a id='lblMount_s'> </a></td>
 						<td style="width:85px;"><a id='lblWeight_s'> </a></td>
 						<td style="width:120px;"><a id='lblClass_s'> </a></td>
-						<td style="width:150px;"><a id='lblScolor_s'> </a></td>
 						<td style="width:150px;"><a id='lblMemo_s'> </a></td>
-						<!--<td style="width:150px;"><a id='lblSize2_s'> </a></td>-->
+						<td style="width:150px;"><a id='lblSize2_s'> </a></td>
+						<td style="width:150px;"><a id='lblMech_s'>剪裁機台</a></td>
+						<td style="width:150px;"><a id='lblMech2_s'>成型機台</a></td>
 						<td style="width:40px;"><a id='lblMins_s'> </a></td>
 						<td style="width:40px;"><a id='lblWaste_s'> </a></td>
 					</tr>
@@ -787,23 +812,35 @@
 							<select id="combSpec.*" class="txt" style="width: 20px;"> </select>
 						</td>
 						<td><input id="txtSize.*" type="text" class="txt c1" /></td>
-						<td><input id="txtStyle.*" type="text" class="txt c1" /></td>
-						<td><input id="txtDime.*" type="text" class="txt num c1" /></td>
-						<td><input id="txtWidth.*" type="text" class="txt num c1" /></td>
-						<td><input id="txtRadius.*" type="text" class="txt num c1" /></td>
-						<td> </td>
+						<td>
+							<input id="txtStyle.*" type="text" class="txt c1" />
+							<input id="txtScolor.*" type="text" class="txt c1" />
+						</td>
+						<td class="pic" style="display: none;"><input id="txtWeight1.*" type="text" class="txt num c1" /></td>
+						<td class="pic" style="display: none;"><input id="txtWeight2.*" type="text" class="txt num c1" /></td>
+						<td class="pic" style="display: none;"><input id="txtWeight3.*" type="text" class="txt num c1" /></td>
+						<td class="pic" style="display: none;"><input id="txtWeight4.*" type="text" class="txt num c1" /></td>
+						<td class="pic" style="display: none;"><input id="txtWeight5.*" type="text" class="txt num c1" /></td>
+						<td class="pic" style="display: none;"> </td>
 						<td><input id="txtLengthb.*" type="text" class="txt num c1" /></td>
 						<!--<td><input id="txtUnit.*" type="text" class="txt c1"/></td>-->
-						<!--<td><input id="txtMount1.*" type="text" class="txt num c1"/></td>-->
+						<td><input id="txtMount1.*" type="text" class="txt num c1"/></td>
 						<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
 						<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
 						<td>
 							<input id="txtClass.*" type="text" class="txt c1" style="width: 70%;"/>
 							<select id="combClass.*" class="txt" style="width: 20px;"> </select>
 						</td>
-						<td><input id="txtScolor.*" type="text" class="txt c1" /></td>
 						<td><input id="txtMemo.*" type="text" class="txt c1"/></td>
-						<!--<td><input id="txtSize2.*" type="text" class="txt c1"/></td>-->
+						<td><input id="txtSize2.*" type="text" class="txt c1"/></td>
+						<td>
+							<input id="txtMechno.*" type="text" class="txt c1"/>
+							<input id="txtMech.*" type="text" class="txt c1"/>
+						</td>
+						<td>
+							<input id="txtMechno2.*" type="text" class="txt c1"/>
+							<input id="txtMech2.*" type="text" class="txt c1"/>
+						</td>
 						<td>
 							<input id="checkMins.*" type="checkbox"/>
 							<input id="txtMins.*" type="hidden"/>

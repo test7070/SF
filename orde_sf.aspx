@@ -101,15 +101,11 @@
 				bbmNum = [['txtTranadd', 15, q_getPara('vcc.weightPrecision'), 1],['txtBenifit', 15, q_getPara('vcc.weightPrecision'), 1],['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]
 								,['txtTotal', 15, 0, 1], ['txtMoney', 15, 0, 1], ['txtTax', 15,0 , 1]];
 				bbsNum = [['txtPrice', 15, q_getPara('vcc.pricePrecision'), 1], ['txtMount', 15, q_getPara('vcc.mountPrecision'), 1]
-								,['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]
-								, ['txtDime', 15, 2, 1], ['txtWidth', 15, 2, 1], ['txtRadius', 15, 2, 1]];
+								,['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]];
 				
 				q_cmbParse("cmbStype", q_getPara('orde.stype'));
 				q_cmbParse("combPaytype", q_getPara('vcc.paytype'));
 				q_cmbParse("cmbTrantype", q_getPara('sys.tran'));
-				//q_cmbParse("cmbTaxtype", q_getPara('sys.taxtype'));
-				//q_cmbParse("combUcolor", q_getPara('vccs_vu.typea'),'s');
-				//q_cmbParse("combProduct", q_getPara('vccs_vu.product'),'s');
 				
 				var t_where = "where=^^ 1=1 ^^";
 				q_gt('ucc', t_where, 0, 0, 0, "");
@@ -126,23 +122,6 @@
 				$('#txtBenifit').change(function() {
 					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')))
 				});
-				
-				/*$('#btnQuat').val('合約匯入');
-				$('#btnQuat').click(function() {
-					var t_custno = trim($('#txtCustno').val());
-					var t_where = '';
-					if (t_custno.length > 0) {
-						t_where = " isnull(enda,0)=0 and isnull(cancel,0)=0 "
-						t_where = t_where + " and custno='"+t_custno+"'";
-						var t_contract=$('#txtContract').val();
-						if(t_contract.length>0)
-							t_where = t_where + " and noa='"+t_contract+"'";
-					}else {
-						alert(q_getMsg('msgCustEmp'));
-						return;
-					}
-					q_box("quats_vu_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'quats', "95%", "95%", $('#btnQuat').val());
-				});*/
 				
 				$('#cmbTaxtype').change(function() {
 					sum();
@@ -369,7 +348,7 @@
 							$(this).click(function() {
 								var n=$(this).attr('id').split('_')[1];
 								var tt_nouno=$('#uno_'+n).text();
-								q_func('qtxt.query.cubnouno', 'cub.txt,cubnouno_vu,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI('#non')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
+								q_func('qtxt.query.cubnouno', 'cub.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI('#non')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
 							});
 						});
 						break;
@@ -529,6 +508,7 @@
 				$('#lblProductno_s').text('品號');
 				$('#lblProduct_s').text('品名');
 				$('#lblUcolor_s').text('類別');
+				$('#lblStyle_s').text('型');
 				$('#lblSpec_s').text('材質');
 				$('#lblSize_s').text('號數');
 				$('#lblLengthb_s').text('米數');
@@ -536,12 +516,6 @@
 				$('#lblUno_s').text('批號');
 				$('#lblMount_s').text('數量(件)');
 				$('#lblWeight_s').text('重量(KG)');
-				$('#lblStyle_s').text('加工型式');
-				$('#lblDime_s').text('彎勾');
-				$('#lblWidth_s').text('長度');
-				$('#lblRadius_s').text('彎勾');
-				$('#lblPic_s').text('形狀');
-				$('#lblScolor_s').text('分區');
 			}
 
 			function btnIns() {
@@ -995,24 +969,18 @@
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' style="width: 2100px;"><!--2000px-->
+		<div class='dbbs' style="width: 100%;"><!--2000px-->
 			<table id="tbbs" class='tbbs' border="1" cellpadding='2' cellspacing='1'>
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:45px;"><input class="btn" id="btnPlus" type="button" value='＋' style="font-weight: bold;" /></td>
 					<td align="center" style="width:60px;"><a id='lblNo2'> </a></td>
 					<!--<td align="center" style="width:150px;"><a id='lblProductno_s'> </a></td>-->
-					<td align="center" style="width:130px;"><a id='lblProduct_s'> </a></td>
-					<td align="center" style="width:140px;"><a id='lblUcolor_s'> </a></td>
-					<td align="center" style="width:130px;"><a id='lblSpec_s'> </a></td>
+					<td align="center" style="width:150px;"><a id='lblProduct_s'> </a></td>
+					<td align="center" style="width:160px;"><a id='lblUcolor_s'> </a></td>
+					<td align="center" style="width:150px;"><a id='lblSpec_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblSize_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblStyle_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblDime_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblWidth_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblRadius_s'> </a></td>
-					<td align="center" style="width:200px;"><a id='lblPic_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblLengthb_s'> </a></td>
-					<td align="center" style="width:130px;"><a id='lblClass_s'> </a></td>
-					<td align="center" style="width:150px;"><a id='lblScolor_s'> </a></td>
+					<td align="center" style="width:150px;"><a id='lblClass_s'> </a></td>
 					<!--<td align="center" style="width:55px;"><a id='lblUnit'> </a></td>-->
 					<td align="center" style="width:60px;"><a id='lblMount_s'> </a></td>
 					<td align="center" style="width:85px;"><a id='lblWeight_s'> </a></td>
@@ -1046,17 +1014,11 @@
 						<select id="combSpec.*" class="txt" style="width: 20px;"> </select>
 					</td>
 					<td><input id="txtSize.*" type="text" class="txt c1" /></td>
-					<td><input id="txtStyle.*" type="text" class="txt c1" /></td>
-					<td><input id="txtDime.*" type="text" class="txt num c1" /></td>
-					<td><input id="txtWidth.*" type="text" class="txt num c1" /></td>
-					<td><input id="txtRadius.*" type="text" class="txt num c1" /></td>
-					<td> </td>
 					<td><input id="txtLengthb.*" type="text" class="txt num c1" /></td>
 					<td>
 						<input id="txtClass.*" type="text" class="txt c1" style="width: 70%;"/>
 						<select id="combClass.*" class="txt" style="width: 20px;"> </select>
 					</td>
-					<td><input id="txtScolor.*" type="text" class="txt c1" /></td>
 					<!--<td><input id="txtUnit.*" type="text" class="txt c1"/></td>-->
 					<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
