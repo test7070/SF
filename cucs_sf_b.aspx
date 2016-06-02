@@ -89,7 +89,7 @@
 					<td align="center"><a id='lblSize2'> </a></td>
 				</tr>
 				<tr  style='background:#cad3ff;'>
-					<td style="width:2%;"><input name="sel"  id="radSel.*" type="radio" /></td>
+					<td style="width:2%;">	<input class="chk"  id="chkSel.*" type="checkbox" name="chkSel"/></td>
 					<td style="width:12%;"><input class="txt" id="txtPicname.*" type="text" style="width:98%;" /></td>
 					<td style="width:10%;"><input class="txt" id="txtSpec.*" type="text" style="width:98%;" /></td>
 					<td style="width:8%;"><input class="txt" id="txtSize.*" type="text" style="width:98%;" /></td>
@@ -106,7 +106,7 @@
 					<td style="width:12%;"><input class="txt" id="txtSize2.*" type="text" style="width:98%;" /></td>
 				</tr>
 			</table>
-			<!--#include file="../inc/brow_ctrl.inc"-->
+			<!--#include file="../inc/pop_ctrl.inc"-->
 		</div>
 	</body>
 </html>
