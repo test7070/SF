@@ -36,8 +36,6 @@
             aPop = new Array(
             	['txtMechno', 'lblMechno', 'mech', 'noa,mech', 'txtMechno,txtMech', 'mech_b.aspx'],
             	['txtProductno_', 'btnProduct_', 'ucaucc', 'noa,product', 'txtProductno_,txtProduct_', 'ucaucc_b.aspx'],
-            	['txtUno__', '', 'view_uccc2', 'uno,uno,productno,product,ucolor,spec,size,lengthb,class,unit,emount,eweight'
-            	, '0txtUno__,txtUno__,txtProductno__,txtProduct__,txtUcolor__,txtSpec__,txtSize__,txtLengthb__,txtClass__,txtUnit__,txtGmount__,txtGweight__', 'uccc_seek_b2.aspx?;;;1=0', '95%', '60%'],
             	['txtStoreno_', 'btnStoreno_', 'store', 'noa,store', 'txtStoreno_,txtStore_', 'store_b.aspx'],
             	['txtStoreno__', 'btnStoreno__', 'store', 'noa,store', 'txtStoreno__,txtStore__', 'store_b.aspx']
             );
@@ -77,11 +75,6 @@
                 bbsMask = [['txtDate2', r_picd], ['txtDatea', r_picd]];
                 q_mask(bbmMask);
                 document.title='加工入庫/領料作業';
-                //q_cmbParse("cmbTypea", q_getPara('cub.typea'));
-                //q_cmbParse("combUcolor", q_getPara('vccs_vu.typea'),'s');
-                //q_cmbParse("combUcolor", q_getPara('vccs_vu.typea'),'t');
-                //q_cmbParse("combProduct", q_getPara('vccs_vu.product'),'s');
-                //q_cmbParse("combProduct", q_getPara('vccs_vu.product'),'t');
                 
                 q_cmbParse("combMechno2",'1@1剪,2@2剪,3@3剪,7@7辦公室');
                 q_cmbParse("cmbItype",'1@裁剪,2@成型');
@@ -98,43 +91,6 @@
                 
                 var t_where = "where=^^ 1=1 ^^";
 				q_gt('ucc', t_where, 0, 0, 0, "");
-                
-				$('#btnOrdes_vu').hide();
-                $('#btnOrdes_vu').click(function() {
-                    var t_bdate = trim($('#txtBdate').val());
-                    var t_edate = trim($('#txtEdate').val());
-                    var t_where = ' 1=1 and isnull(enda,0)!=1 and isnull(cancel,0)!=1 ';
-                    t_bdate = (emp(t_bdate) ? '' : t_bdate);
-                    t_edate = (emp(t_edate) ? r_picd : t_edate);
-                    t_where += " and (datea between '" + t_bdate + "' and '" + t_edate + "') ";
-                    t_where += " and not exists (select * from view_cubs where ordeno=view_ordes"+r_accy+".noa and no2=view_ordes"+r_accy+".no2 ) ";
-                    //t_where += ' and (cut=1)';
-                    q_box("ordes_vu_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'ordes', "95%", "95%", q_getMsg('popOrde'));
-                });
-				
-				$('#btnCubu_vu').hide();
-                $('#btnCubu_vu').click(function() {
-                    if (q_cur == 0 || q_cur == 4) {
-                        var t_where = "noa='" + trim($('#txtNoa').val()) + "'";
-                        q_box("cubu_vu_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where + ";" + r_accy, 'cubu', "95%", "95%", q_getMsg('popCubu'));
-                    }
-                });
-                
-                $('#btnCuc_vu').click(function() {
-                	if (q_cur==1 || q_cur==2){
-	                    //var t_bdate = trim($('#txtBdate').val());
-	                    //var t_edate = trim($('#txtEdate').val());
-	                    //訂單未結案 且 排程數量-加工數量>0
-	                    var t_where = ' 1=1 and isnull(d.oenda,0)!=1 and isnull(d.ocancel,0)!=1 and isnull(b.weight,0)-isnull(c.cubweight,0)>0 ';
-	                    //t_bdate = (emp(t_bdate) ? '' : t_bdate);
-	                    //t_edate = (emp(t_edate) ? r_picd : t_edate);
-	                    //t_where += " and (a.datea between '" + t_bdate + "' and '" + t_edate + "') ";
-	                    //t_where ="where=^^"+t_where+"^^";
-	                    q_box("cucs_vu_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where + ";" + r_accy, 'cucs_vu', "95%", "95%", q_getMsg('popCuc'));
-	                    
-	                    //q_gt('cucs_vu', t_where , 0, 0, 0, "cucs_vu");
-                   }
-                });
                 
                 $('#btnCub_nouno').click(function() {
                 	$('#textNouno').val('');
@@ -176,7 +132,7 @@
 				$('#btnGettostore').click(function() {
 					if(!emp($('#txtNoa').val())){
 						if(confirm("確認要條碼領料轉庫存?")){
-							q_func('qtxt.query.getcubdate', 'cuc_vu.txt,cubdate,' + encodeURI($('#txtNoa').val()));
+							q_func('qtxt.query.getcubdate', 'cuc_sf.txt,cubdate,' + encodeURI($('#txtNoa').val()));
 						}
 					}
 				});
@@ -184,15 +140,15 @@
 				$('#btnDeltostore').click(function() {
 					if(!emp($('#txtNoa').val())){
 						if(confirm("確認要條碼刪除轉庫存?")){
-							q_func('qtxt.query.delcubdate', 'cuc_vu.txt,cubdate,' + encodeURI($('#txtNoa').val()));
+							q_func('qtxt.query.delcubdate', 'cuc_sf.txt,cubdate,' + encodeURI($('#txtNoa').val()));
 						}
 					}
 				});
 				
                 $('#lblDatea').text('加工日');
                 $('#lblBdate').text('排程日');
-                $('#lblMechno').text('人員組別');
-                $('#lblMechno2').text('機台');
+                $('#lblMechno2').text('人員組別');
+                $('#lblMechno').text('機台');
             }
 
             function q_gtPost(t_name) {
@@ -206,17 +162,6 @@
 						q_cmbParse("combProduct", t_ucc,'s');
 						q_cmbParse("combProduct", t_ucc,'t');
 						break;
-                	case 'cucs_vu':
-                		var as = _q_appendData("view_cuc", "", true);
-                		for (var j = 0; j < (q_bbsCount == 0 ? 1 : q_bbsCount); j++) {
-                			$('#btnMinus_'+j).click();
-                		}
-                		
-                		q_gridAddRow(bbsHtm, 'tbbs'
-                		, 'txtCustno,txtComp,txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtUnit,txtLengthc,txtMount,txtWeight,txtMemo,txtDatea,txtOrdeno,txtNo2,txtProductno2,txtProduct2'
-                        , as.length, as, 'acustno,acust,product,ucolor,spec,size,lengthb,class,unit,mount1,emount,eweight,memo,odatea,ordeno,no2,noa,noq', '','');
-                	
-                		break;
                 	case 'bbsspec':
 						var as = _q_appendData("spec", "", true);
 						var t_spec='@';
@@ -325,39 +270,6 @@
 						get_maxuno=true;
 						btnOk();
 						break;
-					/*case 'nouno_getuno':
-						var as = _q_appendData("view_cubs", "", true);
-						if (as[0] != undefined) {
-							var t_nouno=$.trim($('#textNouno').val()).split(',');
-							var tt_nouno='';
-							for (var i=0;i<t_nouno.length;i++){
-								var t_exists=false;
-								var t_mount=0,t_weight=0;
-								for (var j=0;j<as.length;j++){
-									if(as[j].uno==t_nouno[i]){
-										t_exists=true;
-										t_mount=q_add(t_mount,dec(as[j].mount));
-										t_weight=q_add(t_mount,dec(as[j].weight));
-									}
-								}
-								if(!t_exists){
-									alert("批號【"+t_nouno[i]+"】不存在!!")
-									tt_nouno='';
-									break;
-								}else if(t_mount<=0 && t_mount<=0){
-									alert("批號【"+t_nouno[i]+"】已領料!!")
-									tt_nouno='';
-									break;
-								}else{
-									tt_nouno=tt_nouno+t_nouno[i]+"#";
-								}
-							}
-							if(tt_nouno.length>0)
-								q_func('qtxt.query.cubnouno', 'cub.txt,cubnouno_vu,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI('#non')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
-						}else{
-							alert("批號不存在!!");
-						}
-						break;*/
                     case q_name:
                         if (q_cur == 4)
                             q_Seek_gtPost();
@@ -393,7 +305,7 @@
 							alert(t_err);
 						}else{
 							//條碼領料轉庫存
-							q_func('qtxt.query.gettostore', 'cuc_vu.txt,gettostore,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
+							q_func('qtxt.query.gettostore', 'cuc_sf.txt,gettostore,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
 						}
 						break;
 					case 'qtxt.query.gettostore':
@@ -436,7 +348,7 @@
 						}
 						break;	
 					case 'cub_post.post.del1':
-						q_func('qtxt.query.deltostore', 'cuc_vu.txt,deltostore,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
+						q_func('qtxt.query.deltostore', 'cuc_sf.txt,deltostore,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
 						break;
 					case 'qtxt.query.deltostore':
 						var as = _q_appendData("tmp0", "", true, true);
@@ -476,6 +388,36 @@
 						q_boxClose2(s2);
 						break;
 				}
+				if(t_func.indexOf('qtxt.query.cubsuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		alert("批號【"+as[0].uno+"】已存在!!");
+                		$('#btnMinus_'+n).click();
+                	}
+				}
+				if(t_func.indexOf('qtxt.query.cubtuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		if(dec(as[0].mount)<=0 || dec(as[0].weight)<=0 ){
+                			alert("批號【"+as[0].uno+"】已被領用!!");
+                			$('#btnMinut__'+n).click();
+                		}else{
+                			$('#btnMinut__'+n).click();
+							q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtGmount,txtGweight,txtUno'
+								, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno', 'txtUno');
+							
+							if(dec(n)+as.length>=q_bbtCount){
+								$('#btnPlut').click();
+							}
+							$('#txtUno__'+q_add(dec(n),as.length)).focus().select();
+                		}
+                	}else{
+                		alert("批號【"+$('#txtUno__'+n).val()+"】不存在!!");
+                		$('#btnMinut__'+n).click();
+                	}
+				}
 				if(t_func.indexOf('qtxt.query.cuctcheckuno_')>-1){
                 	var n=t_func.split('_')[1];
                 	var as = _q_appendData("tmp0", "", true, true);
@@ -511,45 +453,6 @@
             function q_boxClose(s2) {
                 var ret;
                 switch (b_pop) {
-                	case 'cucs_vu':
-                		if (q_cur > 0 && q_cur < 4) {
-                            if (!b_ret || b_ret.length == 0) {
-                                b_pop = '';
-                                return;
-                            }
-                		
-	                		for (var j = 0; j < (q_bbsCount == 0 ? 1 : q_bbsCount); j++) {
-	                			$('#btnMinus_'+j).click();
-	                		}
-	                		
-	                		q_gridAddRow(bbsHtm, 'tbbs'
-	                		, 'txtCustno,txtComp,txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtUnit,txtLengthc,txtMount,txtWeight,txtMemo,txtDatea,txtOrdeno,txtNo2,txtProductno2,txtProduct2'
-	                        , b_ret.length, b_ret, 'acustno,acust,product,ucolor,spec,size,lengthb,class,unit,mount1,emount,eweight,memo,odatea,ordeno,no2,noa,noq', '','');
-                		}
-                		break;
-                    case 'ordes':
-                        if (q_cur > 0 && q_cur < 4) {
-                            if (!b_ret || b_ret.length == 0) {
-                                b_pop = '';
-                                return;
-                            }
-                            for (var j = 0; j < b_ret.length; j++) {
-                                for (var i = 0; i < q_bbtCount; i++) {
-                                    var t_ordeno = $('#txtOrdeno_' + i).val();
-                                    var t_no2 = $('#txtNo2_' + i).val();
-                                    if (b_ret[j] && b_ret[j].noa == t_ordeno && b_ret[j].no2 == t_no2) {
-                                        b_ret.splice(j, 1);
-                                    }
-                                }
-                            }
-                            if (b_ret && b_ret[0] != undefined) {
-                                ret = q_gridAddRow(bbsHtm, 'tbbs', 'txtCustno,txtComp,txtProductno,txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtUnit,txtOrdeno,txtNo2,txtWeight,txtMount,txtUno,txtMemo'
-                                , b_ret.length, b_ret, 'custno,comp,productno,product,ucolor,spec,size,lengthb,class,unit,noa,no2,mount,weight,uno,memo', 'txtProductno');
-                            }
-                            sum();
-                            b_ret = '';
-                        }
-                        break;
                     case 'uccc':
                         if (!b_ret || b_ret.length == 0) {
                             b_pop = '';
@@ -582,7 +485,7 @@
             function _btnSeek() {
                 if (q_cur > 0 && q_cur < 4)
                     return;
-				q_box('cub_vu_s.aspx', q_name + '_s', "500px", "400px", q_getMsg("popSeek"));
+				q_box('cub_sf_s.aspx', q_name + '_s', "500px", "400px", q_getMsg("popSeek"));
             }
 
             function btnIns() {
@@ -601,13 +504,13 @@
             }
 
             function btnPrint() {
-                //q_box('z_cubp_vu.aspx' + "?;;;noa=" + trim($('#txtNoa').val()) + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
+                //q_box('z_cubp_sf.aspx' + "?;;;noa=" + trim($('#txtNoa').val()) + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
             }
 			
 			var check_cubs_uno=false;
 			var get_uno=false,get_maxuno=false;
             function btnOk() {
-            	t_err = q_chkEmpField([['txtDatea', '加工日'],['txtMechno', q_getMsg('lblMechno')]]);
+            	t_err = q_chkEmpField([['txtDatea', '加工日'],['txtMechno', q_getMsg('機台')]]);
                 if (t_err.length > 0) {
                     alert(t_err);
                     return;
@@ -618,62 +521,8 @@
                     return;
                 }
                 
-                //1040914 不產生uno由cuc產生
-                //判斷批號是否已使用
-				/*if(!check_cubs_uno){
-                	var t_uno = "1=0";
-                    for (var i = 0; i < q_bbsCount; i++) {
-                        if ($.trim($('#txtUno_' + i).val()).length > 0)
-                            t_uno += " or uno='" + $.trim($('#txtUno_' + i).val()) + "'";
-                    }
-					var t_where = "where=^^ ("+t_uno+") and noa!='"+$('#txtNoa').val()+"' ^^";
-					q_gt('view_cubs', t_where, 0, 0, 0, "btnOk_cubs", r_accy);
-					return;
-                }*/
-                
-                //產生批號當天最大批號數
-				//判斷是否要產生批號
-				/*var ordenos_where=' 1=0 ';
-				if(!get_uno){
-					for (var j = 0; j < (q_bbsCount == 0 ? 1 : q_bbsCount); j++) {
-						if(!emp($('#txtProduct_'+j).val()) && emp($('#txtUno_'+j).val()) && !emp($('#txtOrdeno_'+j).val()) && !emp($('#txtNo2_'+j).val())){
-							if(ordenos_where.indexOf(($('#txtOrdeno_'+j).val()+$('#txtNo2_'+j).val()))==-1)
-								ordenos_where=ordenos_where+" or  (uno=isnull((select MAX(uno) from view_cubs where uno like '"+$('#txtOrdeno_'+j).val()+$('#txtNo2_'+j).val()+"-%' ),'') )";
-							get_uno=true;
-						}
-					}
-				}*/
-				
-				//預設產生批號 (訂單號碼(12)+訂序(3)+'-'+機台(?)+流水號(3))
-                /*if(get_uno && !get_maxuno){
-	                var t_where = "where=^^ uno!='' and ("+ordenos_where+") ^^";
-					q_gt('view_cubs', t_where, 0, 0, 0, "btnOk_getuno", r_accy);
-					return;
-                }*/
-				
-				/*check_cubs_uno=false;
-				get_uno=false;
-				get_maxuno=false;*/
-                
-                //檢查是否批號重複
-                /*var uno_repeat=false;
-                for (var i = 0; i < q_bbsCount; i++) {
-                	if(!emp($('#txtUno_'+i).val())){
-	                	for (var j = i+1; j < q_bbsCount; j++) {
-	                		if($('#txtUno_'+i).val()==$('#txtUno_'+j).val()){
-	                			uno_repeat=true;
-	                			break;
-	                		}
-	                	}
-                	}
-                	if(uno_repeat)
-                		break;
-                }
-                if(uno_repeat){
-                	alert("批號重複!!");
-                    return;
-                }*/
-                
+                //加工後 會多產品一個批號 不判斷批號是否重覆
+               	//批號自己輸入
                 sum();
                 
                 if(q_cur==1){
@@ -713,7 +562,7 @@
             }
 
             function bbtSave(as) {
-                if (!as['productno'] && !as['product'] && !as['uno']) {
+                if (!as['product'] && !as['uno']) {
                     as[bbtKey[1]] = '';
                     return;
                 }
@@ -802,7 +651,18 @@
 							if(q_cur==1 || q_cur==2)
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
 						});
-
+						
+						$('#txtUno_'+i).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							var t_noa=$('#txtNoa').val();
+							if(t_noa.length==0)
+								t_noa='#non';
+							if(!emp($('#txtUno_'+b_seq).val())){
+								q_func('qtxt.query.cubsuno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno_'+b_seq).val()+';'+t_noa);
+							}
+						});
                     }
                 }
                 _bbsAssign();
@@ -892,6 +752,18 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2)
 								$('#txtProduct__'+b_seq).val($('#combProduct__'+b_seq).find("option:selected").text());
+						});
+						
+						$('#txtUno__'+i).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							var t_noa=$('#txtNoa').val();
+							if(t_noa.length==0)
+								t_noa='#non';
+							if(!emp($('#txtUno__'+b_seq).val())){
+								q_func('qtxt.query.cubtuno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno__'+b_seq).val()+';'+t_noa);
+							}
 						});
                     }
                 }
@@ -1172,12 +1044,7 @@
 						<td><input id="txtMechno" type="text" class="txt c1"/></td>
 						<td><input id="txtMech" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblMechno2" class="lbl"> </a></td>
-						<td>
-							<!--<input type="button" id="btnCuc_vu" value="排程匯入" style="width:120px;"/>-->
-							<!--<input type="button" id="btnOrdes_vu" value="訂單匯入" style="width:120px;"/>
-							<input type="button" id="btnCubu_vu" value="入庫" style="width:120px;"/>-->
-							<select id="combMechno2" class="txt c1"> </select>
-						</td>
+						<td><select id="combMechno2" class="txt c1"> </select></td>
 						<td><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
 					</tr>
 					<!--<tr>
@@ -1205,7 +1072,7 @@
 					</tr>
 				</table>
 			</div>
-			<div class='dbbs' style="min-width: 2510px;">
+			<div class='dbbs' style="min-width: 2400px;">
 				<table id="tbbs" class='tbbs'>
 					<tr style='color:white; background:#003366;' >
 						<td style="width:20px;"><input id="btnPlus" type="button" style="font-size: medium; font-weight: bold;" value="＋"/></td>
@@ -1223,7 +1090,7 @@
 						<td style="width:85px;"><a id='lblMount_s'> </a></td>
 						<td style="width:85px;"><a id='lblWeight_s'> </a></td>
 						<!--<td style="width:100px;"><a id='lblPrice_s'> </a></td>-->
-						<td style="width:150px;"><a id='lblNeed_s'> </a></td>
+						<!--<td style="width:150px;"><a id='lblNeed_s'> </a></td>-->
 						<td style="width:150px;"><a id='lblMemo_s'> </a></td>						
 						<td style="width:100px;"><a id='lblDate2_s'> </a></td>
 						<td style="width:200px;"><a id='lblStore_s'> </a></td>
@@ -1273,7 +1140,7 @@
 						<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
 						<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
 						<!--<td><input id="txtPrice.*" type="text" class="txt num c1"/></td>-->
-						<td><input id="txtNeed.*" type="text" class="txt c1"/></td>
+						<!--<td><input id="txtNeed.*" type="text" class="txt c1"/></td>-->
 						<td><input id="txtMemo.*" type="text" class="txt c1"/></td>
 						<td><input id="txtDate2.*" type="text" class="txt c1"/></td>
 						<td>

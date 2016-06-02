@@ -455,44 +455,6 @@
 						}
 						q1_weight=0,q2_weight=0;
 						break;
-					case 'btnOk_cubs':
-						var as = _q_appendData("view_cubs", "", true);
-                        if (as[0] != undefined) {
-                        	var t_uno='';
-                        	for ( i = 0; i < as.length; i++) {
-                        		t_uno=((t_uno.length>0)?',':'')+as[i].uno;
-                        	}
-                            alert(t_uno+"批號已存在!!");
-                        }else{
-                        	check_cubs_uno=true;
-                        	btnOk();
-                        }
-                        break;
-					case 'getuno':
-						var as = _q_appendData("view_cubs", "", true);
-						var maxnoq=0; 
-						if(as[0] != undefined){
-							maxnoq=dec(as[0].uno.slice(-3));
-						}
-						
-						//判斷表身批號是否已被使用
-						for (var j = 0; j < (q_bbsCount == 0 ? 1 : q_bbsCount); j++) {
-							if(replaceAll($('#txtDatea').val(),'/','')+(('000'+maxnoq).slice(-3))==$('#txtUno_'+j).val() && !emp($('#txtUno_'+j).val())){
-								maxnoq=maxnoq+1;
-							}
-						}
-						
-						//寫入批號
-						for (var j = 0; j < (q_bbsCount == 0 ? 1 : q_bbsCount); j++) {
-							if(!emp($('#txtStyle_'+j).val()) && emp($('#txtUno_'+j).val())){
-								maxnoq=maxnoq+1;
-								$('#txtUno_'+j).val(replaceAll($('#txtDatea').val(),'/','')+(('000'+maxnoq).slice(-3)));
-							}
-						}
-						
-						get_maxuno=true;
-						btnOk();
-						break;
 					case 'getCardealCarno' :
 						var as = _q_appendData("cardeals", "", true);
 						carnoList = as;
@@ -714,9 +676,9 @@
 			}
 			
 			var check_startdate=false;
-			var check_cubs_uno=false;
-			var get_uno=false,get_maxuno=false;
 			var check_cont=false;
+			var check_uno=false,check_uno_count=0,check_uno_err='';
+			var getnewuno=false;
 			function btnOk() {
 				var t_err = q_chkEmpField([['txtNoa', q_getMsg('lblNoa')],['txtDatea', q_getMsg('lblDatea')], ['txtTggno', q_getMsg('lblTgg')], ['txtCno', q_getMsg('lblAcomp')]]);
 				// 檢查空白
@@ -751,39 +713,47 @@
 					return;
 				}
 				
-				//判斷批號是否已使用
-				/*if(!check_cubs_uno){
-                	var t_uno = "1=0";
-                    for (var i = 0; i < q_bbsCount; i++) {
-                        if ($.trim($('#txtUno_' + i).val()).length > 0)
-                            t_uno += " or uno='" + $.trim($('#txtUno_' + i).val()) + "'";
-                    }
-					var t_where = "where=^^ ("+t_uno+") and noa!='"+$('#txtNoa').val()+"' ^^";
-					q_gt('view_cubs', t_where, 0, 0, 0, "btnOk_cubs", r_accy);
-					return;
-                }*/
-				
-				//產生批號當天最大批號數
-				//判斷是否要產生批號
-				/*if(!get_uno){
-					for (var j = 0; j < (q_bbsCount == 0 ? 1 : q_bbsCount); j++) {
-						if(!emp($('#txtStyle_'+j).val()) && emp($('#txtUno_'+j).val())){
-							get_uno=true;
-							break;
+				//檢查批號重覆
+				for (var i = 0; i < q_bbsCount; i++) {
+					for (var j = i + 1; j < q_bbsCount; j++) {
+						if ($.trim($('#txtUno_' + i).val()).length > 0 && $.trim($('#txtUno_' + i).val()) == $.trim($('#txtUno_' + j).val())) {
+							alert('【' + $.trim($('#txtUno_' + i).val()) + '】批號重覆。\n' + (i + 1) + ', ' + (j + 1));
+							return;
 						}
 					}
 				}
 				
-				if(get_uno && !get_maxuno){
-					var t_where = "where=^^ uno=isnull((select MAX(uno) from view_cubs where uno like '"+replaceAll($('#txtDatea').val(),'/','')+"%' and len(uno)=11),'')  and uno!='' ^^";
-					q_gt('view_cubs', t_where, 0, 0, 0, "getuno", r_accy);
-					return;
-				}*/
+				//判斷批號是否已存在
+				if(!check_uno){
+					check_uno_count=0;check_uno_err='';
+					for (var i = 0; i < q_bbsCount; i++) {
+						if(!emp($('#txtUno_'+i).val())){
+							q_func('qtxt.query.rc2checkuno_'+i, 'cuc_sf.txt,getuno,'+$('#txtUno_'+i).val()+';'+$('#txtNoa').val());
+							check_uno_count++;
+						}	
+					}
+					if(check_uno_count>0){
+						return;
+					}else{
+						check_uno=true;
+					}
+				}
 				
-				check_cubs_uno=false;
+				//取得UNO
+				var needuno=false;
+				for (var i = 0; i < q_bbsCount; i++) {
+					if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
+						needuno=true;
+					}
+				}
+				if(!getnewuno && needuno){
+					q_func('qtxt.query.getnewuno', 'cuc_sf.txt,getnewuno,rc2;'+$('#txtNoa').val()+';'+q_getPara('sys.key_rc2')+';'+$('#txtDatea').val());
+					return;
+				}
+				
+				getnewuno=false;
+				check_uno=false;
 				check_startdate=false;
-				get_uno=false;
-				get_maxuno=false;
 				check_cont=false;
 				
 				$('#txtTranstart').val($('#textQno1').val()+'@'+dec($('#textQweight1').val())+'##'+$('#textQno2').val()+'@'+dec($('#textQweight2').val()));
@@ -921,6 +891,18 @@
 							 if ($(this).val().substr(0, 1) != '#')
                         		$(this).val('#' + $(this).val());
 						});
+						
+						$('#txtUno_'+j).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							var t_noa=$('#txtNoa').val();
+							if(t_noa.length==0)
+								t_noa='#non';
+							if(!emp($('#txtUno_'+b_seq).val())){
+								q_func('qtxt.query.rc2suno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno_'+b_seq).val()+';'+t_noa);
+							}
+						});
 					}
 				}
 				_bbsAssign();
@@ -994,7 +976,7 @@
 			}
 
 			function bbsSave(as) {
-				if (!as['productno'] && !as['product'] && !as['spec'] && !dec(as['total'])) {
+				if (!as['uno'] && !as['product'] && !dec(as['total'])) {
 					as[bbsKey[1]] = '';
 					return;
 				}
@@ -1024,6 +1006,11 @@
 				refreshBbm();
 				HiddenTreat();
 				$('#div_orde').hide();
+				
+				getnewuno=false;
+				check_uno=false;
+				check_startdate=false;
+				check_cont=false;
 			}
 
 			function readonly(t_para, empty) {
@@ -1137,6 +1124,49 @@
 			
 			function q_funcPost(t_func, result) {
 				switch(t_func) {
+					case 'qtxt.query.getnewuno':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							var t_uno=as[0].uno;
+							var t_noa=as[0].noa;
+							var whilenum=0;
+							if(t_noa!='' && ($('#txtNoa').val().length==0 || $('#txtNoa').val()=='AUTO'))
+								$('#txtNoa').val(t_noa);
+							if(t_uno!=''){
+								//檢查是否與表身重覆
+								while(1==1 && whilenum<q_bbsCount*q_bbsCount) //避免無窮迴圈
+								{
+									var isnoexists=true,needuno=false;
+									for (var i = 0; i < q_bbsCount; i++) {
+										if(!emp($('#txtUno_'+i).val())){
+											if(t_uno==$('#txtUno_'+i).val()){
+												isnoexists=false;
+											}
+										}
+										if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
+											needuno=true;
+										}
+									}
+									if(!needuno){
+										break;
+									}
+									if(isnoexists){
+										for (var i = 0; i < q_bbsCount; i++) {
+											if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
+												$('#txtUno_'+i).val(t_uno);
+												break;
+											}
+										}
+									}
+									t_uno=t_noa+'-'+('000'+(dec(t_uno.slice(-3))+1).toString()).slice(-3);
+									whilenum++;
+								}
+							}
+						}
+						//不管有沒有批號都會存檔
+						getnewuno=true;
+	                	btnOk();
+						break;
 					case 'changecontgweight':
 						break;
 					case 'qtxt.query.rc2toorde':
@@ -1158,6 +1188,32 @@
 						$('#div_orde').hide();
 						break;
 				}
+				if(t_func.indexOf('qtxt.query.rc2suno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		alert("批號【"+as[0].uno+"】已存在!!");
+                		$('#btnMinus_'+n).click();
+                	}
+				}
+				if(t_func.indexOf('qtxt.query.rc2checkuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		check_uno_err=check_uno_err+'批號【'+as[0].uno+'】已被領用\n';
+                	}
+                	
+                	check_uno_count--;
+                	if(check_uno_count==0){
+	                	if(check_uno_err.length>0){
+	                		alert(check_uno_err);
+	                	}else{
+	                		check_uno=true;
+	                		btnOk();
+	                	}
+                	}
+				}
+				
 			}
 		</script>
 		<style type="text/css">
@@ -1431,23 +1487,23 @@
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' style="width: 1500px;"><!--2100px-->
+		<div class='dbbs' style="width: 1700px;"><!--2100px-->
 			<table id="tbbs" class='tbbs' border="1" cellpadding='2' cellspacing='1' >
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:1%;"><input class="btn" id="btnPlus" type="button" value='＋' style="font-weight: bold;" /></td>
-					<td align="center" style="width:55px;"><a id='lblNoq_s'> </a></td>
-					<td align="center" style="width:180px;"><a id='lblUno_s'> </a></td>
+					<td align="center" style="width:50px;"><a id='lblNoq_s'> </a></td>
+					<td align="center" style="width:160px;"><a id='lblUno_s'> </a></td>
 					<!--<td align="center" style="width:150px;"><a id='lblProductno_s'> </a></td>-->
 					<td align="center" style="width:150px;"><a id='lblProduct_s'> </a></td>
 					<td align="center" style="width:160px;"><a id='lblUcolor_s'> </a></td>
 					<!--<td align="center" style="width:40px;"><a id='lblStyle_s'> </a></td>-->
 					<td align="center" style="width:150px;"><a id='lblSpec_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblSize_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblLengthb_s'> </a></td>
+					<td align="center" style="width:80px;"><a id='lblSize_s'> </a></td>
+					<td align="center" style="width:80px;"><a id='lblLengthb_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblClass_s'> </a></td>
 					<!--<td align="center" style="width:40px;"><a id='lblUnit_s'> </a></td>-->
-					<td align="center" style="width:90px;"><a id='lblLengthc_s'> </a></td>
-					<td align="center" style="width:90px;"><a id='lblMount_s'> </a></td>
+					<td align="center" style="width:70px;"><a id='lblLengthc_s'> </a></td>
+					<td align="center" style="width:75px;"><a id='lblMount_s'> </a></td>
 					<td align="center" style="width:90px;"><a id='lblWeight_s'> </a></td>
 					<td align="center" style="width:90px;"><a id='lblPrice_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblTotal_s'> </a></td>
@@ -1492,9 +1548,9 @@
 					<td><input id="txtPrice.*" type="text" class="txt num c1" /></td>
 					<td><input id="txtTotal.*" type="text" class="txt num c1" /></td>
 					<td>
-						<input id="txtStoreno.*" type="text" class="txt c1" style="width: 65%;"/>
+						<input id="txtStoreno.*" type="text" class="txt c1" style="width: 30%;"/>
 						<input class="btn" id="btnStoreno.*" type="button" value='.' style=" font-weight: bold;float: left;" />
-						<input id="txtStore.*" type="text" class="txt c1"/>
+						<input id="txtStore.*" type="text" class="txt c1"  style="width: 50%;"/>
 					</td>
 					<td>
 						<input id="txtMemo.*" type="text" class="txt c1"/>

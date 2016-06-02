@@ -30,7 +30,7 @@
                 bbmMask = [['txtBdate', r_picd], ['txtEdate', r_picd]];
                 q_mask(bbmMask);
                 $('#txtNoa').focus();
-                $('#lblMech').text('人員組別');
+                $('#lblMech').text('機台');
             }
             
             function q_seekStr() {
