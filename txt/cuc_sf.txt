@@ -76,6 +76,12 @@ select a.accy,'ucces' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec
 from view_ucces a left join view_ucce b on a.noa=b.noa
 where len(a.uno)>0 and a.noa!=@noa
 
+insert #tmp
+select a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='2' and len(b.uno)>0 and a.noa!=@noa and not exists(select * from #tmp where uno=b.uno)
+
 if(@tablea='rc2')
 begin
 	set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from view_rc2s where uno like @noa+'-%'),'000')
@@ -146,37 +152,55 @@ create table #tmp(
 	ordeno nvarchar(100),
 	no2 nvarchar(50)
 ) 
+--盤點
+insert #tmp
+select a.accy,'ucces' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'',''
+from view_ucces a left join view_ucce b on a.noa=b.noa
+where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
+
+delete a
+from #tmp a outer apply (select MAX(datea) datea from #tmp 
+where product=a.product and spec=a.spec and size=a.size and lengthb =a.lengthb and class =a.class and storeno=a.storeno)b
+where a.datea!=b.datea
 
 insert #tmp
 select a.accy,'rc2s' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'',''
 from view_rc2s a left join view_rc2 b on a.noa = b.noa 
 where b.typea!='2' and len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
+and not exists(select * from #tmp where uno=a.uno)
 union all
 select a.accy,'cubs' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,a.ordeno,a.no2
 from view_cubs a left join view_cub b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
+and not exists(select * from #tmp where uno=a.uno)
 union all
 select a.accy,'inas' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'',''
 from view_inas a left join view_ina b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
-union all
-select a.accy,'ucces' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'',''
-from view_ucces a left join view_ucce b on a.noa=b.noa
-where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
+and not exists(select * from #tmp where uno=a.uno)
+
+--出貨退回
+insert #tmp
+select a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,b.ordeno,b.no2
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='2' and len(b.uno)>0 and (len(@uno)=0 or b.uno=@uno) and a.noa!=@noa
+and not exists(select * from #tmp where uno=b.uno)
 
 --批號一次會全部領 不會剩餘
 update a
-set mount=case when vget>0 or cget>0 or gget>0 then 0 else a.mount end
-,weight=case when vget>0 or cget>0 or gget>0 then 0 else a.weight end
-,lengthc=case when vget>0 or cget>0 or gget>0 then 0 else a.lengthc end
+set mount=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.mount end
+,weight=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.weight end
+,lengthc=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.lengthc end
 from #tmp a 
-outer apply (select count(*)vget from view_vcct where uno=a.uno and noa!=@noa )v
+outer apply (select sum(case when va.typea!='2' then 1 else -1 end)vget from view_vcc va left join view_vcct vb on va.noa=vb.noa where vb.uno=a.uno and va.noa!=@noa)v
 outer apply (select count(*)cget from view_cubt where uno=a.uno and noa!=@noa)c
 outer apply (select count(*)gget from view_gets where uno=a.uno and noa!=@noa)g
+outer apply (select sum(case when ra.typea='2' then 1 else 0 end)rget from view_rc2 ra left join view_rc2s rb on ra.noa=rb.noa where rb.uno=a.uno and ra.noa!=@noa)r
 
 select * from #tmp
 
@@ -478,32 +502,52 @@ create table #unotable(
 	store nvarchar(50)
 ) 
 
+--盤點
 insert #unotable
-select a.accy,'rc2s' tablea,a.noa,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store
-from view_rc2s a left join view_rc2 b on a.noa = b.noa 
-where b.typea!='2' and len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
+select a.accy,'ucces' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_ucce a left join view_ucces b on a.noa = b.noa
+where len(b.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=b.uno)
+
+delete a
+from #unotable a outer apply (select MAX(datea) datea from #unotable 
+where product=a.product and spec=a.spec and size=a.size and lengthb =a.lengthb and class =a.class and storeno=a.storeno)b
+where a.datea!=b.datea
+
+insert #unotable
+select a.accy,'rc2s' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_rc2 a left join view_rc2s b on a.noa = b.noa 
+where a.typea!='2' and len(b.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=b.uno)
 union all
-select a.accy,'cubs' tablea,a.noa,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store
-from view_cubs a left join view_cub b on a.noa=b.noa
-where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
+select a.accy,'cubs' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_cub a left join view_cubs b on a.noa=b.noa
+where len(b.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=b.uno)
 union all
-select a.accy,'inas' tablea,a.noa,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store
-from view_inas a left join view_ina b on a.noa=b.noa
-where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
+select a.accy,'inas' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_ina a left join view_inas b on a.noa=b.noa
+where len(b.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=b.uno)
+
+--出貨退回
+insert #unotable
+select a.accy,'vcct' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='2' and len(b.uno)>0  and not exists(select * from #unotable where uno=b.uno)
+and exists (select * from dbo.fnSplit(@uno) where n=b.uno)
 
 --批號一次會全部領 不會剩餘
 update a
-set mount=case when vget>0 or cget>0 or gget>0 then 0 else a.mount end
-,weight=case when vget>0 or cget>0 or gget>0 then 0 else a.weight end
-,lengthc=case when vget>0 or cget>0 or gget>0 then 0 else a.lengthc end
+set mount=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.mount end
+,weight=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.weight end
+,lengthc=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.lengthc end
 from #unotable a 
-outer apply (select count(*)vget from view_vcct where uno=a.uno )v
+outer apply (select sum(case when va.typea!='2' then 1 else -1 end)vget from view_vcc va left join view_vcct vb on va.noa=vb.noa where vb.uno=a.uno)v
 outer apply (select count(*)cget from view_cubt where uno=a.uno)c
 outer apply (select count(*)gget from view_gets where uno=a.uno)g
-
+outer apply (select sum(case when ra.typea='2' then 1 else 0 end)rget from view_rc2 ra left join view_rc2s rb on ra.noa=rb.noa where rb.uno=a.uno )r
 
 --刪除已領料完畢的批號 --1210顯示已出貨或領料單號
 --delete #unotable where mount<=0 and weight<=0 

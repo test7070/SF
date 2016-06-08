@@ -1,0 +1,153 @@
+﻿z_ucc_sf01:--z_ucc_sf01庫存表
+declare @t_pno nvarchar(50)
+declare @t_ucolor nvarchar(50)
+declare @t_spec nvarchar(50)
+declare @t_size nvarchar(50)
+declare @t_blengthb nvarchar(50)
+declare @t_elengthb nvarchar(50)
+declare @t_class nvarchar(50)
+declare @t_uno nvarchar(50)
+declare @t_edate nvarchar(20)
+declare @t_bstoreno nvarchar(50)
+declare @t_estoreno nvarchar(50)
+declare @t_bcustno nvarchar(50)
+declare @t_ecustno nvarchar(50)
+declare @t_ordeno nvarchar(50)
+
+set @t_pno = case when '#non'=[7] then '' else [7] end
+set @t_ucolor = case when '#non'=[8] then '' else [8] end
+set @t_spec = case when '#non'=[9] then '' else [9] end
+set @t_size = case when '#non'=[10] then '' else [10] end
+set @t_blengthb = case when '#non'=[11] then '0' else [11] end
+set @t_elengthb = case when '#non'=[12] then '999' else [12] end
+set @t_class = case when '#non'=[13] then '' else [13] end
+set @t_uno = case when '#non'=[14] then '' else [14] end
+set @t_edate = case when '#non'=[15] then char(255) else [15] end
+set @t_bstoreno = case when '#non'=[16] then '' else [16] end
+set @t_estoreno = case when '#non'=[17] then char(255) else [17] end
+--set @t_bcustno = case when '#non'=[18] then '' else [18] end
+--set @t_ecustno = case when '#non'=[19] then char(255) else [19] end
+--set @t_ordeno = case when '#non'=[20] then '' else [20] end
+
+---------------------------------------------------------------------------------
+SET QUOTED_IDENTIFIER OFF
+declare @cmd nvarchar(max)
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+
+create table #tmp(
+	gno nvarchar(2),
+	accy nvarchar(50),
+	tablea nvarchar(50), 
+	noa nvarchar(50),
+	datea nvarchar(50),
+	uno nvarchar(50),
+	product nvarchar(50),
+	ucolor nvarchar(50),
+	spec nvarchar(50),
+	size nvarchar(50),
+	lengthb float,
+	class nvarchar(50),
+	mount float,
+	weight float,
+	lengthc float,
+	storeno nvarchar(50),
+	store nvarchar(50)
+)
+
+--盤點
+insert #tmp
+select '0',a.accy,'ucces' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_ucce a left join view_ucces b on a.noa = b.noa 
+where len(b.uno)>0 and a.datea<=@t_edate
+and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
+and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+
+--刪除多次盤點的資料 只保留最後一次盤點
+delete a
+from #tmp a outer apply (select MAX(datea) datea from #tmp 
+where product=a.product and spec=a.spec and size=a.size and lengthb =a.lengthb and class =a.class and storeno=a.storeno)b
+where a.datea!=b.datea
+
+insert #tmp
+select '0',a.accy,'rc2s' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_rc2 a left join view_rc2s b on a.noa = b.noa 
+where a.typea!='2' and len(b.uno)>0 and a.datea<=@t_edate and not exists(select * from #tmp where uno=b.uno)
+and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
+and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+union all
+select '0',a.accy,'cubs' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_cub a left join view_cubs b on a.noa=b.noa
+where len(b.uno)>0 and a.datea<=@t_edate and not exists(select * from #tmp where uno=b.uno)
+and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
+and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+union all
+select '0',a.accy,'inas' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_ina a left join view_inas b on a.noa=b.noa
+where len(b.uno)>0 and a.datea<=@t_edate and not exists(select * from #tmp where uno=b.uno)
+and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
+and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+
+--出貨退回
+insert #tmp
+select '0',a.accy,'vcct' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='2' and len(b.uno)>0 and a.datea<=@t_edate and not exists(select * from #tmp where uno=b.uno)
+and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
+and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+
+--批號一次會全部領 不會剩餘
+update a
+set mount=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.mount end
+,weight=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.weight end
+,lengthc=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.lengthc end
+from #tmp a 
+outer apply (select sum(case when va.typea!='2' then 1 else -1 end)vget from view_vcc va left join view_vcct vb on va.noa=vb.noa where vb.uno=a.uno)v
+outer apply (select count(*)cget from view_cubt where uno=a.uno)c
+outer apply (select count(*)gget from view_gets where uno=a.uno)g
+outer apply (select sum(case when ra.typea='2' then 1 else 0 end)rget from view_rc2 ra left join view_rc2s rb on ra.noa=rb.noa where rb.uno=a.uno )r
+
+delete #tmp where mount<=0 and weight<=0
+
+--小計
+insert #tmp
+select '1','','','',char(255),char(255),product,ucolor,spec,size,lengthb,class,sum(mount),sum(weight),sum(lengthc),'',''
+from #tmp where gno='0' group by product,ucolor,spec,size,lengthb,class
+
+--總計
+insert #tmp
+select '2','','','',char(255),char(255),char(255),char(255),char(255),char(255),999,char(255),sum(mount),sum(weight),sum(lengthc),'',''
+from #tmp where gno='0' 
+
+select ROW_NUMBER() over (partition by product,ucolor,spec,size,lengthb,class order by product,ucolor,spec,cast(dbo.get_num(size) as int),lengthb,class,gno,uno,datea) rr
+,dbo.getComma(mount,[2])mount
+,dbo.getComma(weight,[3])weight
+,dbo.getComma(lengthc,-1)lengthc
+,dbo.getComma(case when isnull(mount,0)=0 then 0 else round(isnull(weight,0)/isnull(mount,0),4) end,[3])avgweight
+,*
+from #tmp order by product,ucolor,spec,cast(dbo.get_num(size) as int),lengthb,class,gno,rr
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+;
