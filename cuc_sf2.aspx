@@ -104,10 +104,10 @@
 				});
 				
 				//庫存
-				/*$('#btnStk').click(function() {
+				$('#btnStk').click(function() {
 					//window.open("./z_ucc_vu.aspx"+ "?"+ r_userno + ";" + r_name + ";" + q_id +";;" + r_accy);
-					q_box('z_ucc_vu.aspx', 'z_ucc_vu', "95%", "95%", $('#btnStk').val());
-				});*/
+					q_box('z_ucc_sf.aspx', 'z_ucc_sf', "95%", "95%", $('#btnStk').val());
+				});
 				
 				//料單報表
 				/*$('#btnCubp').click(function() {
@@ -2344,8 +2344,8 @@
 		<input type='button' id='btnCub' style='font-size:16px;' value="入庫"/>
 		<input type='button' id='btnCancels' style='font-size:16px;' value="取消鎖定"/>
 		<input type='button' id='btnClear' style='font-size:16px;' value="畫面刷新"/>
-		<!--<input type='button' id='btnStk' style='font-size:16px;' value="庫存表"/>
-		<input type='button' id='btnCubp' style='font-size:16px;' value="料單報表"/>-->
+		<input type='button' id='btnStk' style='font-size:16px;' value="庫存表"/>
+		<!--<input type='button' id='btnCubp' style='font-size:16px;' value="料單報表"/>-->
 		<BR>
 		<a id="lblCucnoa" class="lbl" style="color: #4297D7;cursor: pointer;font-weight: bolder;">案　號</a>&nbsp;
 		<select id="combCucno" class="txt" style="font-size: medium;"> </select>
