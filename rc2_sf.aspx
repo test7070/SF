@@ -697,6 +697,25 @@
 					return;
 				}
 				
+				var t_zero=false;
+				for (var i = 0; i < q_bbsCount; i++) {
+					if(dec($('#txtMount_'+i).val())==0 && dec($('#txtWeight_'+i).val())==0 && !emp($('#txtProduct_'+i).val())){
+						t_zero=true;
+					}
+				}
+				
+				if(t_zero){
+					if (confirm('進貨品項【件數】和【重量】為0將會清空，是否繼續?')){
+						for (var i = 0; i < q_bbsCount; i++) {
+							if(dec($('#txtMount_'+i).val())==0 && dec($('#txtWeight_'+i).val())==0 && !emp($('#txtProduct_'+i).val())){
+								$('#btnMinus_'+i).click();
+							}
+						}
+					}else{
+						return;
+					}
+				}
+				
 				//判斷起算日,寫入帳款月份
 				//104/09/30 如果備註沒有*字就重算帳款月份
 				//if(!check_startdate && emp($('#txtMon').val())){
@@ -930,6 +949,72 @@
 	                			if(emp($('#txtStoreno_'+i).val())){
 	                				$('#txtStoreno_'+i).val($('#txtStoreno_0').val());
 	                				$('#txtStore_'+i).val($('#txtStore_0').val());
+	                			}
+	                		}
+                		}
+                	}
+				});
+				$('#btnProductCopy').click(function() {
+					if(q_cur==1 || q_cur==2){
+                		if(!emp($('#txtProduct_0').val())){
+	                		for (var i = 1; i < q_bbsCount; i++) {
+	                			if(emp($('#txtProduct_'+i).val())){
+	                				$('#txtProduct_'+i).val($('#txtProduct_0').val());
+	                			}
+	                		}
+                		}
+                	}
+				});
+				$('#btnUcolorCopy').click(function() {
+					if(q_cur==1 || q_cur==2){
+                		if(!emp($('#txtUcolor_0').val())){
+	                		for (var i = 1; i < q_bbsCount; i++) {
+	                			if(emp($('#txtUcolor_'+i).val())){
+	                				$('#txtUcolor_'+i).val($('#txtUcolor_0').val());
+	                			}
+	                		}
+                		}
+                	}
+				});
+				$('#btnSpecCopy').click(function() {
+					if(q_cur==1 || q_cur==2){
+                		if(!emp($('#txtSpec_0').val())){
+	                		for (var i = 1; i < q_bbsCount; i++) {
+	                			if(emp($('#txtSpec_'+i).val())){
+	                				$('#txtSpec_'+i).val($('#txtSpec_0').val());
+	                			}
+	                		}
+                		}
+                	}
+				});
+				$('#btnSizeCopy').click(function() {
+					if(q_cur==1 || q_cur==2){
+                		if(!emp($('#txtSize_0').val())){
+	                		for (var i = 1; i < q_bbsCount; i++) {
+	                			if(emp($('#txtSize_'+i).val())){
+	                				$('#txtSize_'+i).val($('#txtSize_0').val());
+	                			}
+	                		}
+                		}
+                	}
+				});
+				$('#btnLengthbCopy').click(function() {
+					if(q_cur==1 || q_cur==2){
+                		if(!emp($('#txtLengthb_0').val())){
+	                		for (var i = 1; i < q_bbsCount; i++) {
+	                			if(emp($('#txtLengthb_'+i).val())){
+	                				$('#txtLengthb_'+i).val($('#txtLengthb_0').val());
+	                			}
+	                		}
+                		}
+                	}
+				});
+				$('#btnClassCopy').click(function() {
+					if(q_cur==1 || q_cur==2){
+                		if(!emp($('#txtClass_0').val())){
+	                		for (var i = 1; i < q_bbsCount; i++) {
+	                			if(emp($('#txtClass_'+i).val())){
+	                				$('#txtClass_'+i).val($('#txtClass_0').val());
 	                			}
 	                		}
                 		}
@@ -1494,13 +1579,31 @@
 					<td align="center" style="width:50px;"><a id='lblNoq_s'> </a></td>
 					<td align="center" style="width:160px;"><a id='lblUno_s'> </a></td>
 					<!--<td align="center" style="width:150px;"><a id='lblProductno_s'> </a></td>-->
-					<td align="center" style="width:150px;"><a id='lblProduct_s'> </a></td>
-					<td align="center" style="width:160px;"><a id='lblUcolor_s'> </a></td>
+					<td align="center" style="width:150px;">
+						<a id='lblProduct_s'> </a>
+						<input class="btn"  id="btnProductCopy" type="button" value='≡' style="font-weight: bold;"  />
+					</td>
+					<td align="center" style="width:160px;">
+						<a id='lblUcolor_s'> </a>
+						<input class="btn"  id="btnUcolorCopy" type="button" value='≡' style="font-weight: bold;"  />
+					</td>
 					<!--<td align="center" style="width:40px;"><a id='lblStyle_s'> </a></td>-->
-					<td align="center" style="width:150px;"><a id='lblSpec_s'> </a></td>
-					<td align="center" style="width:80px;"><a id='lblSize_s'> </a></td>
-					<td align="center" style="width:80px;"><a id='lblLengthb_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblClass_s'> </a></td>
+					<td align="center" style="width:150px;">
+						<a id='lblSpec_s'> </a>
+						<input class="btn"  id="btnSpecCopy" type="button" value='≡' style="font-weight: bold;"  />
+					</td>
+					<td align="center" style="width:80px;">
+						<a id='lblSize_s'> </a>
+						<input class="btn"  id="btnSizeCopy" type="button" value='≡' style="font-weight: bold;"  />
+					</td>
+					<td align="center" style="width:80px;">
+						<a id='lblLengthb_s'> </a>
+						<input class="btn"  id="btnLengthbCopy" type="button" value='≡' style="font-weight: bold;"  />
+					</td>
+					<td align="center" style="width:100px;">
+						<a id='lblClass_s'> </a>
+						<input class="btn"  id="btnClassCopy" type="button" value='≡' style="font-weight: bold;"  />
+					</td>
 					<!--<td align="center" style="width:40px;"><a id='lblUnit_s'> </a></td>-->
 					<td align="center" style="width:70px;"><a id='lblLengthc_s'> </a></td>
 					<td align="center" style="width:75px;"><a id='lblMount_s'> </a></td>
