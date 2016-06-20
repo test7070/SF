@@ -78,24 +78,13 @@
                         type : '5',
                         name : 'xitype', //[17]
                         value:('#non@全部,1@裁剪,2@成型').split(',')
-                    },{//[18]
+                    },{
 						type : '5',
-						name : 'xsheet',
-						value :('Y@含板料,N@不含板料').split(',')
-					}, {//[18][19]
-						type : '1',
-						name : 'xtime'
-					},{//[20]
-						type : '5',
-						name : 'xshowget',
-						value :('Y@含領料,N@不含領料').split(',')
-					},{//[21]
-						type : '5',
-						name : 'xenda',
+						name : 'xenda',//[18]
 						value :('#non@全部,0@未結案,1@已結案').split(',')
-					},{//[22]
+					},{
 						type : '5',
-						name : 'xorder',
+						name : 'xorder',//[19]
 						value :('noa@案號,comp@客戶,bdate@預交日').split(',')
 					}]
 				});
