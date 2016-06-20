@@ -1,4 +1,5 @@
 z_cubp_sf01:--z_cubp_sf01
+SET QUOTED_IDENTIFIER OFF 
 declare @t_bdate nvarchar(30)
 declare @t_edate nvarchar(30)
 declare @t_bmechno nvarchar(30)
@@ -43,7 +44,7 @@ from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
 where isnull(a.datea,'') between @t_bdate and @t_edate 
 and isnull(a.mechno,'') between @t_bmechno and @t_emechno
 and (len(@t_itype)=0 or isnull(a.itype,'')=@t_itype)
-and isnull(b.productno2)!='' --加工 沒有值表示餘料入庫
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
 
 if((select count(*) from @result)>0)
 begin
@@ -59,6 +60,7 @@ select dbo.getComma(lengthc,[2]) lengthc
 from @result order by gno,dno;
 ---------------------------------------------------------------------------------------------------------------------------------
 z_cubp_sf02:--z_cubp_sf02
+SET QUOTED_IDENTIFIER OFF 
 declare @t_bdate nvarchar(30)
 declare @t_edate nvarchar(30)
 declare @t_bmechno nvarchar(30)
@@ -103,7 +105,7 @@ from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
 where isnull(a.datea,'') between @t_bdate and @t_edate 
 and isnull(a.mechno,'') between @t_bmechno and @t_emechno
 and (len(@t_itype)=0 or isnull(a.itype,'')=@t_itype)
-and isnull(b.productno2)!='' --加工 沒有值表示餘料入庫
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
 
 if((select count(*) from @result)>0)
 begin
@@ -119,6 +121,7 @@ select dbo.getComma(lengthc,[2]) lengthc
 from @result order by mechno,gno,dno;
 --------------------------------------------------------------------------------------------------------------------------
 z_cubp_sf03:--z_cubp_sf03
+SET QUOTED_IDENTIFIER OFF 
 declare @t_bdate nvarchar(30)
 declare @t_edate nvarchar(30)
 declare @t_bmechno nvarchar(30)
