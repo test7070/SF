@@ -18,33 +18,28 @@ declare @tmp table(
 	size nvarchar(100),
 	picname nvarchar(100),
 	imgdata nvarchar(max),
-	image1 nvarchar(max),
 	lengthb float,
-	mount1 float,
+	lengthc float,
 	mount float,
-	weighta float
+	weight float,
+	class nvarchar(50),
+	memo nvarchar(MAX)
 )
 
 insert @tmp
 select '0',a.noa,a.datea,a.mech,b.noq,b.productno,b.product,b.ucolor,b.spec,b.size,b.picname
-		,b.imgdata,'' 
-		,b.lengthb,b.mount1,b.mount,b.weight
-from  view_cuc a
-outer apply (select * from view_cucs where noa=a.noa)b
-where
-len(@t_xnoa)=0 or a.noa=@t_xnoa
+		,b.imgdata,b.lengthb,b.mount1,b.mount,b.weight,b.class,b.memo
+from  view_cuc a left join view_cucs b on a.noa=b.noa
+where len(@t_xnoa)=0 or a.noa=@t_xnoa
 
 insert @tmp(gno,noa)
-select '1',noa
-from @tmp
-group by noa
-
+select '1',noa from @tmp group by noa
 
 select
 dbo.getComma(lengthb,2) lengthb,
-dbo.getComma(mount1,2) mount1,
+dbo.getComma(lengthc,2) lengthc,
 dbo.getComma(mount,2) mount,
-dbo.getComma(weighta,2) weighta
+dbo.getComma(weight,2) weight
 ,case when len(isnull(imgdata,''))>0 then 
 			'<img src="'+imgdata+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' 
 			else '<span style="display:block'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end image1
@@ -52,5 +47,3 @@ dbo.getComma(weighta,2) weighta
 from @tmp
 order by noa,gno
 ;
-
-
