@@ -708,13 +708,13 @@
 	            $('#lblBo_admin').text('職務津貼');
 	            $('#lblBo_traffic').text('交通津貼');
 	            $('#lblBo_special').text('責任津貼');
-	            $('#lblBo_oth').text('其他津貼');
+	            $('#lblBo_oth').text('其他獎金');
 	            $('#lblDatea').text('發薪日');
 	            $('#lblMoneys').text('底薪');
 	            $('#lblBo_admins').text('職務津貼');
 	            $('#lblBo_traffics').text('交通津貼');
 	            $('#lblBo_specials').text('責任津貼');
-	            $('#lblBo_oths').text('其他津貼');
+	            $('#lblBo_oths').text('其他獎金');
 	            $('#lblAddh2_1s').text('加班時數');
 	            $('#lblAddh100s').text('值班時數');
 	            $('#lblMoney1s').text('獎金基數');
