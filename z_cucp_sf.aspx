@@ -47,6 +47,35 @@
 					},{
 						type : '1', //[2][3]
 						name : 'xdate'
+					},{
+                        type : '2',//[4][5]
+                        name : 'xcust',
+                        dbf : 'cust',
+                        index : 'noa,comp',
+                        src : 'cust_b.aspx'
+                    }, {
+                        type : '6',
+                        name : 'xproduct' //[6]
+                    }, {
+                        type : '6',
+                        name : 'xspec' //[7]
+                    }, {
+                        type : '5',
+                        name : 'xsize', //[8]
+                        value:(',#2,#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16').split(',')
+                    }, {
+                        type : '6',
+                        name : 'xmemo' //[9]
+                    },{
+                        type : '2',//[10][11] //直接以型式篩選要給的使用人 不篩選>裁剪 篩選彎料>成型
+                        name : 'xpicno',
+                        dbf : 'img',
+                        index : 'noa,namea',
+                        src : 'img_b.aspx'
+                    },{
+						type : '5',
+						name : 'xorder',//[10]
+						value :('memo@備註(區域),pic@加工型式,#non@無').split(',')
 					}]
                 });
 				 q_popAssign();
@@ -69,8 +98,22 @@
 				
 				var t_key = q_getHref();
 				if(t_key[1] != undefined){
-				$('#txtXnoa').val(t_key[1]);}
-                				
+					$('#txtXnoa').val(t_key[1]);
+				}
+				
+				var tmp = document.getElementById("txtXspec");
+                var selectbox = document.createElement("select");
+                selectbox.id="combSpec";
+                selectbox.style.cssText ="width:20px;font-size: medium;";
+                tmp.parentNode.appendChild(selectbox,tmp);
+                
+                $('#combSpec').change(function() {
+					$('#txtXspec').val($('#combSpec').find("option:selected").text());
+				});
+				
+				$('#combSpec').css('font-size','medium');
+				$('#Xsize select').css('font-size','medium');
+				$('#Xorder select').css('font-size','medium');
             }
 
             function q_boxClose(s2) {
@@ -86,10 +129,10 @@
 	ondragover="event.dataTransfer.dropEffect='none';event.stopPropagation(); event.preventDefault();"
 	ondrop="event.dataTransfer.dropEffect='none';event.stopPropagation(); event.preventDefault();"
 	>
-		<div id="q_menu"></div>
+		<div id="q_menu"> </div>
 		<div style="position: absolute;top: 10px;left:50px;z-index: 1;width:2000px;">
 			<div id="container">
-				<div id="q_report"></div>
+				<div id="q_report"> </div>
 			</div>
 			<div class="prt" style="margin-left: -40px;">
                 <!--#include file="../inc/print_ctrl.inc"-->
