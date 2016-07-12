@@ -53,37 +53,19 @@
                  q_getFormat();
                  q_langShow();
 			
-                 var r_1911=1911;
-                 if(r_len==4){//西元年
-						r_1911=0;
-                 }else{
-						$('#txtXdate1').datepicker();
-						$('#txtXdate2').datepicker();
-				 }
+                 if(r_len==4){                	
+                	$.datepicker.r_len=4;
+					//$.datepicker.setDefaults($.datepicker.regional["ENG"]);
+                }
+                
+				$('#txtXdate1').datepicker();
+				$('#txtXdate2').datepicker();
+				 
                  $('#txtXdate1').mask(r_picd);
                  $('#txtXdate2').mask(r_picd);
                  
-                var t_date, t_year, t_month, t_day;
-                t_date = new Date();
-                t_date.setDate(1);
-                t_year = t_date.getUTCFullYear() - r_1911;
-                t_year = t_year > 99 ? t_year + '' : '0' + t_year;
-                t_month = t_date.getUTCMonth() + 1;
-                t_month = t_month > 9 ? t_month + '' : '0' + t_month;
-                t_day = t_date.getUTCDate();
-                t_day = t_day > 9 ? t_day + '' : '0' + t_day;
-                $('#txtXdate1').val(t_year + '/' + t_month + '/' + t_day);      
-
-                t_date = new Date();
-                t_date.setDate(35);
-                t_date.setDate(0);
-                t_year = t_date.getUTCFullYear() - r_1911;
-                t_year = t_year > 99 ? t_year + '' : '0' + t_year;
-                t_month = t_date.getUTCMonth() + 1;
-                t_month = t_month > 9 ? t_month + '' : '0' + t_month;
-                t_day = t_date.getUTCDate();
-                t_day = t_day > 9 ? t_day + '' : '0' + t_day;
-                $('#txtXdate2').val(t_year + '/' + t_month + '/' + t_day);
+                $('#txtXdate1').val(q_date().substr(0,r_lenm)+'/01');
+                $('#txtXdate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',45).substr(0,r_lenm)+'/01',-1));
 				
 				var t_key = q_getHref();
 				if(t_key[1] != undefined){
