@@ -42,39 +42,39 @@
 						name : 'path',
 						value : getLocation()
 					},{
-						type : '6', //[1]
+						type : '6', //[2]
 						name : 'xnoa'
 					},{
-						type : '1', //[2][3]
+						type : '1', //[3][4]
 						name : 'xdate'
 					},{
-                        type : '2',//[4][5]
+                        type : '2',//[5][6]
                         name : 'xcust',
                         dbf : 'cust',
                         index : 'noa,comp',
                         src : 'cust_b.aspx'
                     }, {
                         type : '6',
-                        name : 'xproduct' //[6]
+                        name : 'xproduct' //[7]
                     }, {
                         type : '6',
-                        name : 'xspec' //[7]
+                        name : 'xspec' //[8]
                     }, {
                         type : '5',
-                        name : 'xsize', //[8]
+                        name : 'xsize', //[9]
                         value:(',#2,#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16').split(',')
                     }, {
                         type : '6',
-                        name : 'xmemo' //[9]
+                        name : 'xmemo' //[10]
                     },{
-                        type : '2',//[10][11] //直接以型式篩選要給的使用人 不篩選>裁剪 篩選彎料>成型
+                        type : '2',//[11][12] //直接以型式篩選要給的使用人 不篩選>裁剪 篩選彎料>成型
                         name : 'xpicno',
                         dbf : 'img',
                         index : 'noa,namea',
                         src : 'img_b.aspx'
                     },{
 						type : '5',
-						name : 'xorder',//[10]
+						name : 'xorder',//[13]
 						value :('memo@備註(區域),pic@加工型式,#non@無').split(',')
 					}]
                 });
