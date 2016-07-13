@@ -101,6 +101,7 @@
 					$('#txtXnoa').val(t_key[1]);
 				}
 				
+				q_gt('spec', '1=1 ', 0, 0, 0, "spec");
 				var tmp = document.getElementById("txtXspec");
                 var selectbox = document.createElement("select");
                 selectbox.id="combSpec";
@@ -118,8 +119,20 @@
 
             function q_boxClose(s2) {
             }
-
-            function q_gtPost(s2) {
+			
+			var t_spec='@'
+            function q_gtPost(t_name) {
+                switch (t_name) {
+                	case 'spec':
+                		var as = _q_appendData("spec", "", true);
+						for ( i = 0; i < as.length; i++) {
+							t_spec+=","+as[i].noa;
+						}
+						q_cmbParse("combSpec", t_spec); 
+                		break;
+                    default:
+                        break;
+                }
             }
 
 	</script>
