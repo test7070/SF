@@ -281,6 +281,7 @@
 						t_length += value;
 						ctx.font = t_para[i].fontsize+"px Arial";
 						ctx.fillStyle = 'black';
+						ctx.textAlign="center";
 						ctx.fillText(value+'',t_para[i].left,t_para[i].top);
 					}
 				}
