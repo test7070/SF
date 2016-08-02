@@ -17,6 +17,10 @@ declare @tmp table(
 	noa nvarchar(100),
 	datea nvarchar(10),
 	mech nvarchar(100),
+	cust nvarchar(200),
+	bdate nvarchar(20),
+	amemo nvarchar(MAX),
+	tmemo nvarchar(MAX),
 	
 	noq nvarchar(100),
 	productno nvarchar(100),
@@ -33,18 +37,24 @@ declare @tmp table(
 	mount float,
 	weight float,
 	class nvarchar(50),
-	memo nvarchar(MAX)
+	memo nvarchar(MAX),
+	bsize nvarchar(100)
 )
 
 insert @tmp
-select '0',0,a.noa,a.datea,a.mech,b.noq,b.productno,b.product,b.ucolor,b.spec,b.size,b.picno,b.picno,b.picname
-		,b.imgdata,b.lengthb,b.mount1,b.mount,b.weight,b.class,b.memo
+select '0',0,a.noa,a.datea,a.mech,a.cust,a.bdate,a.memo,''
+		,b.noq,b.productno,b.product,b.ucolor,b.spec,b.size,b.picno,b.picno,b.picname
+		,b.imgdata,b.lengthb,b.mount1,b.mount,b.weight,b.class,b.memo,b.size2
 from  view_cuc a left join view_cucs b on a.noa=b.noa
 where a.noa=@t_xnoa 
 and (len(@t_spec)=0 or b.spec=@t_spec)
 and (len(@t_size)=0 or b.size=@t_size)
 and (len(@t_memo)=0 or b.memo=@t_memo)
 and (b.picno between @t_bpicno and @t_epicno)
+
+update a
+set tmemo=stuff((select CHAR(59)+size+'-'+spec+'='+dbo.getComma(SUM(weight),0)+'KG' from @tmp where noa=a.noa group by size,spec order by dbo.get_num(size),spec FOR XML PATH('')),1,1,'')
+from @tmp a
 
 if(@t_order='memo')
 begin
