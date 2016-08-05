@@ -40,14 +40,23 @@
 	                    },  {
 	                        type : '1', //[2][3]
 	                        name : 'xnoa'
-	                    }]
+	                    },  {type : '8',
+							 name : 'xshowtaxname',
+							 value : "1@顯示稅金".split(',')
+                        },  {type : '6',
+							 name : 'xaddr2',
+                        }]
                     });
                 q_popAssign();
                 var t_noa=typeof(q_getId()[3])=='undefined'?'':q_getId()[3];
                 t_noa  =  t_noa.replace('noa=','');
                 $('#txtXnoa1').val(t_noa);
                 $('#txtXnoa2').val(t_noa);
+                
+        
             }
+
+
 
             function q_boxClose(s2) {
             }

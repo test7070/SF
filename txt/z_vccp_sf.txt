@@ -1,9 +1,13 @@
 ﻿z_vccp_sf01:--z_vccp_sf01
 declare @t_bxnoa nvarchar(20)
 declare @t_exnoa nvarchar(20)
+declare @t_xshowtaxname nvarchar(1)
+declare @t_xaddr2 nvarchar(100)
 
-set @t_bxnoa = case when '#non' = [2] then '' else [2] end
+set @t_bxnoa = case when '#non' =[2] then '' else [2] end
 set @t_exnoa = case when '#non' = [3] then CHAR(255) else [3] end
+set @t_xshowtaxname  = case when '#non' = [4] then '' else [4] end
+set @t_xaddr2 = case when '#non' = [5] then '' else [5] end
 ---------------------------------------------------------------------------------
 declare @tmp1 table(
 	gno nvarchar(1),
@@ -28,21 +32,38 @@ declare @tmp1 table(
 	long float,
 	pmount float,
 	pweight float,
+
 	
 	trantype nvarchar(10),
+	taxname nvarchar(10),
 	intime nvarchar(10),
 	cardeal nvarchar(20),
 	store nvarchar(50),
 	carno nvarchar(20)
 )
+if (LEN(@t_xaddr2)!=0)
+begin
+	insert into @tmp1
+	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr2,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),
+		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,sum(b.mount),sum(b.weight),
+		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,'','','',''
+	from view_vcc a
+	left join view_vccs b on a.noa = b. noa
+	where (a.noa between @t_bxnoa and @t_exnoa)
+	and (len(@t_xaddr2)!=0 and isnull(a.addr2,'')=@t_xaddr2)
+	group by a.datea,a.custno,a.comp,a.addr2,a.apvmemo,b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,a.trantype
+end
+else
+begin
+	insert into @tmp1
+	select '0',a.noa,a.datea,a.custno,a.comp,a.addr2,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,
+		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
+		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,a.paydate,a.cardeal,b.store,a.carno
+	from view_vcc a
+	left join view_vccs b on a.noa = b. noa
+	where (a.noa between @t_bxnoa and @t_exnoa)
+end
 
-insert into @tmp1
-select '0',a.noa,a.datea,a.custno,a.comp,a.addr2,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,
-	   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
-	   a.trantype,a.paydate,a.cardeal,b.store,a.carno
-from view_vcc a
-left join view_vccs b on a.noa = b. noa
-where (a.noa between @t_bxnoa and @t_exnoa)
 
 update @tmp1 set tweight = case when tweight is null then 0 else tweight end,
 				 eweight = case when eweight is null then 0 else eweight end,
@@ -124,6 +145,7 @@ declare @tmp2 table(
 	pweight1 float,pweight2 float,pweight3 float,pweight4 float,pweight5 float,pweight6 float,
 	
 	trantype nvarchar(10),
+	taxname nvarchar(10),
 	intime nvarchar(10),
 	cardeal nvarchar(20),
 	store nvarchar(50),
@@ -149,11 +171,12 @@ while(@@FETCH_STATUS <> -1)
 begin 
 	if(@noa2 != @noa1 or @recno%6 = 1) 
 	begin 
-		set @recno = 1 
-		insert into @tmp2(gno,noa,datea,custno,cust,addr,qno,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,intime,cardeal,store,carno) 
-		select gno,noa,datea,custno,cust,addr,qno,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,intime,cardeal,store,carno
-		from @tmp1 where idno = @idno1 
-		
+		set @recno = 1
+		begin 
+			insert into @tmp2(gno,noa,datea,custno,cust,addr,qno,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,taxname,intime,cardeal,store,carno) 
+			select gno,noa,datea,custno,cust,addr,qno,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,taxname,intime,cardeal,store,carno
+			from @tmp1 where idno = @idno1
+		end
 		set @noa2 = @noa1 
 		set @recno = @recno + 1 
 		set @idno2 = @idno2 + 1 
