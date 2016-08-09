@@ -441,16 +441,20 @@
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-							if(q_cur==1 || q_cur==2)
+							if(q_cur==1 || q_cur==2){
 								$('#txtParaf_'+b_seq).val($('#combParaf_'+b_seq).find("option:selected").text());
+								createImg(b_seq);
+							}
 						});
 						
 						$('#combParag_' + j).change(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-							if(q_cur==1 || q_cur==2)
+							if(q_cur==1 || q_cur==2){
 								$('#txtParag_'+b_seq).val($('#combParag_'+b_seq).find("option:selected").text());
+								createImg(b_seq);
+							}
 						});
 						
 						$('#checkMins_'+j).click(function() {
@@ -543,6 +547,14 @@
                     		var t_d=dec($('#txtParad_'+n).val());
                     		var t_e=dec($('#txtParae_'+n).val());
                     		$('#txtLengthb_'+n).val(q_add(q_add(q_add(q_add(t_a,t_b),t_c),t_d),t_e));
+                    	});
+                    	$('#txtParaf_'+j).change(function(e){
+                    		var n = $(this).attr('id').replace('txtParae_', '');
+                    		createImg(n);
+                    	});
+                    	$('#txtParag_'+j).change(function(e){
+                    		var n = $(this).attr('id').replace('txtParae_', '');
+                    		createImg(n);
                     	});
                         $('#txtMechno_' + j).bind('contextmenu', function(e) {
                             /*滑鼠右鍵*/
