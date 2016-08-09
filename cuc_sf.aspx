@@ -44,6 +44,7 @@
                 q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
                 q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
+				q_gt('adpro', "where=^^1=1 and isnull(product,'')!='' ^^", 0, 0, 0, "bbsparafg");
             });
 
             //////////////////   end Ready
@@ -113,8 +114,8 @@
 					if($(this).val()=='形狀顯示'){
 						$(this).val('形狀關閉')	
 						$('.pic').show();
-						$('#tbbs').css("width","2350px");
-						$('.dbbs').css("width","2350px");
+						$('#tbbs').css("width","2550px");
+						$('.dbbs').css("width","2550px");
 					}else{
 						$(this).val('形狀顯示')
 						$('.pic').hide();
@@ -143,8 +144,8 @@
                 		if($('#btnPic').val()=='形狀顯示'){
 							$('#btnPic').val('形狀關閉')	
 							$('.pic').show();
-							$('#tbbs').css("width","2350px");
-							$('.dbbs').css("width","2350px");
+							$('#tbbs').css("width","2550px");
+							$('.dbbs').css("width","2550px");
 						}
                 	break;
                 }
@@ -231,6 +232,15 @@
 						}
 						q_cmbParse("combClass", t_class,'s');
 						break;
+					case 'bbsparafg':
+						var as = _q_appendData("adpro", "", true);
+						var t_product='@';
+						for ( i = 0; i < as.length; i++) {
+							t_product+=","+as[i].product;
+						}
+						q_cmbParse("combParaf", t_product,'s');
+						q_cmbParse("combParag", t_product,'s');
+						break;	
                     case q_name:
                         if (q_cur == 4)
                             q_Seek_gtPost();
@@ -427,6 +437,22 @@
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
 						});
 						
+						$('#combParaf_' + j).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2)
+								$('#txtParaf_'+b_seq).val($('#combParaf_'+b_seq).find("option:selected").text());
+						});
+						
+						$('#combParag_' + j).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2)
+								$('#txtParag_'+b_seq).val($('#combParag_'+b_seq).find("option:selected").text());
+						});
+						
 						$('#checkMins_'+j).click(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
@@ -439,6 +465,7 @@
 							}
 							weighttotal();
 						});
+						
 						$('#checkWaste_'+j).click(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
@@ -461,10 +488,11 @@
                             if($('#btnPic').val()=='形狀顯示'){
 								$('#btnPic').val('形狀關閉')	
 								$('.pic').show();
-								$('#tbbs').css("width","2350px");
-								$('.dbbs').css("width","2350px");
+								$('#tbbs').css("width","2550px");
+								$('.dbbs').css("width","2550px");
 							}
                         });
+                        
                         $('#txtParaa_'+j).change(function(e){
                     		var n = $(this).attr('id').replace('txtParaa_', '');
                     		createImg(n);
@@ -550,11 +578,13 @@
                 $('#vewCust').text('客戶');
                 $('#lblSize2_s').text('內部工令');
                 $('#lblStyle_s').text('加工型式');
-				$('#lblWeight1_s').text('參數A');
-				$('#lblWeight2_s').text('參數B');
-				$('#lblWeight3_s').text('參數C');
-				$('#lblWeight4_s').text('參數D');
-				$('#lblWeight5_s').text('參數E');
+				$('#lblParaa_s').text('參數A');
+				$('#lblParab_s').text('參數B');
+				$('#lblParac_s').text('參數C');
+				$('#lblParad_s').text('參數D');
+				$('#lblParae_s').text('參數E');
+				$('#lblParaf_s').text('續接參數F');
+				$('#lblParag_s').text('續接參數G');
 				$('#lblPic_s').text('形狀');
 				if($('#btnPic').val()=='形狀顯示'){
 					$('.pic').hide();
@@ -562,8 +592,8 @@
 					$('.dbbs').css("width","1650px");
 				}else{
 					$('.pic').show();
-					$('#tbbs').css("width","2350px");
-					$('.dbbs').css("width","2350px");
+					$('#tbbs').css("width","2550px");
+					$('.dbbs').css("width","2550px");
 				}
 				
 				//1050802複製功能
@@ -724,8 +754,8 @@
                 if($('#btnPic').val()=='形狀顯示'){
 					$('#btnPic').val('形狀關閉')	
 					$('.pic').show();
-					$('#tbbs').css("width","2350px");
-					$('.dbbs').css("width","2350px");
+					$('#tbbs').css("width","2550px");
+					$('.dbbs').css("width","2550px");
 				}
             }
 
@@ -741,8 +771,8 @@
 				if($('#btnPic').val()=='形狀顯示'){
 					$('#btnPic').val('形狀關閉')	
 					$('.pic').show();
-					$('#tbbs').css("width","2350px");
-					$('.dbbs').css("width","2350px");
+					$('#tbbs').css("width","2550px");
+					$('.dbbs').css("width","2550px");
 				}
             }
 
@@ -1102,11 +1132,13 @@
 							<input class="btn"  id="btnSizeCopy" type="button" value='≡' style="font-weight: bold;"  />
 						</td>
 						<td style="width:120px;"><a id='lblStyle_s'> </a></td>
-						<td style="width:100px;display: none;" class="pic"><a id='lblWeight1_s'> </a></td>
-						<td style="width:100px;display: none;" class="pic"><a id='lblWeight2_s'> </a></td>
-						<td style="width:100px;display: none;" class="pic"><a id='lblWeight3_s'> </a></td>
-						<td style="width:100px;display: none;" class="pic"><a id='lblWeight4_s'> </a></td>
-						<td style="width:100px;display: none;" class="pic"><a id='lblWeight5_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblParaa_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblParab_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblParac_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblParad_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblParae_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblParaf_s'> </a></td>
+						<td style="width:100px;display: none;" class="pic"><a id='lblParag_s'> </a></td>
 						<td style="width:200px;" class="pic"><a id='lblPic_s'> </a></td>
 						<td style="width:85px;"><a id='lblLengthb_s'> </a></td>
 						<!--<td style="width:55px;"><a id='lblUnit_s'> </a></td>-->
@@ -1161,6 +1193,14 @@
 						<td class="pic" style="display: none;"><input id="txtParac.*" type="text" class="txt num c1" /></td>
 						<td class="pic" style="display: none;"><input id="txtParad.*" type="text" class="txt num c1" /></td>
 						<td class="pic" style="display: none;"><input id="txtParae.*" type="text" class="txt num c1" /></td>
+						<td class="pic" style="display: none;">
+							<input id="txtParaf.*" type="text" class="txt c1" style="width: 70%;" />
+							<select id="combParaf.*" class="txt" style="width: 20px;"> </select>
+						</td>
+						<td class="pic" style="display: none;">
+							<input id="txtParag.*" type="text" class="txt c1" style="width: 70%;"/>
+							<select id="combParag.*" class="txt" style="width: 20px;"> </select>
+						</td>
 						<td class="pic">
 							<canvas id="canvas.*" width="150" height="50"> </canvas>
 							<img id="imgPic.*" src="" style="display:none;"/>
