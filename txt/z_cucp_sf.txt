@@ -90,9 +90,9 @@ end
 
 select
 dbo.getComma(lengthb,2) lengthb,
-dbo.getComma(lengthc,2) lengthc,
-dbo.getComma(mount,2) mount,
-dbo.getComma(weight,2) weight
+dbo.getComma(lengthc,0) lengthc,
+dbo.getComma(mount,0) mount,
+dbo.getComma(weight,0) weight
 ,case when len(isnull(imgdata,''))>0 then 
 			'<img src="'+imgdata+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' 
 			else '<span style="display:block'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end image1
