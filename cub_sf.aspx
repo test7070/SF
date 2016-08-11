@@ -77,7 +77,7 @@
                 document.title='加工入庫/領料作業';
                 
                 q_cmbParse("combMechno2",'1@1剪,2@2剪,3@3剪,7@7辦公室');
-                q_cmbParse("cmbItype",'1@裁剪,2@成型');
+                q_cmbParse("cmbItype",'1@裁剪,2@成型,3@續接');
                 
                 if(r_userno.toUpperCase()=='B01'){
 					$('#combMechno2').val('1');

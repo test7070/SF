@@ -507,6 +507,19 @@
 							weighttotal();
 						});
 						
+						$('#checkHours_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								if($('#checkHours_'+b_seq).prop('checked'))
+									$('#txtHours_'+b_seq).val(1);
+								else
+									$('#txtHours_'+b_seq).val(0);
+							}
+							weighttotal();
+						});
+						
 						$('#txtPicno_' + j).bind('contextmenu', function(e) {
                             /*滑鼠右鍵*/
                             e.preventDefault();
@@ -609,6 +622,7 @@
                 $('#lblWeight_s').text('重量(KG)');
                 $('#lblMemo_s').text('備註 (標籤)');
                 $('#lblMins_s').text('裁剪完工');
+                $('#lblHours_s').text('續接完工');
                 $('#lblWaste_s').text('成型完工');
                 $('#vewNoa').text('案號');
                 $('#vewCust').text('客戶');
@@ -929,9 +943,11 @@
 				for (var i = 0; i < q_bbsCount; i++) {
 					if(q_cur==1 || q_cur==2){
 						$('#checkMins_'+i).removeAttr('disabled');
+						$('#checkHours_'+i).removeAttr('disabled');
 						$('#checkWaste_'+i).removeAttr('disabled');
 					}else{
 						$('#checkMins_'+i).attr('disabled', 'disabled');
+						$('#checkHours_'+i).attr('disabled', 'disabled');
 						$('#checkWaste_'+i).attr('disabled', 'disabled');
 					}
 					if($('#txtMins_'+i).val()==0){
@@ -943,6 +959,11 @@
 						$('#checkWaste_'+i).prop('checked',false);
 					}else{
 						$('#checkWaste_'+i).prop('checked',true);
+					}
+					if($('#txtHours_'+i).val()==0){
+						$('#checkHours_'+i).prop('checked',false);
+					}else{
+						$('#checkHours_'+i).prop('checked',true);
 					}
 				}
 			}
@@ -1199,6 +1220,7 @@
 						<td style="width:150px;"><a id='lblMech_s'>剪裁機台</a></td>
 						<td style="width:150px;"><a id='lblMech2_s'>成型機台</a></td>
 						<td style="width:40px;"><a id='lblMins_s'> </a></td>
+						<td style="width:40px;"><a id='lblHours_s'> </a></td>
 						<td style="width:40px;"><a id='lblWaste_s'> </a></td>
 					</tr>
 					<tr  style='background:#cad3ff;'>
@@ -1271,6 +1293,10 @@
 						<td>
 							<input id="checkMins.*" type="checkbox"/>
 							<input id="txtMins.*" type="hidden"/>
+						</td>
+						<td>
+							<input id="checkHours.*" type="checkbox"/>
+							<input id="txtHours.*" type="hidden"/>
 						</td>
 						<td>
 							<input id="checkWaste.*" type="checkbox"/>

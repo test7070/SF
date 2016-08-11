@@ -228,8 +228,31 @@ waste:--waste
 	set @accy=isnull((select accy from view_cucs where noa=@noa and noq=@noq),@accy)
 		
 	EXEC("
-		update cucs"+@accy+" set cubno='"+@userno+"'+'##'+'"+@namea+"'+'##'+'"+@now_datetime+"'
+		update cucs"+@accy+" set cubno=cubno+'@@'+'"+@userno+"'+'##'+'"+@namea+"'+'##'+'"+@now_datetime+"'
 		,waste=1
+		where noa='"+@noa+"' and noq='"+@noq+"'
+	")
+;
+-------------------------------------------------------------------------------------------------------------------------------
+hours:--hours
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max) = ''
+	declare @accy nvarchar(max) = [1]
+	declare @noa nvarchar(max) = [2]
+	declare @noq nvarchar(max) = [3]
+	declare @userno nvarchar(max) = [4]
+	declare @namea nvarchar(max) = [5]
+	
+	--鎖定時間
+	declare @now_datetime nvarchar(20)
+	set @now_datetime=CONVERT (VARCHAR(20), GETDATE(),20 )
+	select @now_datetime
+	
+	set @accy=isnull((select accy from view_cucs where noa=@noa and noq=@noq),@accy)
+		
+	EXEC("
+		update cucs"+@accy+" set cubno=cubno+'@@'+'"+@userno+"'+'##'+'"+@namea+"'+'##'+'"+@now_datetime+"'
+		,hours=1
 		where noa='"+@noa+"' and noq='"+@noq+"'
 	")
 ;
@@ -343,7 +366,7 @@ cucstocub:--cucstocub
 	declare @xmount nvarchar(max) = [9]
 	declare @xcount nvarchar(max) = [10]
 	declare @xweight nvarchar(max) = [11]
-	declare @itype nvarchar(50) = [12] --1 裁剪 2成型
+	declare @itype nvarchar(50) = [12] --1 裁剪 2成型 3續接
 	
 	declare @mech nvarchar(max) = isnull((select mech from mech where noa=@mechno),'')
 	declare @cubno nvarchar(100) --新加工單號
@@ -410,7 +433,7 @@ cucstocub:--cucstocub
 				from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
 			")
 		end
-		else
+		else --直料和續接 
 		begin
 			exec("
 				insert cubs"+@accy+" (noa,noq,custno,comp,product,ucolor,spec,size,lengthb,class
@@ -472,7 +495,7 @@ declare @uno nvarchar(MAX) = [2]
 declare @mechno nvarchar(max) = case when '#non'=[3] then '' else [3] end
 declare @userno nvarchar(max) = [4]
 declare @namea nvarchar(max) = [5]
-declare @itype nvarchar(50) = [6] --1 裁剪 2成型
+declare @itype nvarchar(50) = [6] --1 裁剪 2成型 3續接
 declare @cmd nvarchar(max) = ''
 
 set @uno=REPLACE(@uno,'#',',')
@@ -956,6 +979,7 @@ cucutocubs:--cucutocubs
 	declare @namea nvarchar(max) = [6]
 	--cuct資料
 	declare @xcucu nvarchar(max) = [7]
+	declare @itype nvarchar(50) = [8] --1 裁剪 2成型 3續接
 	if(@xcucu='#non')
 	begin
 		set @xcucu=''
@@ -1022,7 +1046,7 @@ cucutocubs:--cucutocubs
 		--bbm
 		exec("
 			insert cub"+@accy+" (noa,datea,mechno,mech,memo,worker,kind,itype)
-			select '"+@cubno+"','"+@datea+"','"+@mechno+"','"+@mech+"','"+@memo+"','"+@namea+"','"+@now_datetime+"','1' 
+			select '"+@cubno+"','"+@datea+"','"+@mechno+"','"+@mech+"','"+@memo+"','"+@namea+"','"+@now_datetime+"','"+@itype+"' 
 		")
 		
 		--bbs
