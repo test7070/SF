@@ -50,7 +50,7 @@
 							new_where=new_where+" or (a.noa+'-'+b.noq='"+$('#cucs_noa'+i).text()+"-"+$('#cucs_noq'+i).text()+"' )";
 					}
 					var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-					var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+					var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 					q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'importcucs', r_accy);
 					Lock();
 				}
@@ -75,7 +75,7 @@
 				
 				//載入案號 資料 --先用 加工名稱排除 板料 和 直料 //編號目前不知道
                 var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-                var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+                var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 				q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
 				
 				//q_cmbParse("combSize", ',#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16');
@@ -152,7 +152,7 @@
 	                    }
 	                    
 	                    t_where="swhere"+t_where+" order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-	                    var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+	                    var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 	                    q_box("cucs_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";"+t_where+t_where1+" ;" + r_accy, 'cucs_sf_b', "95%", "95%", '加工單');
 	                    
 	                    /*Lock();
@@ -192,7 +192,7 @@
                     });*/
                 	//初始化cucs
                 	var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='')  and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
-                	var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+                	var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 					q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
                 });
                 
@@ -224,14 +224,14 @@
 						if(t_err.length>0){
 							if(confirm(t_err)){
 								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'tocub', r_accy);
 								Lock();
 							}
 						}else{
 							if(confirm("確定是否要入庫?")){//確定轉至加工單
 								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'tocub', r_accy);
 								Lock();
 							}
@@ -650,36 +650,36 @@
 				switch (t_name) {
 					case 'init':
 						//載入bbs表頭
-						var string = "<table id='cucs_table' style='width:1890px;word-break:break-all;'>";
+						var string = "<table id='cucs_table' style='width:1500px;word-break:break-all;'>";
 						string+='<tr id="cucs_header">';
 						string+='<td id="cucs_chk" align="center" style="width:30px; color:black;">鎖定</td>';
 						string+='<td id="cucs_cubno" align="center" style="width:20px; color:black;display:none;">鎖定人</td>'
-						string+='<td id="cucs_noa" align="center" style="width:110px; color:black;">案號</td>'
+						string+='<td id="cucs_noa" align="center" style="width:70px; color:black;">案號</td>'
 						string+='<td id="cucs_noq" align="center" style="width:40px; color:black;">案序</td>'
 						string+='<td id="cucs_ucolor" title="類別" align="center" style="width:120px; color:black;display:none;">類別</td>';
 						string+='<td id="cucs_product" title="品名" align="center" style="width:70px; color:black;display:none;">品名</td>';
 						string+='<td id="cucs_picno" title="型狀" align="center" style="width:50px; color:black;display:none;">型狀</td>';
-						string+='<td id="cucs_picname" title="型狀名稱" align="center" style="width:80px; color:black;">加工名稱</td>';
-						string+='<td id="cucs_paraf" title="續接材料1" align="center" style="width:70px; color:black;">續接<BR>材料1</td>';
-						string+='<td id="cucs_parag" title="續接材料2" align="center" style="width:70px; color:black;">續接<BR>材料2</td>';
-						string+='<td id="cucs_pic" title="型狀" align="center" style="width:170px; color:black;">型狀</td>';
-						string+='<td id="cucs_spec" title="材質" align="center" style="width:90px; color:black;">材質</td>';
-						string+='<td id="cucs_size" title="號數" align="center" style="width:60px; color:black;">號數</td>';
-						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:60px; color:black;">米數</td>';
-						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:70px; color:black;" class="co1">訂單件數</td>';
-						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:70px; color:black;" class="co1">訂單支數</td>';
-						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:80px; color:black;" class="co1">訂單重量</td>';
+						string+='<td id="cucs_picname" title="型狀名稱" align="center" style="width:80px; color:black;">型狀名稱</td>';
+						string+='<td id="cucs_paraf" title="續接材料1" align="center" style="width:50px; color:black;">續接<BR>材料1</td>';
+						string+='<td id="cucs_parag" title="續接材料2" align="center" style="width:50px; color:black;">續接<BR>材料2</td>';
+						string+='<td id="cucs_pic" title="續接工作圖" align="center" style="width:170px; color:black;">續接工作圖</td>';
+						string+='<td id="cucs_spec" title="材質" align="center" style="width:80px; color:black;">材質</td>';
+						string+='<td id="cucs_size" title="號數" align="center" style="width:50px; color:black;">號數</td>';
+						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:50px; color:black;">米數</td>';
+						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:50px; color:black;" class="co1">訂單件數</td>';
+						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:50px; color:black;" class="co1">訂單支數</td>';
+						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:50px; color:black;" class="co1">訂單重量</td>';
 						string+='<td id="cucs_emount" title="未完工件數" align="center" style="width:60px; color:black;display:none;" class="co2">未完工件數</td>';
 						string+='<td id="cucs_elengthc" title="未完工支數" align="center" style="width:60px; color:black;display:none;" class="co2">未完工支數</td>';
 						string+='<td id="cucs_eweight" title="未完工重量" align="center" style="width:60px; color:black;display:none;" class="co2">未完工重量</td>';
-						string+='<td id="cucs_cubmount" title="已完工件數" align="center" style="width:90px; color:black;" class="co2">已完工件數</td>';
-						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:90px; color:black;" class="co2">已完工支數</td>';
-						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:90px; color:black;" class="co2">已完工重量</td>';
-						string+='<td id="cucs_xmount" title="件數" align="center" style="width:70px; color:black;" class="co3">件數</td>';
-						string+='<td id="cucs_xcount" title="支數" align="center" style="width:70px; color:black;" class="co3">支數<BR><input id="btnAutoxcount" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
-						string+='<td id="cucs_xweight" title="重量" align="center" style="width:80px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
+						string+='<td id="cucs_cubmount" title="已完工件數" align="center" style="width:60px; color:black;" class="co2">已完工件數</td>';
+						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:60px; color:black;" class="co2">已完工支數</td>';
+						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:60px; color:black;" class="co2">已完工重量</td>';
+						string+='<td id="cucs_xmount" title="件數" align="center" style="width:50px; color:black;" class="co3">件數</td>';
+						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;" class="co3">支數<BR><input id="btnAutoxcount" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
+						string+='<td id="cucs_xweight" title="重量" align="center" style="width:60px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
 						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;display:none;">廠牌</td>';
-						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:110px; color:black;">備註(標籤)</td>';
+						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:100px; color:black;">備註(標籤)</td>';
 						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;">工令</td>';
 						string+='<td id="cucs_custno" title="客戶編號" align="center" style="width:75px; color:black;display:none;">客戶編號</td>';
 						string+='<td id="cucs_cust" title="客戶名稱" align="center" style="width:75px; color:black;">客戶名稱</td>';
@@ -694,36 +694,36 @@
 						
 						//浮動表頭
 						var string = "<div id='cucs_float' style='position:absolute;display:block;left:0px; top:0px;'>";
-						string+="<table id='cucs_table2' style='width:1890px;border-bottom: none;'>";
+						string+="<table id='cucs_table2' style='width:1500px;border-bottom: none;'>";
 						string+='<tr id="cucs_header">';
 						string+='<td id="cucs_chk" align="center" style="width:30px; color:black;">鎖定</td>';
 						string+='<td id="cucs_cubno" align="center" style="width:20px; color:black;display:none;">鎖定人</td>'
-						string+='<td id="cucs_noa" align="center" style="width:110px; color:black;">案號</td>'
+						string+='<td id="cucs_noa" align="center" style="width:70px; color:black;">案號</td>'
 						string+='<td id="cucs_noq" align="center" style="width:40px; color:black;">案序</td>'
 						string+='<td id="cucs_ucolor" title="類別" align="center" style="width:120px; color:black;display:none;">類別</td>';
 						string+='<td id="cucs_product" title="品名" align="center" style="width:70px; color:black;display:none;">品名</td>';
 						string+='<td id="cucs_picno" title="型狀" align="center" style="width:50px; color:black;display:none;">型狀</td>';
 						string+='<td id="cucs_picname" title="型狀名稱" align="center" style="width:80px; color:black;">型狀名稱</td>';
-						string+='<td id="cucs_paraf" title="續接材料1" align="center" style="width:70px; color:black;">續接<BR>材料1</td>';
-						string+='<td id="cucs_parag" title="續接材料2" align="center" style="width:70px; color:black;">續接<BR>材料2</td>';
-						string+='<td id="cucs_pic" title="型狀" align="center" style="width:170px; color:black;">型狀</td>';
-						string+='<td id="cucs_spec" title="材質" align="center" style="width:90px; color:black;">材質</td>';
-						string+='<td id="cucs_size" title="號數" align="center" style="width:60px; color:black;">號數</td>';
-						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:60px; color:black;">米數</td>';
-						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:70px; color:black;" class="co1">訂單件數</td>';
-						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:70px; color:black;" class="co1">訂單支數</td>';
-						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:80px; color:black;" class="co1">訂單重量</td>';
+						string+='<td id="cucs_paraf" title="續接材料1" align="center" style="width:50px; color:black;">續接<BR>材料1</td>';
+						string+='<td id="cucs_parag" title="續接材料2" align="center" style="width:50px; color:black;">續接<BR>材料2</td>';
+						string+='<td id="cucs_pic" title="續接工作圖" align="center" style="width:170px; color:black;">續接工作圖</td>';
+						string+='<td id="cucs_spec" title="材質" align="center" style="width:80px; color:black;">材質</td>';
+						string+='<td id="cucs_size" title="號數" align="center" style="width:50px; color:black;">號數</td>';
+						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:50px; color:black;">米數</td>';
+						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:50px; color:black;" class="co1">訂單件數</td>';
+						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:50px; color:black;" class="co1">訂單支數</td>';
+						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:50px; color:black;" class="co1">訂單重量</td>';
 						string+='<td id="cucs_emount" title="未完工件數" align="center" style="width:60px; color:black;display:none;" class="co2">未完工件數</td>';
 						string+='<td id="cucs_elengthc" title="未完工支數" align="center" style="width:60px; color:black;display:none;" class="co2">未完工支數</td>';
 						string+='<td id="cucs_eweight" title="未完工重量" align="center" style="width:60px; color:black;display:none;" class="co2">未完工重量</td>';
-						string+='<td id="cucs_cubmount" title="已完工件數" align="center" style="width:90px; color:black;" class="co2">已完工件數</td>';
-						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:90px; color:black;" class="co2">已完工支數</td>';
-						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:90px; color:black;" class="co2">已完工重量</td>';
-						string+='<td id="cucs_xmount" title="件數" align="center" style="width:70px; color:black;" class="co3">件數</td>';
-						string+='<td id="cucs_xcount" title="支數" align="center" style="width:70px; color:black;" class="co3">支數<BR><input id="btnAutoxcount2" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
-						string+='<td id="cucs_xweight" title="重量" align="center" style="width:80px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
+						string+='<td id="cucs_cubmount" title="已完工件數" align="center" style="width:60px; color:black;" class="co2">已完工件數</td>';
+						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:60px; color:black;" class="co2">已完工支數</td>';
+						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:60px; color:black;" class="co2">已完工重量</td>';
+						string+='<td id="cucs_xmount" title="件數" align="center" style="width:50px; color:black;" class="co3">件數</td>';
+						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;" class="co3">支數<BR><input id="btnAutoxcount2" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
+						string+='<td id="cucs_xweight" title="重量" align="center" style="width:60px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
 						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;display:none;">廠牌</td>';
-						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:110px; color:black;">備註(標籤)</td>';
+						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:100px; color:black;">備註(標籤)</td>';
 						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;">工令</td>';
 						string+='<td id="cucs_custno" title="客戶編號" align="center" style="width:75px; color:black;display:none;">客戶編號</td>';
 						string+='<td id="cucs_cust" title="客戶名稱" align="center" style="width:75px; color:black;">客戶名稱</td>';
@@ -1110,7 +1110,7 @@
 							}
 							//Lock();
 							var t_where="where=^^  1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ^^";
-							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 							//判斷是否能被鎖定或解除
 							if($(this).prop('checked')){
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'getcanlock_'+n, r_accy);
@@ -1193,7 +1193,7 @@
 								&& !$('#cucs_chk'+i).prop('disabled')){ //沒有被核取過的資料 且目前沒被鎖定過
 									$('#cucs_chk'+i).prop('checked',true).parent().parent().find('td').css('background', 'darkturquoise');
 									var t_where="where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ^^";
-									var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+									var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 									q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'getcanlock_'+i, r_accy);
 									//$('#cucs_chk'+i).click();
 									//$('#cucs_chk'+i).prop('checked',true).parent().parent().find('td').css('background', 'darkturquoise');
@@ -2013,7 +2013,7 @@
 									im_where=im_where+" or (a.noa+'-'+b.noq='"+b_ret[i].noa+"-"+b_ret[i].noq+"' )";
 							}
 							var t_where = "where=^^ 1=1 and ("+im_where+") and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
 							q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'importcucs', r_accy);
 							if(chk_cucs.length==0){
 								intervalupdate = setInterval(";");
@@ -2373,6 +2373,7 @@
 		<div id='q_acDiv'> </div>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<input type='button' id='btnAuthority' name='btnAuthority' style='font-size:16px;' value='權限'/>
+		<a style="color: red;font-size: 20px;font-weight: bolder;">現場續接器作業</a>
 		<a id='logout' class="lbl" style="color: coral;cursor: pointer;font-weight: bolder;float: right;">登出</a>
 		<BR>
 		<a class="lbl">加工日</a>&nbsp;<input id="textDatea"  type="text" class="txt" style="width: 100px;"/>&nbsp;

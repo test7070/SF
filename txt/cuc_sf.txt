@@ -435,17 +435,34 @@ cucstocub:--cucstocub
 		end
 		else --直料和續接 
 		begin
-			exec("
-				insert cubs"+@accy+" (noa,noq,custno,comp,product,ucolor,spec,size,lengthb,class
-				,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store)
-				select '"+@cubno+"',right('000'+cast(ROW_NUMBER() over(order by a.noa,a.noq) as nvarchar(50)),3)
-				,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
-				,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
-				(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
-				,case when isnull(c.picname,'')!='直料' and isnull(c.picname,'')!='板料' and isnull(c.picname,'')!='' then '03' else '02' end
-				,case when isnull(c.picname,'')!='直料' and isnull(c.picname,'')!='板料' and isnull(c.picname,'')!='' then '半成品倉' else '成品倉' end
-				from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
-			")
+			if(@itype='1')--直料
+			begin
+				exec("
+					insert cubs"+@accy+" (noa,noq,custno,comp,product,ucolor,spec,size,lengthb,class
+					,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store)
+					select '"+@cubno+"',right('000'+cast(ROW_NUMBER() over(order by a.noa,a.noq) as nvarchar(50)),3)
+					,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
+					,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
+					(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
+					,case when (isnull(c.picname,'')!='直料' and isnull(c.picname,'')!='板料' and isnull(c.picname,'')!='') or (isnull(c.paraf,'')!='' or isnull(c.parag,'')!='') then '03' else '02' end
+					,case when (isnull(c.picname,'')!='直料' and isnull(c.picname,'')!='板料' and isnull(c.picname,'')!='') or (isnull(c.paraf,'')!='' or isnull(c.parag,'')!='') then '半成品倉' else '成品倉' end
+					from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
+				")
+			end
+			else --續接
+			begin
+				exec("
+					insert cubs"+@accy+" (noa,noq,custno,comp,product,ucolor,spec,size,lengthb,class
+					,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store)
+					select '"+@cubno+"',right('000'+cast(ROW_NUMBER() over(order by a.noa,a.noq) as nvarchar(50)),3)
+					,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
+					,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
+					(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
+					,case when isnull(c.picname,'')!='直料' and isnull(c.picname,'')!='板料' and isnull(c.picname,'')!='' then '03' else '02' end
+					,case when isnull(c.picname,'')!='直料' and isnull(c.picname,'')!='板料' and isnull(c.picname,'')!='' then '半成品倉' else '成品倉' end
+					from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
+				")
+			end
 		end
 	
 		insert dno (tablea,noa,usera)

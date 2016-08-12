@@ -650,7 +650,7 @@
 				switch (t_name) {
 					case 'init':
 						//載入bbs表頭
-						var string = "<table id='cucs_table' style='width:1720px;word-break:break-all;'>";
+						var string = "<table id='cucs_table' style='width:1450px;word-break:break-all;'>";
 						string+='<tr id="cucs_header">';
 						string+='<td id="cucs_chk" align="center" style="width:30px; color:black;">鎖定</td>';
 						string+='<td id="cucs_cubno" align="center" style="width:20px; color:black;display:none;">鎖定人</td>'
@@ -664,21 +664,21 @@
 						string+='<td id="cucs_spec" title="材質" align="center" style="width:90px; color:black;">材質</td>';
 						string+='<td id="cucs_size" title="號數" align="center" style="width:60px; color:black;">號數</td>';
 						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:60px; color:black;">米數</td>';
-						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:70px; color:black;" class="co1">訂單件數</td>';
-						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:70px; color:black;" class="co1">訂單支數</td>';
-						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:80px; color:black;" class="co1">訂單重量</td>';
+						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:50px; color:black;" class="co1">訂單件數</td>';
+						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:50px; color:black;" class="co1">訂單支數</td>';
+						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:50px; color:black;" class="co1">訂單重量</td>';
 						string+='<td id="cucs_emount" title="未完工件數" align="center" style="width:60px; color:black;display:none;" class="co2">未完工件數</td>';
 						string+='<td id="cucs_elengthc" title="未完工支數" align="center" style="width:60px; color:black;display:none;" class="co2">未完工支數</td>';
 						string+='<td id="cucs_eweight" title="未完工重量" align="center" style="width:60px; color:black;display:none;" class="co2">未完工重量</td>';
-						string+='<td id="cucs_cubmount" title="已完工件數" align="center" style="width:90px; color:black;" class="co2">已完工件數</td>';
-						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:90px; color:black;" class="co2">已完工支數</td>';
-						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:90px; color:black;" class="co2">已完工重量</td>';
-						string+='<td id="cucs_xmount" title="件數" align="center" style="width:70px; color:black;" class="co3">件數</td>';
-						string+='<td id="cucs_xcount" title="支數" align="center" style="width:70px; color:black;" class="co3">支數<BR><input id="btnAutoxcount" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
-						string+='<td id="cucs_xweight" title="重量" align="center" style="width:80px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
+						string+='<td id="cucs_cubmount" title="已完工件數" align="center" style="width:60px; color:black;" class="co2">已完工件數</td>';
+						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:60px; color:black;" class="co2">已完工支數</td>';
+						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:60px; color:black;" class="co2">已完工重量</td>';
+						string+='<td id="cucs_xmount" title="件數" align="center" style="width:50px; color:black;" class="co3">件數</td>';
+						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;" class="co3">支數<BR><input id="btnAutoxcount" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
+						string+='<td id="cucs_xweight" title="重量" align="center" style="width:60px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
 						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;display:none;">廠牌</td>';
 						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:110px; color:black;">備註(標籤)</td>';
-						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;>工令</td>';
+						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;">工令</td>';
 						string+='<td id="cucs_custno" title="客戶編號" align="center" style="width:75px; color:black;display:none;">客戶編號</td>';
 						string+='<td id="cucs_cust" title="客戶名稱" align="center" style="width:75px; color:black;">客戶名稱</td>';
 						string+='<td id="cucs_ordeno" title="訂單號碼" align="center" style="width:90px; color:black;display:none;">訂單號碼</td>';
@@ -691,7 +691,7 @@
 						
 						//浮動表頭
 						var string = "<div id='cucs_float' style='position:absolute;display:block;left:0px; top:0px;'>";
-						string+="<table id='cucs_table2' style='width:1720px;border-bottom: none;'>";
+						string+="<table id='cucs_table2' style='width:1450px;border-bottom: none;'>";
 						string+='<tr id="cucs_header">';
 						string+='<td id="cucs_chk" align="center" style="width:30px; color:black;">鎖定</td>';
 						string+='<td id="cucs_cubno" align="center" style="width:20px; color:black;display:none;">鎖定人</td>'
@@ -705,18 +705,18 @@
 						string+='<td id="cucs_spec" title="材質" align="center" style="width:90px; color:black;">材質</td>';
 						string+='<td id="cucs_size" title="號數" align="center" style="width:60px; color:black;">號數</td>';
 						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:60px; color:black;">米數</td>';
-						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:70px; color:black;" class="co1">訂單件數</td>';
-						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:70px; color:black;" class="co1">訂單支數</td>';
-						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:80px; color:black;" class="co1">訂單重量</td>';
+						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:50px; color:black;" class="co1">訂單件數</td>';
+						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:50px; color:black;" class="co1">訂單支數</td>';
+						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:50px; color:black;" class="co1">訂單重量</td>';
 						string+='<td id="cucs_emount" title="未完工件數" align="center" style="width:60px; color:black;display:none;" class="co2">未完工件數</td>';
 						string+='<td id="cucs_elengthc" title="未完工支數" align="center" style="width:60px; color:black;display:none;" class="co2">未完工支數</td>';
 						string+='<td id="cucs_eweight" title="未完工重量" align="center" style="width:60px; color:black;display:none;" class="co2">未完工重量</td>';
-						string+='<td id="cucs_cubmount" title="已完工件數" align="center" style="width:90px; color:black;" class="co2">已完工件數</td>';
-						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:90px; color:black;" class="co2">已完工支數</td>';
-						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:90px; color:black;" class="co2">已完工重量</td>';
-						string+='<td id="cucs_xmount" title="件數" align="center" style="width:70px; color:black;" class="co3">件數</td>';
-						string+='<td id="cucs_xcount" title="支數" align="center" style="width:70px; color:black;" class="co3">支數<BR><input id="btnAutoxcount2" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
-						string+='<td id="cucs_xweight" title="重量" align="center" style="width:80px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
+						string+='<td id="cucs_cubmount" title="已完工件數" align="center" style="width:60px; color:black;" class="co2">已完工件數</td>';
+						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:60px; color:black;" class="co2">已完工支數</td>';
+						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:60px; color:black;" class="co2">已完工重量</td>';
+						string+='<td id="cucs_xmount" title="件數" align="center" style="width:50px; color:black;" class="co3">件數</td>';
+						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;" class="co3">支數<BR><input id="btnAutoxcount2" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
+						string+='<td id="cucs_xweight" title="重量" align="center" style="width:60px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
 						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;display:none;">廠牌</td>';
 						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:110px; color:black;">備註(標籤)</td>';
 						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;">工令</td>';
@@ -2348,6 +2348,7 @@
 		<div id='q_acDiv'> </div>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<input type='button' id='btnAuthority' name='btnAuthority' style='font-size:16px;' value='權限'/>
+		<a style="color: red;font-size: 20px;font-weight: bolder;">現場成型作業</a>
 		<a id='logout' class="lbl" style="color: coral;cursor: pointer;font-weight: bolder;float: right;">登出</a>
 		<BR>
 		<a class="lbl">加工日</a>&nbsp;<input id="textDatea"  type="text" class="txt" style="width: 100px;"/>&nbsp;
