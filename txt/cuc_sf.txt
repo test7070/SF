@@ -226,10 +226,11 @@ waste:--waste
 	select @now_datetime
 	
 	set @accy=isnull((select accy from view_cucs where noa=@noa and noq=@noq),@accy)
-		
+	
+	--105/08/15 如果成型完成表示裁剪和續接也完工
 	EXEC("
 		update cucs"+@accy+" set cubno=cubno+'@@'+'"+@userno+"'+'##'+'"+@namea+"'+'##'+'"+@now_datetime+"'
-		,waste=1
+		,waste=1,mins=1,hours=case when isnull(paraf,'')!='' or isnull(parag,'')!='' then 1 else hours end
 		where noa='"+@noa+"' and noq='"+@noq+"'
 	")
 ;
@@ -249,10 +250,12 @@ hours:--hours
 	select @now_datetime
 	
 	set @accy=isnull((select accy from view_cucs where noa=@noa and noq=@noq),@accy)
-		
+	
+	--105/08/15 如果續接完成表示裁剪也完工
+	
 	EXEC("
 		update cucs"+@accy+" set cubno=cubno+'@@'+'"+@userno+"'+'##'+'"+@namea+"'+'##'+'"+@now_datetime+"'
-		,hours=1
+		,hours=1,mins=1
 		where noa='"+@noa+"' and noq='"+@noq+"'
 	")
 ;

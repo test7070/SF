@@ -1038,14 +1038,39 @@
 						//事件更新
 						$('#cucs .cucs_chk').unbind('click');
 						$('#cucs .cucs_chk').click(function(e) {
-							var n=$(this).attr('id').replace('cucs_chk','')
+							var n=$(this).attr('id').replace('cucs_chk','');
 							if($(this).prop('checked')){
 								var t_err = q_chkEmpField([['combMechno', '機　台']]);
-				                if (t_err.length > 0 || chk_cucs.length>=8) {
+								
+								var t_err2='';
+								//105/08/15判斷是否已續接或成型
+	                			var t_where = "where=^^ 1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"'^^";
+								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype!='1' and (d.mount>0 or d.weight>0) ^^";
+								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'getcubs', r_accy,1);
+								var cubs = _q_appendData("view_cuc", "", true);
+								if (cubs[0] != undefined){
+									if(cubs[0].cubmount>0 || cubs[0].cubweight>0){
+										var t_err2='';
+										if(cubs[0].paraf!='' || cubs[0].parag!='')
+											t_err2='續接';
+										if(cubs[0].picname!='直料' && cubs[0].picname!='板料' && cubs[0].picname!='')
+											t_err2=t_err2+(t_err.length>0?'或':'')+'成型';
+										
+										if(confirm('此加工品項已進行'+t_err2+'生產，是否繼續?')){
+											t_err2='';
+		                				}
+									}
+	                			}else{
+	                				alert('加工單遺失，請確認加工單是否存在!!');
+	                				t_err2='加工單遺失';
+	                			}
+								
+				                if (t_err.length > 0 || chk_cucs.length>=8 || t_err2.length>0) {
 				                	if(t_err.length>0)
 				                    	alert(t_err);
-				                    else 
+				                    else if(chk_cucs.length>=8)
 				                    	alert('加工項目超過8筆!!');
+				                    	
 				                    $(this).prop("checked",false).parent().parent().find('td').css('background', 'lavender');
 				                    $('#cucs_tr'+n+' .co1').css('background-color', 'antiquewhite');
 		                            $('#cucs_tr'+n+' .co2').css('background-color', 'lightpink');
