@@ -119,7 +119,7 @@
 				});*/
 				
 				$('#lblCucnoa').click(function() {
-					q_box("cuc_vu_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=1 and isnull(waste,0)=0 and isnull(picname,'')!='直料' and isnull(picname,'')!='板料' and isnull(picname,'')!='' ) ;" + r_accy, 'cuc_vu_b', "95%", "95%", '加工單');
+					q_box("cuc_vu_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(waste,0)=0 and isnull(hours,0)=0 and (isnull(paraf,'')!='' or isnull(parag,'')!='') and isnull(picname,'')!='板料' and isnull(picname,'')!='' ) ;" + r_accy, 'cuc_vu_b', "95%", "95%", '加工單');
 				});
 				
 				$('#combCucno').change(function() {
@@ -2048,6 +2048,9 @@
 						b_ret = getb_ret();
 						if(b_ret && b_ret[0]!=undefined){
 							$('#combCucno').val(b_ret[0].noa);
+							$('#textCustno').val(b_ret[0].custno);
+							$('#textComp').val(b_ret[0].cust);
+							$('#textMech').val(b_ret[0].mech);
 						}
 						break;
 					case q_name + '_s':
