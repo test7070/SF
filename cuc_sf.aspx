@@ -1153,7 +1153,7 @@
 						<td><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 						<td><input id="txtWorker2" type="text" class="txt c1"/></td>
-						<td align="center"><input id="btnPic" type="button" value="成型參數顯示"></td>
+						<td align="center"><input id="btnPic" type="button" value="成型參數關閉"></td>
 						<td align="center"><input id="btnPic2" type="button" value="續接參數顯示"></td>
 					</tr>
 					<tr>
