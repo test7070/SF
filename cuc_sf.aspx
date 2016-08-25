@@ -1099,7 +1099,7 @@
                 font-size: medium;
             }
             #q_acDiv {
-                width: 300px;
+                white-space: nowrap;
             }
 		</style>
 	</head>
