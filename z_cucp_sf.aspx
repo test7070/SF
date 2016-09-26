@@ -99,6 +99,23 @@
 				var t_key = q_getHref();
 				if(t_key[1] != undefined){
 					$('#txtXnoa').val(t_key[1]);
+					
+					if(window.parent.q_name=='z_cubp_sf'){
+						$('#txtXnoa').val('');
+						if(t_key[1].indexOf('z_cucp_sf')>-1){
+							$('#txtXnoa').val(t_key[3]);
+							t_report=t_key[1];
+							var click_report=999;
+							for(var i=0;i<$('#q_report').data().info.reportData.length;i++){
+								if($('#q_report').data().info.reportData[i].report==t_report){
+									click_report=i;
+									$('#q_report div div .radio').eq(click_report).removeClass('nonselect').addClass('select').click();
+								}
+							}
+							if($('#txtXnoa').val().length>0 && click_report!=999)
+								$('#btnOk').click();
+						}
+					}
 				}
 				
 				q_gt('spec', '1=1 ', 0, 0, 0, "spec");

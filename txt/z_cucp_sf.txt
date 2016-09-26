@@ -100,3 +100,193 @@ dbo.getComma(weight,0) weight
 from @tmp
 order by idno
 ;
+--******************************************************************************************************
+z_cucp_sf02:--z_cucp_sf02
+SET QUOTED_IDENTIFIER OFF	
+
+declare @t_path nvarchar(max) = '[1]'
+declare @t_xnoa nvarchar(100) = case when '#non'= [2] then '' else [2] end
+-----------------------------------------------------------------------------------
+declare @result table(
+	gno nvarchar(10),
+	noa nvarchar(30),
+	comp nvarchar(100),
+	memo nvarchar(MAX),
+	datea nvarchar(20),
+	odate nvarchar(MAX),
+	mech nvarchar(MAX),
+	
+	no2 nvarchar(20),
+	size nvarchar(max),
+	spec nvarchar(MAX),
+	picname nvarchar(MAX),
+	isc nvarchar(10),
+	lengthb float,
+	om float,
+	oh float,
+	ow float,
+	--裁剪
+	am float,
+	ah float,
+	aw float,
+	aend nvarchar(10),
+	--續接
+	cm float,
+	ch float,
+	cw float,
+	cend nvarchar(10),
+	--已完工
+	bm float,
+	bh float,
+	bw float,
+	enda nvarchar(10),
+	vm float,
+	vh float,
+	vw float,
+	bmemo nvarchar(max)
+)
+
+insert @result
+select '0',a.noa,a.cust,a.memo,a.datea,a.bdate,a.mech
+,b.no2,b.size,b.spec,b.picname,case when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then 'V' else '' end,b.lengthb
+,isnull(b.mount,0),isnull(b.mount1,0),isnull(b.weight,0)
+,isnull(c.am,0),isnull(c.ah,0),isnull(c.aw,0),(case when isnull(b.mins,0)>0 then 'V' else '' end )
+,isnull(e.cm,0),isnull(e.ch,0),isnull(e.cw,0),(case when isnull(b.hours,0)>0 then 'V' else '' end )
+,case when isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' then isnull(d.bm,0)
+when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then isnull(e.cm,0) else isnull(c.am,0) end
+,case when isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' then isnull(d.bh,0)
+when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then isnull(e.ch,0) else isnull(c.ah,0) end
+,case when isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' then isnull(d.bw,0)
+when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then isnull(e.cw,0) else isnull(c.aw,0) end
+,case when isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' then (case when isnull(b.waste,0)>0 then 'V' else '' end )
+when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then (case when isnull(b.hours,0)>0 then 'V' else '' end ) else (case when isnull(b.mins,0)>0 then 'V' else '' end ) end
+,isnull(f.vm,0),isnull(f.vh,0),isnull(f.vw,0),b.memo
+from view_cuc a left join view_cucs b on a.noa=b.noa
+outer apply (select SUM(cb.mount) am,SUM(cb.hmount) ah,SUM(cb.weight) aw  from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='1' and cb.productno2=a.noa and cb.product2=b.noq)c
+outer apply (select SUM(cb.mount) bm,SUM(cb.hmount) bh,SUM(cb.weight) bw  from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='2' and cb.productno2=a.noa and cb.product2=b.noq)d
+outer apply (select SUM(cb.mount) cm,SUM(cb.hmount) ch,SUM(cb.weight) cw  from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='3' and cb.productno2=a.noa and cb.product2=b.noq)e
+outer apply (select SUM(mount) vm,SUM(0) vh,SUM(weight) vw from view_vcct where ordeno=b.ordeno and no2=b.no2)f
+where a.noa = @t_xnoa
+
+if((select count(*) from @result)>0)
+begin
+	insert @result (gno,noa,om,oh,ow,am,ah,aw,cm,ch,cw,bm,bh,bw,vm,vh,vw)
+	select '1',noa,sum(om),sum(oh),sum(ow),sum(am),sum(ah),sum(aw),sum(cm),sum(ch),sum(cw) 
+	,sum(bm),sum(bh),sum(bw),sum(vm),sum(vh),sum(vw) 
+	from @result group by noa
+end
+
+select 
+dbo.getComma(lengthb,-1) lengthb,
+dbo.getComma(om,0) om,
+dbo.getComma(oh,0) oh,
+dbo.getComma(ow,0) ow,
+dbo.getComma(am,0) am,
+dbo.getComma(ah,0) ah,
+dbo.getComma(aw,0) aw,
+dbo.getComma(cm,0) cm,
+dbo.getComma(ch,0) ch,
+dbo.getComma(cw,0) cw,
+dbo.getComma(bm,0) bm,
+dbo.getComma(bh,0) bh,
+dbo.getComma(bw,0) bw,
+dbo.getComma(vm,0) vm,
+dbo.getComma(vh,0) vh,
+dbo.getComma(vw,0) vw,
+* from @result order by noa,gno,no2
+;
+--******************************************************************************************************
+z_cucp_sf03:--z_cucp_sf03
+SET QUOTED_IDENTIFIER OFF	
+
+declare @t_path nvarchar(max) = '[1]'
+declare @t_xnoa nvarchar(100) = case when '#non'= [2] then '' else [2] end
+-----------------------------------------------------------------------------------
+declare @result table(
+	gno nvarchar(10),
+	noa nvarchar(30),
+	comp nvarchar(100),
+	memo nvarchar(MAX),
+	datea nvarchar(20),
+	odate nvarchar(MAX),
+	mech nvarchar(MAX),
+	
+	no2 nvarchar(20),
+	size nvarchar(max),
+	spec nvarchar(MAX),
+	picname nvarchar(MAX),
+	isc nvarchar(10),
+	lengthb float,
+	om float,
+	oh float,
+	ow float,
+	--裁剪
+	am float,
+	ah float,
+	aw float,
+	aend nvarchar(10),
+	--續接
+	cm float,
+	ch float,
+	cw float,
+	cend nvarchar(10),
+	--已完工
+	bm float,
+	bh float,
+	bw float,
+	enda nvarchar(10),
+	vm float,
+	vh float,
+	vw float,
+	bmemo nvarchar(max)
+)
+
+insert @result
+select '0',a.noa,a.cust,a.memo,a.datea,a.bdate,a.mech
+,b.no2,b.size,b.spec,b.picname,case when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then 'V' else '' end,b.lengthb
+,isnull(b.mount,0),isnull(b.mount1,0),isnull(b.weight,0)
+,isnull(c.am,0),isnull(c.ah,0),isnull(c.aw,0),(case when isnull(b.mins,0)>0 then 'V' else '' end )
+,isnull(e.cm,0),isnull(e.ch,0),isnull(e.cw,0),(case when isnull(b.hours,0)>0 then 'V' else '' end )
+,case when isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' then isnull(d.bm,0)
+when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then isnull(e.cm,0) else isnull(c.am,0) end
+,case when isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' then isnull(d.bh,0)
+when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then isnull(e.ch,0) else isnull(c.ah,0) end
+,case when isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' then isnull(d.bw,0)
+when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then isnull(e.cw,0) else isnull(c.aw,0) end
+,case when isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' then (case when isnull(b.waste,0)>0 then 'V' else '' end )
+when isnull(b.paraf,'')!='' or isnull(b.parag,'')!='' then (case when isnull(b.hours,0)>0 then 'V' else '' end ) else (case when isnull(b.mins,0)>0 then 'V' else '' end ) end
+,isnull(f.vm,0),isnull(f.vh,0),isnull(f.vw,0),b.memo
+from view_cuc a left join view_cucs b on a.noa=b.noa
+outer apply (select SUM(cb.mount) am,SUM(cb.hmount) ah,SUM(cb.weight) aw  from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='1' and cb.productno2=a.noa and cb.product2=b.noq)c
+outer apply (select SUM(cb.mount) bm,SUM(cb.hmount) bh,SUM(cb.weight) bw  from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='2' and cb.productno2=a.noa and cb.product2=b.noq)d
+outer apply (select SUM(cb.mount) cm,SUM(cb.hmount) ch,SUM(cb.weight) cw  from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='3' and cb.productno2=a.noa and cb.product2=b.noq)e
+outer apply (select SUM(mount) vm,SUM(0) vh,SUM(weight) vw from view_vcct where ordeno=b.ordeno and no2=b.no2)f
+where a.noa = @t_xnoa
+
+if((select count(*) from @result)>0)
+begin
+	insert @result (gno,noa,om,oh,ow,am,ah,aw,cm,ch,cw,bm,bh,bw,vm,vh,vw)
+	select '1',noa,sum(om),sum(oh),sum(ow),sum(am),sum(ah),sum(aw),sum(cm),sum(ch),sum(cw) 
+	,sum(bm),sum(bh),sum(bw),sum(vm),sum(vh),sum(vw) 
+	from @result group by noa
+end
+
+select 
+dbo.getComma(lengthb,-1) lengthb,
+dbo.getComma(om,0) om,
+dbo.getComma(oh,0) oh,
+dbo.getComma(ow,0) ow,
+dbo.getComma(am,0) am,
+dbo.getComma(ah,0) ah,
+dbo.getComma(aw,0) aw,
+dbo.getComma(cm,0) cm,
+dbo.getComma(ch,0) ch,
+dbo.getComma(cw,0) cw,
+dbo.getComma(bm,0) bm,
+dbo.getComma(bh,0) bh,
+dbo.getComma(bw,0) bw,
+dbo.getComma(vm,0) vm,
+dbo.getComma(vh,0) vh,
+dbo.getComma(vw,0) vw,
+* from @result order by noa,gno,no2
+;
