@@ -110,48 +110,37 @@
 					q_box("ordes_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'ordes_sf', "95%", "95%", $('#btnOrde').val());
 				});
 				
+				$('#btnImg').click(function() {
+					if($(this).val()=='圖型顯示'){
+						$(this).val('圖型關閉');
+						$('.img').show();
+					}else{
+						$(this).val('圖型顯示');
+						$('.img').hide();
+					}
+					bbswidth();
+				});
+				
 				$('#btnPic').click(function() {
 					if($(this).val()=='成型參數顯示'){
 						$(this).val('成型參數關閉');
 						$('.pic').show();
-						$('#tbbs').css("width","2350px");
-						$('.dbbs').css("width","2350px");
-						if($('#btnPic2').val()!='續接參數顯示'){
-							$('#tbbs').css("width","2550px");
-							$('.dbbs').css("width","2550px");
-						}
 					}else{
 						$(this).val('成型參數顯示');
 						$('.pic').hide();
-						$('#tbbs').css("width","1650px");
-						$('.dbbs').css("width","1650px");
-						if($('#btnPic2').val()!='續接參數顯示'){
-							$('#tbbs').css("width","1850px");
-							$('.dbbs').css("width","1850px");
-						}
 					}
+					bbswidth();
 				});
 				
 				$('#btnPic2').click(function() {
 					if($(this).val()=='續接參數顯示'){
 						$(this).val('續接參數關閉');
 						$('.pic2').show();
-						$('#tbbs').css("width","1850px");
-						$('.dbbs').css("width","1850px");
-						if($('#btnPic').val()!='成型參數顯示'){
-							$('#tbbs').css("width","2550px");
-							$('.dbbs').css("width","2550px");
-						}
 					}else{
 						$(this).val('續接參數顯示');
 						$('.pic2').hide();
-						$('#tbbs').css("width","1650px");
-						$('.dbbs').css("width","1650px");
-						if($('#btnPic').val()!='成型參數顯示'){
-							$('#tbbs').css("width","2350px");
-							$('.dbbs').css("width","2350px");
-						}
 					}
+					bbswidth();
 				});
                 
                 $('#lblNoa').text('案號'); 
@@ -163,7 +152,22 @@
                 $('#lblMech').text('工地名稱');
                 $('#lblWeight').text('料單總重量');
             }
-
+            
+            function bbswidth() {
+				var t_width=1650;
+				if($('#btnImg').val()=='圖型關閉'){ //圖型顯示
+					t_width=t_width+200;
+				}
+				if($('#btnPic').val()=='成型參數關閉'){ //成型參數顯示
+					t_width=t_width+500;
+				}
+				if($('#btnPic2').val()=='續接參數關閉'){ //續接參數顯示
+					t_width=t_width+220;
+				}
+				$('#tbbs').css("width",t_width+"px");
+				$('.dbbs').css("width",t_width+"px");
+			}
+			
             function q_popPost(s1) {
                 switch(s1) {
 					case 'txtPicno_':
@@ -637,29 +641,22 @@
 				$('#lblParag_s').text('續接參數G');
 				$('#lblPic_s').text('形狀');
 				
+				if($('#btnImg').val()=='圖型關閉顯示'){
+					$('.img').hide();
+				}else{
+					$('.img').show();
+				}
 				if($('#btnPic').val()=='成型參數顯示'){
 					$('.pic').hide();
-					$('#tbbs').css("width","1850px");
-					$('.dbbs').css("width","1850px");
-					if($('#btnPic2').val()=='續接參數顯示'){
-						$('.pic2').hide();
-						$('#tbbs').css("width","1650px");
-						$('.dbbs').css("width","1650px");
-					}else{
-						$('.pic2').show();
-					}
 				}else{
 					$('.pic').show();
-					$('#tbbs').css("width","2350px");
-					$('.dbbs').css("width","2350px");
-					if($('#btnPic2').val()=='續接參數顯示'){
-						$('.pic2').hide();
-					}else{
-						$('.pic2').show();
-						$('#tbbs').css("width","2550px");
-						$('.dbbs').css("width","2550px");	
-					}
 				}
+				if($('#btnPic2').val()=='續接參數顯示'){
+					$('.pic2').hide();
+				}else{
+					$('.pic2').show();
+				}
+				bbswidth();
 				
 				//1050802複製功能
                 $('#btnProductCopy').click(function() {
@@ -1153,8 +1150,9 @@
 						<td><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 						<td><input id="txtWorker2" type="text" class="txt c1"/></td>
-						<td align="center"><input id="btnPic" type="button" value="成型參數關閉"></td>
+						<td align="center"><input id="btnPic" type="button" value="成型參數顯示"></td>
 						<td align="center"><input id="btnPic2" type="button" value="續接參數顯示"></td>
+						<td align="center"><input id="btnImg" type="button" value="圖型關閉"></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblGen" class="lbl"> </a></td>
@@ -1197,9 +1195,9 @@
 						<td style="width:100px;display: none;" class="pic"><a id='lblParac_s'> </a></td>
 						<td style="width:100px;display: none;" class="pic"><a id='lblParad_s'> </a></td>
 						<td style="width:100px;display: none;" class="pic"><a id='lblParae_s'> </a></td>
-						<td style="width:100px;display: none;" class="pic2"><a id='lblParaf_s'> </a></td>
-						<td style="width:100px;display: none;" class="pic2"><a id='lblParag_s'> </a></td>
-						<td style="width:200px;" class="pic"><a id='lblPic_s'> </a></td>
+						<td style="width:110px;display: none;" class="pic2"><a id='lblParaf_s'> </a></td>
+						<td style="width:110px;display: none;" class="pic2"><a id='lblParag_s'> </a></td>
+						<td style="width:200px;" class="img"><a id='lblPic_s'> </a></td>
 						<td style="width:85px;"><a id='lblLengthb_s'> </a></td>
 						<!--<td style="width:55px;"><a id='lblUnit_s'> </a></td>-->
 						<td style="width:85px;"><a id='lblMount1_s'> </a></td>
@@ -1262,7 +1260,7 @@
 							<input id="txtParag.*" type="text" class="txt c1" style="width: 70%;"/>
 							<select id="combParag.*" class="txt" style="width: 20px;"> </select>
 						</td>
-						<td class="pic">
+						<td class="img">
 							<canvas id="canvas.*" width="150" height="50"> </canvas>
 							<img id="imgPic.*" src="" style="display:none;"/>
 							<textarea id="txtImgorg.*" style="display:none;"> </textarea>
