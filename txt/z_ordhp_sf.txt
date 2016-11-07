@@ -1,0 +1,149 @@
+z_ordhp_sf01:--z_ordhp_sf01
+SET QUOTED_IDENTIFIER OFF 
+declare @t_bdate nvarchar(30)
+declare @t_edate nvarchar(30)
+declare @t_typea nvarchar(30)
+declare @t_btggno nvarchar(30)
+declare @t_etggno nvarchar(30)
+
+set @t_bdate = case when '#non'=[1] then '' else [1] end 
+set @t_edate = case when '#non'=[2] then char(255) else [2] end 
+set @t_typea = case when '#non'=[3] then '' else [3] end
+set @t_btggno = case when '#non'=[4] then '' else [4] end 
+set @t_etggno = case when '#non'=[5] then char(255) else [5] end 
+-----------------------------------------------------------------------------------
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	drop table #tmp
+END
+
+IF OBJECT_ID('tempdb..#tmpa')is not null
+BEGIN
+	drop table #tmpa
+END
+
+create table #tmp(
+	gno nvarchar(2),
+	idno nvarchar(10),
+	datea nvarchar(50),
+	noa nvarchar(50),
+	cno nvarchar(50),
+	acomp nvarchar(100),
+	tggno  nvarchar(50),
+	tgg nvarchar(100),
+	addr nvarchar(150),
+	typea nvarchar(50),
+	weight float,
+	f1 float, --進貨損耗%
+	f2 float, --進貨總量
+	f3 float, --進貨已完成
+	f4 float, --進貨餘量
+	f5 float, --進貨單價
+	f6 float, --出貨損耗
+	f7 float, --出貨總量
+	f8 float, --出貨已完成
+	f9 float, --出貨餘量
+	f10 float, --出貨單價
+	fx float, --差異數 f3-f8-(f2-f7)
+	memo nvarchar(MAX),
+	tweight float
+)	
+CREATE INDEX tmp_index ON #tmp (noa)
+
+insert #tmp
+select '0',ROW_NUMBER() over (order by datea,noa)
+,datea,noa,cno,acomp,tggno,nick,addr,typea,weight
+,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,isnull(f3,0)-isnull(f8,0)-(isnull(f2,0)-isnull(f7,0)),memo,0
+from ordh
+where datea between @t_bdate and @t_edate
+and (len(@t_typea)=0 or typea=@t_typea)
+and tggno between @t_btggno and @t_etggno
+
+declare @tt_bdate nvarchar(10)=''
+if(LEN(@t_bdate)>0)
+	set @tt_bdate=dbo.q_cdn(@t_bdate,-31)
+
+create table #tmpa(
+	noa nvarchar(50),
+	typea nvarchar(10),
+	memo nvarchar(MAX),
+	total float,
+	payed float,
+	qno1 nvarchar(50),
+	qweight1 float,
+	qno2 nvarchar(50),
+	qweight2 float
+)
+CREATE INDEX tmpa_index ON #tmpa (noa,typea)
+
+insert #tmpa
+select noa,'vcc',apvmemo,(case when typea='1' then 1 else -1 end)*total,(case when typea='1' then 1 else -1 end)*payed
+,left(apvmemo,charindex('@',apvmemo)-1)
+,(case when typea='1' then 1 else -1 end)*cast(SUBSTRING(apvmemo,charindex('@',apvmemo)+1,charindex('##',apvmemo)-charindex('@',apvmemo)-1) as float)
+,left(SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo)),CHARINDEX('@',SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo)))-1)
+,(case when typea='1' then 1 else -1 end)*cast(SUBSTRING(SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo)),charindex('@',SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo)))+1,len(SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo))))as float)
+from view_vcc where len(apvmemo)>0
+and (custno between @t_btggno and @t_etggno ) --出貨與合約客戶會一樣
+and datea>= @tt_bdate --會先有合約才會出貨 --避免提早出貨多抓取前1個月的出貨
+
+insert #tmpa
+select noa,'rc2',transtart,(case when typea='1' then 1 else -1 end)*total,(case when typea='1' then 1 else -1 end)*payed
+,left(transtart,charindex('@',transtart)-1)
+,(case when typea='1' then 1 else -1 end)*cast(SUBSTRING(transtart,charindex('@',transtart)+1,charindex('##',transtart)-charindex('@',transtart)-1) as float)
+,left(SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart)),CHARINDEX('@',SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart)))-1)
+,(case when typea='1' then 1 else -1 end)*cast(SUBSTRING(SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart)),charindex('@',SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart)))+1,len(SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart))))as float)
+from view_rc2 where len(transtart)>0
+and (tggno between @t_btggno and @t_etggno ) --出貨與合約客戶會一樣
+and datea>= @tt_bdate --會先有合約才會出貨 --避免提早出貨多抓取前1個月的出貨
+
+update a
+set f3=isnull(r1.weight,0)+isnull(r2.weight,0)
+,f4=f2-(isnull(r1.weight,0)+isnull(r2.weight,0))
+,f8=isnull(v1.weight,0)+isnull(v2.weight,0)
+,f9=f7-(isnull(v1.weight,0)+isnull(v2.weight,0))
+from #tmp a 
+outer apply (select SUM(qweight1)weight from #tmpa where qno1=a.noa and typea='rc2') r1
+outer apply (select SUM(qweight2)weight from #tmpa where qno2=a.noa and typea='rc2') r2
+outer apply (select SUM(qweight1)weight from #tmpa where qno1=a.noa and typea='vcc') v1
+outer apply (select SUM(qweight2)weight from #tmpa where qno2=a.noa and typea='vcc') v2
+
+update #tmp set fx=isnull(f3,0)-isnull(f8,0)-(isnull(f2,0)-isnull(f7,0))
+
+if((select count(*) from #tmp)>0)
+begin
+	insert #tmp(gno,idno,weight,f2,f3,f4,f7,f8,f9,fx,tweight)
+	select '1',MAX(idno)+1,SUM(weight),SUM(f2),SUM(f3),SUM(f4),SUM(f7),SUM(f8),SUM(f9),SUM(fx),SUM(fx) from #tmp
+	
+	update #tmp
+	set tweight=isnull((select tweight from #tmp where gno='1'),0)
+	where gno='0'
+end
+
+select 
+dbo.getComma(weight,-1) weight,
+dbo.getComma(f1,-1) f1,
+dbo.getComma(f2,-1) f2,
+dbo.getComma(f3,-1) f3,
+dbo.getComma(f4,-1) f4,
+dbo.getComma(f5,-1) f5,
+dbo.getComma(f6,-1) f6,
+dbo.getComma(f7,-1) f7,
+dbo.getComma(f8,-1) f8,
+dbo.getComma(f9,-1) f9,
+dbo.getComma(f10,-1) f10,
+case when fx>=0 then dbo.getComma(abs(fx),-1) else '<font color=red>('+dbo.getComma(abs(fx),-1)+')</font>' end fx,
+dbo.getComma(tweight,-1) tweight,
+case when gno='0' and len(noa)>0 then 'ordh_sf?noa=$noa' else '' end qhref,
+dbo.charbr(addr,5) addr,
+* from #tmp order by gno,idno
+
+IF OBJECT_ID('tempdb..#tmpa')is not null
+BEGIN
+	drop table #tmpa
+END
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	drop table #tmp
+END
+;
