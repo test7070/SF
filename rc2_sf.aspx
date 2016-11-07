@@ -205,30 +205,60 @@
 				});
 				
 				$('#lblQno1').click(function() {
-					var t_where="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0 ";
-					if(q_cur==1 || q_cur==2)
-						t_where=t_where+" and noa!='"+$('#textQno2').val()+"'";
-					q_box("contst_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'cont1_b', "600px", "700px", '進貨合約');
+					//1=1^^where[1]=^^1=1^^where[2]=^^1=1^^where[3]=^^1=1^^
+					var t_where1="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0";//cont
+					var t_where2="where[1]=^^tggno='"+$('#txtTggno').val()+"' and f4>0 and isnull(enda,0)=0";//ordhs
+					var t_where3="where[2]=^^1=0^^";//quat
+					var t_where4="where[3]=^^1=0 order by datea,noa ^^";//ordbht
+					
+					if(q_cur==1 || q_cur==2){
+						t_where1=t_where1+" and noa!='"+$('#textQno2').val()+"'";
+						t_where2=t_where2+" and noa!='"+$('#textQno2').val()+"'";
+					}
+					
+					t_where1=t_where1+" ^^";
+					t_where2=t_where2+" ^^";
+					
+					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'cont1_b', "600px", "700px", '進貨合約');
 				});
 				
 				$('#textQno1').change(function() {
 					if(!emp($('#textQno1').val())){
-						var t_where="where=^^noa='"+$('#textQno1').val()+"'^^ ";
-						q_gt('cont', t_where, 0, 0, 0, "qno1_chage", r_accy);
+						var t_where1="where=^^noa='"+$('#textQno1').val()+"'^^ ";
+						var t_where2="where[1]=^^noa='"+$('#textQno1').val()+"'^^ ";
+						var t_where3="where[2]=^^1=0^^ ";
+						var t_where4="where[3]=^^=1=0^^ ";
+						
+						q_gt('cont_sf', t_where1t_where2+t_where3+t_where4, 0, 0, 0, "qno1_chage", r_accy);
 					}
 				});
 				
 				$('#lblQno2').click(function() {
-					var t_where="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0 ";
-					if(q_cur==1 || q_cur==2)
-						t_where=t_where+" and noa!='"+$('#textQno1').val()+"'";
-					q_box("contst_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'cont2_b', "600px", "700px",  '進貨合約');
+					//1=1^^where[1]=^^1=1^^where[2]=^^1=1^^where[3]=^^1=1^^
+					var t_where1="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0";//cont
+					var t_where2="where[1]=^^tggno='"+$('#txtTggno').val()+"' and f4>0 and isnull(enda,0)=0";//ordhs
+					var t_where3="where[2]=^^1=0^^";//quat
+					var t_where4="where[3]=^^1=0 order by datea,noa ^^";//ordbht
+					
+					if(q_cur==1 || q_cur==2){
+						t_where1=t_where1+" and noa!='"+$('#textQno1').val()+"'";
+						t_where2=t_where2+" and noa!='"+$('#textQno1').val()+"'";
+					}
+					
+					t_where1=t_where1+" ^^";
+					t_where2=t_where2+" ^^";
+					
+					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'cont2_b', "600px", "700px", '進貨合約');
 				});
 				
 				$('#textQno2').change(function() {
 					if(!emp($('#textQno2').val())){
-						var t_where="where=^^noa='"+$('#textQno2').val()+"'^^ ";
-						q_gt('cont', t_where, 0, 0, 0, "qno2_chage", r_accy);
+						var t_where1="where=^^noa='"+$('#textQno2').val()+"'^^ ";
+						var t_where2="where[1]=^^noa='"+$('#textQno2').val()+"'^^ ";
+						var t_where3="where[2]=^^1=0^^ ";
+						var t_where4="where[3]=^^=1=0^^ ";
+						
+						q_gt('cont_sf', t_where1t_where2+t_where3+t_where4, 0, 0, 0, "qno2_chage", r_accy);
 					}
 				});
 				
@@ -301,7 +331,7 @@
 						if (q_cur > 0 && q_cur < 4) {
 							b_ret = getb_ret();
 							if (!b_ret || b_ret.length == 0 || b_ret[0]==undefined)
-								return;
+								break;
 							$('#textQno2').val(b_ret[0].noa);
 							if(b_ret[0].atax=="true"){
 								$('#chkAtax').prop('checked',true);
@@ -367,12 +397,12 @@
 						for ( i = 0; i < as.length; i++) {
 							if(as[i].noa==$('#textQno1').val()){
 								qno1_exists=true;
-								q1_weight=dec(as[i].ordeweight);
+								q1_weight=dec(as[i].weight);
 								qtgg1=trim(as[i].tggno);
 							}
 							if(as[i].noa==$('#textQno2').val()){
 								qno2_exists=true;
-								q2_weight=dec(as[i].ordeweight);
+								q2_weight=dec(as[i].weight);
 								qtgg2=trim(as[i].tggno);
 							}
 						}
@@ -727,8 +757,11 @@
 				
 				//檢查合約是否存在或已結案
 				if(!check_cont && (!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
-					var t_where = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
-					q_gt('cont', t_where, 0, 0, 0, "cont_btnOk", r_accy);
+					var t_where1 = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
+					var t_where2 = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
+					var t_where3 = "where=^^ 1=0 ^^";
+					var t_where4 = "where=^^ 1=0 ^^";
+					q_gt('cont_sf', t_where1+t_where2+t_where3+t_where4, 0, 0, 0, "cont_btnOk", r_accy);
 					return;
 				}
 				

@@ -22,7 +22,7 @@
             q_desc = 1;
             q_tables = 't';
             var q_name = "ordh";
-            var q_readonly = ['txtWorker', 'txtWorker2','textF3','textF4','textF7','textF8'];         
+            var q_readonly = ['txtWorker', 'txtWorker2','textF3','textF4','textF8','textF9'];         
             var q_readonlys = [];
             var q_readonlyt = [];
             var bbmNum = [];
@@ -39,7 +39,7 @@
             brwCount2 = 5;
 
             aPop = new Array(
-	            ['txtTggno', 'lblTgg_sf', 'view_cust_tgg', 'noa,comp,nick', 'txtTggno,txtComp,txtNick', 'custtgg_b.aspx'],
+	            ['txtTggno', 'lblTgg_sf', 'view_cust_tgg', 'noa,comp,nick', 'txtTggno,txtTgg,txtNick', 'custtgg_b.aspx'],
 	            ['txtCno', 'lblCno_sf', 'acomp', 'noa,acomp', 'txtCno,txtAcomp', 'acomp_b.aspx']
            	);
 
@@ -69,8 +69,8 @@
                 bbmNum = [['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]
                 		,['textF1', 15, q_getPara('vcc.weightPrecision'), 1],['textF2', 15, q_getPara('vcc.weightPrecision'), 1]
                 		,['textF3', 15, q_getPara('vcc.weightPrecision'), 1],['textF4', 15, q_getPara('vcc.weightPrecision'), 1]
-                		,['textF5', 15, q_getPara('vcc.weightPrecision'), 1],['textF6', 15, q_getPara('vcc.weightPrecision'), 1]
-                		,['textF7', 15, q_getPara('vcc.weightPrecision'), 1],['textF8', 15, q_getPara('vcc.weightPrecision'), 1]
+                		,['textF6', 15, q_getPara('vcc.weightPrecision'), 1],['textF7', 15, q_getPara('vcc.weightPrecision'), 1]
+                		,['textF8', 15, q_getPara('vcc.weightPrecision'), 1],['textF9', 15, q_getPara('vcc.weightPrecision'), 1]
                 		];
             					
             	bbsNum = [['txtLengthb', 10, 2, 1]
@@ -108,13 +108,13 @@
                 	}
                 	$('#textF2').change();
 					
-                	var t_rate=dec($('#textF5').val())
+                	var t_rate=dec($('#textF6').val())
                 	if(t_rate==0){
-                		$('#textF6').val(t_weight);
+                		$('#textF7').val(t_weight);
                 	}else{
-                		$('#textF6').val(round(t_weight-(t_weight*t_rate/100),q_getPara('vcc.weightPrecision')));
+                		$('#textF7').val(round(t_weight-(t_weight*t_rate/100),q_getPara('vcc.weightPrecision')));
                 	}
-                	$('#textF6').change();
+                	$('#textF7').change();
                 	
                 	
 				});
@@ -163,25 +163,7 @@
                 	$('#txtMemo1').val($(this).val());
 				});
                 
-                $('#textF5').keyup(function(e) {
-                	if(e.which>=37 && e.which<=40){return;}
-					var tmp=$(this).val();
-					tmp=tmp.match(/\d{1,}\.{0,1}\d{0,}/);
-					$(this).val(tmp);
-				}).change(function() {
-                	$('#txtF5').val($(this).val());
-                	
-                	var t_weight=dec($('#txtWeight').val());
-                	var t_rate=dec($('#textF5').val())
-                	if(t_rate==0){
-                		$('#textF6').val(t_weight);
-                	}else{
-                		$('#textF6').val(round(t_weight-(t_weight*t_rate/100),q_getPara('vcc.weightPrecision')));
-                	}
-                	$('#textF6').change();
-				});
-				
-				$('#textF6').keyup(function(e) {
+                $('#textF6').keyup(function(e) {
                 	if(e.which>=37 && e.which<=40){return;}
 					var tmp=$(this).val();
 					tmp=tmp.match(/\d{1,}\.{0,1}\d{0,}/);
@@ -189,18 +171,36 @@
 				}).change(function() {
                 	$('#txtF6').val($(this).val());
                 	
-                	var t_tweight=dec($(this).val());
-                	var t_endweight=dec($('#textF7').val())
-                	$('#textF8').val(t_tweight-t_endweight);
-                	$('#txtF8').change();
+                	var t_weight=dec($('#txtWeight').val());
+                	var t_rate=dec($('#textF6').val())
+                	if(t_rate==0){
+                		$('#textF7').val(t_weight);
+                	}else{
+                		$('#textF7').val(round(t_weight-(t_weight*t_rate/100),q_getPara('vcc.weightPrecision')));
+                	}
+                	$('#textF7').change();
 				});
 				
-				$('#textF7').change(function() {
+				$('#textF7').keyup(function(e) {
+                	if(e.which>=37 && e.which<=40){return;}
+					var tmp=$(this).val();
+					tmp=tmp.match(/\d{1,}\.{0,1}\d{0,}/);
+					$(this).val(tmp);
+				}).change(function() {
                 	$('#txtF7').val($(this).val());
+                	
+                	var t_tweight=dec($(this).val());
+                	var t_endweight=dec($('#textF8').val())
+                	$('#textF9').val(t_tweight-t_endweight);
+                	$('#textF9').change();
 				});
 				
 				$('#textF8').change(function() {
                 	$('#txtF8').val($(this).val());
+				});
+				
+				$('#textF9').change(function() {
+                	$('#txtF9').val($(this).val());
 				});
 				
 				$('#textMemo2').change(function() {
@@ -275,6 +275,16 @@
             }
 
             function btnOk() {
+            	
+            	if($('#txtPrice_0').val())
+					$('#txtF5').val($('#txtPrice_0').val());
+				else
+					$('#txtF5').val(0);
+            	
+            	if($('#txtPrice__0').val())
+					$('#txtF10').val($('#txtPrice__0').val());
+				else
+					$('#txtF10').val(0);
             	
                 if (q_cur == 1)
                     $('#txtWorker').val(r_name);
@@ -395,7 +405,7 @@
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2)
-								$('#txtProductno__'+b_seq).val($('#combProduct__'+b_seq).find("option:selected").text());
+								$('#txtProduct__'+b_seq).val($('#combProduct__'+b_seq).find("option:selected").text());
 						});
 						
                     	$('#combUcolor__' + i).change(function() {
@@ -491,7 +501,7 @@
             }
 
             function btnPrint() {
-                q_box("z_ordh_sfp.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";noa='"+trim($('#txtNoa').val())+"';" + r_accy + "_" + r_cno, 'z_ordh_sfp', "95%", "95%", m_print);
+                q_box("z_ordhp_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";noa='"+trim($('#txtNoa').val())+"';" + r_accy + "_" + r_cno, 'z_ordhp_sf', "95%", "95%", m_print);
             }
 
             function wrServer(key_value) {
@@ -511,7 +521,7 @@
             }
             
             function bbtSave(as) {
-				if (!as['spec']) {
+				if (!as['product']) {
 					as[bbtKey[1]] = '';
 					return;
 				}
@@ -552,8 +562,8 @@
                 	$('#textF1').attr('disabled', 'disabled');
                 	$('#textF2').attr('disabled', 'disabled');
                 	$('#textMemo1').attr('disabled', 'disabled');
-                	$('#textF5').attr('disabled', 'disabled');
                 	$('#textF6').attr('disabled', 'disabled');
+                	$('#textF7').attr('disabled', 'disabled');
                 	$('#textMemo2').attr('disabled', 'disabled');
                 	
                 	for (var i = 0; i < q_bbsCount; i++) {
@@ -575,8 +585,8 @@
                 	$('#textF1').removeAttr('disabled');
                 	$('#textF2').removeAttr('disabled');
                 	$('#textMemo1').removeAttr('disabled');
-                	$('#textF5').removeAttr('disabled');
                 	$('#textF6').removeAttr('disabled');
+                	$('#textF7').removeAttr('disabled');
                 	$('#textMemo2').removeAttr('disabled');
                 	
                 	for (var i = 0; i < q_bbsCount; i++) {
@@ -680,10 +690,10 @@
                 $('#textF3').val(FormatNumber($('#txtF3').val()));
                 $('#textF4').val(FormatNumber($('#txtF4').val()));
                 $('#textMemo1').val($('#txtMemo1').val());
-                $('#textF5').val(FormatNumber($('#txtF5').val()));
                 $('#textF6').val(FormatNumber($('#txtF6').val()));
                 $('#textF7').val(FormatNumber($('#txtF7').val()));
                 $('#textF8').val(FormatNumber($('#txtF8').val()));
+                $('#textF9').val(FormatNumber($('#txtF9').val()));
                 $('#textMemo2').val($('#txtMemo2').val());
             }
             
@@ -922,7 +932,7 @@
 						<td><span> </span><a id="lblTgg_sf" class="lbl btn" >配合廠商</a></td>
 						<td><input id="txtTggno"type="text" class="txt c1"/></td>
 						<td colspan="2">
-							<input id="txtComp"type="text" class="txt c1"/>
+							<input id="txtTgg"type="text" class="txt c1"/>
 							<input id="txtNick"  type="text" class="txt" style="display:none;"/>
 						</td>
 					</tr>
@@ -959,11 +969,13 @@
 							<input id="txtF2" type="hidden"><!--進貨總量Kg-->
 							<input id="txtF3" type="hidden"><!--進貨已完成-->
 							<input id="txtF4" type="hidden"><!--進貨餘量-->
+							<input id="txtF5" type="hidden"><!--進貨單價-->
 							<input id="txtMemo1" type="hidden"><!--進貨備註-->
-							<input id="txtF5" type="hidden"><!--出貨損耗%-->
-							<input id="txtF6" type="hidden"><!--出貨總量Kg-->
-							<input id="txtF7" type="hidden"><!--出貨已完成-->
-							<input id="txtF8" type="hidden"><!--出貨餘量-->
+							<input id="txtF6" type="hidden"><!--出貨損耗%-->
+							<input id="txtF7" type="hidden"><!--出貨總量Kg-->
+							<input id="txtF8" type="hidden"><!--出貨已完成-->
+							<input id="txtF9" type="hidden"><!--出貨餘量-->
+							<input id="txtF10" type="hidden"><!--出貨單價-->
 							<input id="txtMemo2" type="hidden"><!--出貨備註-->
 						</td>
 					</tr>
@@ -1053,10 +1065,10 @@
 					<td>備註</td>
 				</tr>
 				<tr style="height: 25px;">
-					<td><input id="textF5" type="text" class="txt num c1"/></td>
 					<td><input id="textF6" type="text" class="txt num c1"/></td>
 					<td><input id="textF7" type="text" class="txt num c1"/></td>
 					<td><input id="textF8" type="text" class="txt num c1"/></td>
+					<td><input id="textF9" type="text" class="txt num c1"/></td>
 					<td><input id="textMemo2" type="text" class="txt c1"/></td>
 				</tr>
 			</table>
@@ -1084,7 +1096,7 @@
 					</td>
 					<td><a id="lblNo..*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
 					<td>
-						<input id="txtProductno..*" type="text" class="txt c1" style="width: 90px;"/>
+						<input id="txtProduct..*" type="text" class="txt c1" style="width: 90px;"/>
 						<select id="combProduct..*" class="txt" style="width: 20px;"> </select>
 					</td>
 					<td>

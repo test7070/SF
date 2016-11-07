@@ -223,30 +223,58 @@
 				});
 				
 				$('#lblQno1').click(function() {
-					var t_where="custno='"+$('#txtCustno').val()+"' and eweight>0 and isnull(enda,0)=0 ";
-					if(q_cur==1 || q_cur==2)
-						t_where=t_where+" and noa!='"+$('#textQno2').val()+"'";
-					q_box("quat_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'quat1_b', "600px", "700px", '出貨合約');
+					//1=1^^where[1]=^^1=1^^where[2]=^^1=1^^where[3]=^^1=1^^
+					var t_where1="1=0^^";//cont
+					var t_where2="where[1]=^^1=0^^";//ordhs
+					var t_where3="where[2]=^^custno='"+$('#txtCustno').val()+"' and eweight>0 and isnull(enda,0)=0";
+					var t_where4="where[3]=^^tggno='"+$('#txtCustno').val()+"' and f9>0 and isnull(enda,0)=0";
+					
+					if(q_cur==1 || q_cur==2){
+						t_where3=t_where3+" and noa!='"+$('#textQno2').val()+"'";
+						t_where4=t_where4+" and noa!='"+$('#textQno2').val()+"'";
+					}
+					
+					t_where3=t_where3+" ^^";
+					t_where4=t_where4+" order by datea,noa ^^";
+					
+					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'quat1_b', "600px", "700px", '出貨合約');
 				});
 				
 				$('#textQno1').change(function() {
 					if(!emp($('#textQno1').val())){
-						var t_where="where=^^noa='"+$('#textQno1').val()+"'^^ ";
-						q_gt('view_quat', t_where, 0, 0, 0, "qno1_chage", r_accy);
+						var t_where1="where=^^1=0^^ ";
+						var t_where2="where[1]=^^1=0^^ ";
+						var t_where3="where[2]=^^noa='"+$('#textQno1').val()+"'^^ ";
+						var t_where4="where[3]=^^noa='"+$('#textQno1').val()+"'^^ ";
+						
+						q_gt('cont_sf', t_where1t_where2+t_where3+t_where4, 0, 0, 0, "qno1_chage", r_accy);
 					}
 				});
 				
 				$('#lblQno2').click(function() {
-					var t_where="custno='"+$('#txtCustno').val()+"' and eweight>0 and isnull(enda,0)=0 ";
-					if(q_cur==1 || q_cur==2)
-						t_where=t_where+" and noa!='"+$('#textQno1').val()+"'";
-					q_box("quat_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'quat2_b', "600px", "700px", '出貨合約');
+					//1=1^^where[1]=^^1=1^^where[2]=^^1=1^^where[3]=^^1=1^^
+					var t_where1="1=0^^";//cont
+					var t_where2="where[1]=^^1=0^^";//ordhs
+					var t_where3="where[2]=^^custno='"+$('#txtCustno').val()+"' and eweight>0 and isnull(enda,0)=0";
+					var t_where4="where[3]=^^tggno='"+$('#txtCustno').val()+"' and f9>0 and isnull(enda,0)=0";
+					
+					if(q_cur==1 || q_cur==2){
+						t_where3=t_where3+" and noa!='"+$('#textQno1').val()+"'";
+						t_where4=t_where4+" and noa!='"+$('#textQno1').val()+"'";
+					}
+					
+					t_where3=t_where3+" ^^";
+					t_where4=t_where4+" order by datea,noa ^^";
+					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'quat2_b', "600px", "700px", '出貨合約');
 				});
 				
 				$('#textQno2').change(function() {
 					if(!emp($('#textQno2').val())){
-						var t_where="where=^^noa='"+$('#textQno2').val()+"'^^ ";
-						q_gt('view_quat', t_where, 0, 0, 0, "qno2_chage", r_accy);
+						var t_where1="where=^^1=0^^ ";
+						var t_where2="where[1]=^^1=0^^ ";
+						var t_where3="where[2]=^^noa='"+$('#textQno2').val()+"'^^ ";
+						var t_where4="where[3]=^^noa='"+$('#textQno2').val()+"'^^ ";
+						q_gt('cont_sf', t_where1t_where2+t_where3+t_where4, 0, 0, 0, "qno2_chage", r_accy);
 					}
 				});
 				
@@ -350,8 +378,9 @@
 					case 'ordes':
 						if (q_cur > 0 && q_cur < 4) {
 							b_ret = getb_ret();
-							if (!b_ret || b_ret.length == 0)
-								return;
+							if (!b_ret || b_ret.length == 0){
+								break;
+							}
 							
 							ret = q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtSpec,txtSize,txtLengthb,txtClass,txtUnit,txtPrice,txtMount,txtWeight,txtOrdeno,txtNo2'
 							, b_ret.length, b_ret, 'product,spec,size,lengthb,class,unit,price,mount,weight,noa,no2', 'txtProduct,txtSpec');
@@ -431,7 +460,7 @@
 						q_cmbParse("combClass", t_class,'t');
 						break;
 					case 'quat_btnOk':
-						var as = _q_appendData("view_quat", "", true);
+						var as = _q_appendData("cont", "", true);
 						var qno1_exists=(emp($('#textQno1').val())?true:false);
 						var qno2_exists=(emp($('#textQno2').val())?true:false);
 						var qcust1='',qcust2='';
@@ -439,12 +468,12 @@
 							if(as[i].noa==$('#textQno1').val()){
 								qno1_exists=true;
 								q1_weight=dec(as[i].weight);
-								qcust1=trim(as[i].custno);
+								qcust1=trim(as[i].tggno);
 							}
 							if(as[i].noa==$('#textQno2').val()){
 								qno2_exists=true;
 								q2_weight=dec(as[i].weight);
-								qcust2=trim(as[i].custno);
+								qcust2=trim(as[i].tggno);
 							}
 						}
 						
@@ -738,13 +767,13 @@
                         }
 						break;
 					case 'qno1_chage':
-						var as = _q_appendData("view_quat", "", true);
+						var as = _q_appendData("cont", "", true);
 						if (as[0] != undefined) {
 							if((as[0].enda)=="true" && $('#cmbTypea').val()!='2'){
 								alert($('#textQno1').val()+'合約已結案!');
 							}else if(dec(as[0].eweight)<=0  && $('#cmbTypea').val()!='2'){
 								alert($('#textQno1').val()+'合約已出貨完畢!');
-							}else if(!emp($('#txtCustno').val()) && $('#txtCustno').val()!=as[0].custno){
+							}else if(!emp($('#txtCustno').val()) && $('#txtCustno').val()!=as[0].tggno){
 								alert('合約客戶與出貨客戶不同!!');
 							}else{
 								if(as[0].atax=="true"){
@@ -760,13 +789,13 @@
 						}
 						break;
 					case 'qno2_chage':
-						var as = _q_appendData("view_quat", "", true);
+						var as = _q_appendData("cont", "", true);
 						if (as[0] != undefined) {
 							if((as[0].enda)=="true" && $('#cmbTypea').val()!='2'){
 								alert($('#textQno2').val()+'合約已結案!');
 							}else if(dec(as[0].eweight)<=0 && $('#cmbTypea').val()!='2'){
 								alert($('#textQno2').val()+'合約已出貨完畢!');
-							}else if(!emp($('#txtCustno').val()) && $('#txtCustno').val()!=as[0].custno){
+							}else if(!emp($('#txtCustno').val()) && $('#txtCustno').val()!=as[0].tggno){
 								alert('合約客戶與出貨客戶不同!!');
 							}else{
 							if(as[0].atax=="true"){
@@ -904,8 +933,11 @@
 				
 				//檢查合約是否存在或已結案
 				if(!check_quat && (!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
-					var t_where = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
-					q_gt('view_quat', t_where, 0, 0, 0, "quat_btnOk", r_accy);
+					var t_where1 = "where=^^ 1=0 ^^";
+					var t_where2 = "where=^^ 1=0 ^^";
+					var t_where3 = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
+					var t_where4 = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
+					q_gt('cont_sf', t_where1+t_where2+t_where3+t_where4, 0, 0, 0, "quat_btnOk", r_accy);
 					return;
 				}
 				
