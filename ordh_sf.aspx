@@ -548,7 +548,11 @@
                 $('#vewTypea').text('類型');
                 refreshBbm();
                 if(!emp($('#txtTggno').val())){
-					q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"'^^ ", 0, 0, 0, "custms");
+                	if(q_getPara('sys.project').toUpperCase()=='VU'){
+						q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"'^^ ", 0, 0, 0, "custms");
+					}else{
+						q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' and isnull(enda,0)=0 order by noq desc ^^ ", 0, 0, 0, "custms");
+					}
 				}
             }
 
@@ -670,7 +674,11 @@
 			   	switch (s1) {
 			   		case 'txtTggno':
 			   			if(!emp($('#txtTggno').val())){
-							q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"'^^ ", 0, 0, 0, "custms");
+			   				if(q_getPara('sys.project').toUpperCase()=='VU'){
+								q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"'^^ ", 0, 0, 0, "custms");
+							}else{
+								q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' and isnull(enda,0)=0  order by noq desc^^ ", 0, 0, 0, "custms");
+							}
 						}else{
 							$('#combAccount').text('');
 						}
