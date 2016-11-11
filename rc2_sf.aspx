@@ -145,11 +145,13 @@
 				});
 				
 				$('#lblOrdc').click(function() {
-					t_where = '';
+					//105/11/08 互換合約再另外作業處理 維持抓cont
+					var t_where = '';
 					t_contno = $('#txtOrdcno').val();
 					if (t_invo.length > 0) {
 						t_where = "noa='" +t_contno + "'";
-						q_box("contst_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'contst', "95%", "95%", '進貨合約');
+						q_box("contst_vu.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'contst', "95%", "95%", '進貨合約');
+						//q_box("contst_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'contst', "95%", "95%", '進貨合約');
 					}
 				});
 				
@@ -205,8 +207,8 @@
 				});
 				
 				$('#lblQno1').click(function() {
-					//1=1^^where[1]=^^1=1^^where[2]=^^1=1^^where[3]=^^1=1^^
-					var t_where1="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0";//cont
+					//105/11/08 互換合約再另外作業處理 維持抓cont
+					/*var t_where1="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0";//cont
 					var t_where2="where[1]=^^tggno='"+$('#txtTggno').val()+"' and f4>0 and isnull(enda,0)=0";//ordhs
 					var t_where3="where[2]=^^1=0^^";//quat
 					var t_where4="where[3]=^^1=0 order by datea,noa ^^";//ordbht
@@ -219,23 +221,33 @@
 					t_where1=t_where1+" ^^";
 					t_where2=t_where2+" ^^";
 					
-					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'cont1_b', "600px", "700px", '進貨合約');
+					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'cont1_b', "600px", "700px", '進貨合約');*/
+					
+					var t_where="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0 ";
+					if(q_cur==1 || q_cur==2)
+						t_where=t_where+" and noa!='"+$('#textQno2').val()+"'";
+					q_box("contst_vu_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'cont1_b', "600px", "700px", '進貨合約');
 				});
 				
 				$('#textQno1').change(function() {
-					if(!emp($('#textQno1').val())){
+					//105/11/08 互換合約再另外作業處理 維持抓cont
+					/*if(!emp($('#textQno1').val())){
 						var t_where1="where=^^noa='"+$('#textQno1').val()+"'^^ ";
 						var t_where2="where[1]=^^noa='"+$('#textQno1').val()+"'^^ ";
 						var t_where3="where[2]=^^1=0^^ ";
 						var t_where4="where[3]=^^=1=0^^ ";
 						
 						q_gt('cont_sf', t_where1t_where2+t_where3+t_where4, 0, 0, 0, "qno1_chage", r_accy);
+					}*/
+					if(!emp($('#textQno1').val())){
+						var t_where="where=^^noa='"+$('#textQno1').val()+"'^^ ";
+						q_gt('cont', t_where, 0, 0, 0, "qno1_chage", r_accy);
 					}
 				});
 				
 				$('#lblQno2').click(function() {
-					//1=1^^where[1]=^^1=1^^where[2]=^^1=1^^where[3]=^^1=1^^
-					var t_where1="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0";//cont
+					//105/11/08 互換合約再另外作業處理 維持抓cont
+					/*var t_where1="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0";//cont
 					var t_where2="where[1]=^^tggno='"+$('#txtTggno').val()+"' and f4>0 and isnull(enda,0)=0";//ordhs
 					var t_where3="where[2]=^^1=0^^";//quat
 					var t_where4="where[3]=^^1=0 order by datea,noa ^^";//ordbht
@@ -248,17 +260,26 @@
 					t_where1=t_where1+" ^^";
 					t_where2=t_where2+" ^^";
 					
-					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'cont2_b', "600px", "700px", '進貨合約');
+					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'cont2_b', "600px", "700px", '進貨合約');*/
+					var t_where="tggno='"+$('#txtTggno').val()+"' and eweight>0 and isnull(enda,0)=0 ";
+					if(q_cur==1 || q_cur==2)
+						t_where=t_where+" and noa!='"+$('#textQno1').val()+"'";
+					q_box("contst_vu_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'cont2_b', "600px", "700px",  '進貨合約');
 				});
 				
 				$('#textQno2').change(function() {
-					if(!emp($('#textQno2').val())){
+					//105/11/08 互換合約再另外作業處理 維持抓cont
+					/*if(!emp($('#textQno2').val())){
 						var t_where1="where=^^noa='"+$('#textQno2').val()+"'^^ ";
 						var t_where2="where[1]=^^noa='"+$('#textQno2').val()+"'^^ ";
 						var t_where3="where[2]=^^1=0^^ ";
 						var t_where4="where[3]=^^=1=0^^ ";
 						
 						q_gt('cont_sf', t_where1t_where2+t_where3+t_where4, 0, 0, 0, "qno2_chage", r_accy);
+					}*/
+					if(!emp($('#textQno2').val())){
+						var t_where="where=^^noa='"+$('#textQno2').val()+"'^^ ";
+						q_gt('cont', t_where, 0, 0, 0, "qno2_chage", r_accy);
 					}
 				});
 				
@@ -390,6 +411,7 @@
 						q_cmbParse("combClass", t_class,'s');
 						break;
 					case 'cont_btnOk':
+						//105/11/08 互換合約再另外作業處理 維持抓cont
 						var as = _q_appendData("cont", "", true);
 						var qno1_exists=(emp($('#textQno1').val())?true:false);
 						var qno2_exists=(emp($('#textQno2').val())?true:false);
@@ -397,12 +419,14 @@
 						for ( i = 0; i < as.length; i++) {
 							if(as[i].noa==$('#textQno1').val()){
 								qno1_exists=true;
-								q1_weight=dec(as[i].weight);
+								//q1_weight=dec(as[i].weight);
+								q1_weight=dec(as[i].ordeweight);
 								qtgg1=trim(as[i].tggno);
 							}
 							if(as[i].noa==$('#textQno2').val()){
 								qno2_exists=true;
-								q2_weight=dec(as[i].weight);
+								//q2_weight=dec(as[i].weight);
+								q2_weight=dec(as[i].ordeweight);
 								qtgg2=trim(as[i].tggno);
 							}
 						}
@@ -687,11 +711,13 @@
 			}
 
 			function q_stPost() {
+				//105/11/08 互換合約再另外作業處理 維持抓cont
 				t_cont1=t_cont1.length==0?'#non':t_cont1;
 				t_cont2=t_cont2.length==0?'#non':t_cont2;
 				if(q_cur==3){
 					if(t_cont1 != '#non' || t_cont2 != '#non'){
-						q_func('qtxt.query.changecontgweight', 'rc2.txt,changecont_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_cont1)+ ';' + encodeURI(t_cont2));
+						//q_func('qtxt.query.changecontgweight', 'rc2.txt,changecont_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_cont1)+ ';' + encodeURI(t_cont2));
+						q_func('qtxt.query.changecontgweight', 'rc2.txt,changecont_vu,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_cont1)+ ';' + encodeURI(t_cont2));
 					}
 					t_cont1='#non',t_cont2='#non';
 				}
@@ -700,8 +726,10 @@
 				var s1 = xmlString.split(';');
 				abbm[q_recno]['accno'] = s1[0];
 				$('#txtAccno').val(s1[0]);
-				if((!emp($('#textQno1').val()) || !emp($('#textQno2').val()) || t_cont1 != '#non' || t_cont2 != '#non' ))
-					q_func('qtxt.query.changecontgweight', 'rc2.txt,changecont_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_cont1)+ ';' + encodeURI(t_cont2));
+				if((!emp($('#textQno1').val()) || !emp($('#textQno2').val()) || t_cont1 != '#non' || t_cont2 != '#non' )){
+					//q_func('qtxt.query.changecontgweight', 'rc2.txt,changecont_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_cont1)+ ';' + encodeURI(t_cont2));
+					q_func('qtxt.query.changecontgweight', 'rc2.txt,changecont_vu,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_cont1)+ ';' + encodeURI(t_cont2));
+				}
 				t_cont1='#non',t_cont2='#non';
 			}
 			
@@ -756,12 +784,18 @@
 				}
 				
 				//檢查合約是否存在或已結案
-				if(!check_cont && (!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
+				//105/11/08 互換合約再另外作業處理 維持抓cont
+				/*if(!check_cont && (!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
 					var t_where1 = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
 					var t_where2 = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
 					var t_where3 = "where=^^ 1=0 ^^";
 					var t_where4 = "where=^^ 1=0 ^^";
 					q_gt('cont_sf', t_where1+t_where2+t_where3+t_where4, 0, 0, 0, "cont_btnOk", r_accy);
+					return;
+				}*/
+				if(!check_cont && (!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
+					var t_where = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
+					q_gt('cont', t_where, 0, 0, 0, "cont_btnOk", r_accy);
 					return;
 				}
 				
