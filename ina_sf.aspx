@@ -57,7 +57,7 @@
                 q_mask(bbmMask);
                 
                 bbmNum = [['txtWeight', 15, q_getPara('rc2.weightPrecision'), 1]]
-				bbsNum = [['txtLengthb', 10, 2, 1], ['txtMount', 10, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 10, q_getPara('vcc.weightPrecision'), 1]];
+				bbsNum = [['txtLengthb', 10, 2, 1], ['txtMount', 10, q_getPara('rc2.mountPrecision'), 1], ['txtWeight', 10, q_getPara('rc2.weightPrecision'), 1]];
 				
 				q_gt('ucc', "1=1", 0, 0, 0, "bbsucc");
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
@@ -283,7 +283,7 @@
                 if (q_cur > 0 && q_cur < 4)// 1-3
                     return;
 
-                q_box('ina_s.aspx', q_name + '_s', "500px", "330px", q_getMsg("popSeek"));
+                q_box('ina_sf_s.aspx', q_name + '_s', "500px", "350px", q_getMsg("popSeek"));
             }
 
             function combPay_chg() {
@@ -404,6 +404,7 @@
             }
 
             function btnModi() {
+            	t_ordhno=$('#txtOrdeno').val();
                 if (emp($('#txtNoa').val()))
                     return;
                 _btnModi();
@@ -433,7 +434,7 @@
 				if (!(q_cur == 1 || q_cur == 2))
 					return false;
 				
-				if((!emp($('#textQno1').val()) || !emp($('#textQno2').val()) || t_cont1 != '#non' || t_cont2 != '#non' )){
+				if((!emp($('#txtOrdeno').val()) || t_ordhno != '#non')){
 					q_func('qtxt.query.changeordhsgweight', 'ordh.txt,changeordhs_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_ordhno));
 				}
 				t_ordhno='#non';
@@ -466,6 +467,21 @@
 
             function readonly(t_para, empty) {
                 _readonly(t_para, empty);
+                if(t_para){
+                	for (var i = 0; i < q_bbsCount; i++) {
+                		$('#combProduct_'+i).attr('disabled', 'disabled');
+                		$('#combUcolor_'+i).attr('disabled', 'disabled');
+                		$('#combSpec_'+i).attr('disabled', 'disabled');
+                		$('#combClass_'+i).attr('disabled', 'disabled');
+                	}
+                }else{
+                	for (var i = 0; i < q_bbsCount; i++) {
+                		$('#combProduct_'+i).removeAttr('disabled');
+                		$('#combUcolor_'+i).removeAttr('disabled');
+                		$('#combSpec_'+i).removeAttr('disabled');
+                		$('#combClass_'+i).removeAttr('disabled');
+                	}
+                }
             }
 
             function btnMinus(id) {
@@ -514,11 +530,13 @@
             }
 
             function btnDele() {
+            	t_ordhno=$('#txtOrdeno').val();
                 _btnDele();
             }
 
             function btnCancel() {
                 _btnCancel();
+                t_ordhno='#non';
             }
 			function FormatNumber(n) {
 				var xx = "";
@@ -737,10 +755,10 @@
 		<div class="dview" id="dview" style="float: left;  width:32%;"  >
 			<table class="tview" id="tview"   border="1" cellpadding='2'  cellspacing='0' style="background-color: #FFFF66;">
 				<tr>
-					<td align="center" style="width:5%"><a id='vewChk'> </a></td>
-					<td align="center" style="width:20%"><a id='vewDatea'> </a></td>
-					<td align="center" style="width:25%"><a id='vewTgg'> </a></td>
-					<td align="center" style="width:25%"><a id='vewOrdeno_sf'>合約號碼</a></td>
+					<td align="center" style="width:1%"><a id='vewChk'> </a></td>
+					<td align="center" style="width:25%"><a id='vewDatea'> </a></td>
+					<td align="center" style="width:35%"><a id='vewTgg'> </a></td>
+					<td align="center" style="width:35%"><a id='vewOrdeno_sf'>合約號碼</a></td>
 				</tr>
 				<tr>
 					<td><input id="chkBrow.*" type="checkbox" style=' '/></td>
