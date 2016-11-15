@@ -374,6 +374,7 @@
 							$('#textQno1').val(b_ret[0].noa);
 							$('#txtSalesno').val(b_ret[0].salesno);
 							$('#txtSales').val(b_ret[0].sales);
+							$('#txtAddr2').val(b_ret[0].addr2);
 							if(b_ret[0].atax=="true"){
 								$('#chkAtax').prop('checked',true);
 							}else{
@@ -805,10 +806,12 @@
 									$('#chkAtax').prop('checked',true);
 									$('#txtSalesno').val(as[0].salesno);
 									$('#txtSales').val(as[0].sales);
+									$('#txtAddr2').val(as[0].addr2);
 								}else{
 									$('#chkAtax').prop('checked',false);
 									$('#txtSalesno').val(as[0].salesno);
 									$('#txtSales').val(as[0].sales);
+									$('#txtAddr2').val(as[0].addr2);
 								}
 								refreshBbm();
 								sum();

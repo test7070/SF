@@ -549,7 +549,7 @@
                 refreshBbm();
                 if(!emp($('#txtTggno').val())){
                 	if(q_getPara('sys.project').toUpperCase()=='VU'){
-						q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"'^^ ", 0, 0, 0, "custms");
+						q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' order by noq desc^^ ", 0, 0, 0, "custms");
 					}else{
 						q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' and isnull(enda,0)=0 order by noq desc ^^ ", 0, 0, 0, "custms");
 					}
@@ -675,7 +675,7 @@
 			   		case 'txtTggno':
 			   			if(!emp($('#txtTggno').val())){
 			   				if(q_getPara('sys.project').toUpperCase()=='VU'){
-								q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"'^^ ", 0, 0, 0, "custms");
+								q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' order by noq desc^^ ", 0, 0, 0, "custms");
 							}else{
 								q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' and isnull(enda,0)=0  order by noq desc^^ ", 0, 0, 0, "custms");
 							}
