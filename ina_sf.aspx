@@ -424,13 +424,20 @@
                 _btnOk(key_value, bbmKey[0], bbsKey[1], '', 2);
             }
             
+            var t_deleno='',t_rc2no='';
             function q_stPost() {
 				t_ordhno=t_ordhno.length==0?'#non':t_ordhno;
+				t_deleno=t_deleno.length==0?'#non':t_deleno;
+				
 				if(q_cur==3){
 					if(t_ordhno != '#non'){
 						q_func('qtxt.query.changeordhsgweight', 'ordh.txt,changeordhs_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_ordhno));
 					}
 					t_ordhno='#non';
+					
+					if(t_deleno != '#non' && t_rc2no !=''){
+						q_func('rc2_post.post.ina2rc230', r_accy + ',' + t_rc2no + ',0');
+					}
 				}
 				if (!(q_cur == 1 || q_cur == 2))
 					return false;
@@ -439,6 +446,22 @@
 					q_func('qtxt.query.changeordhsgweight', 'ordh.txt,changeordhs_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_ordhno));
 				}
 				t_ordhno='#non';
+				
+				if(!emp($('#txtNoa').val())){
+					var today = new Date();
+					var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
+					if(q_cur==1){
+						q_func('qtxt.query.ina2rc2.1', 'ina.txt,ina2rc2_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_rc2'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+					}else if(q_cur==2){
+						q_gt('view_ina', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
+						var as = _q_appendData("view_ina", "", true, true);
+						if (as[0] != undefined) {
+							if(!emp(as[0].transtartno))
+								t_rc2no=as[0].transtartno;
+						}
+						q_func('rc2_post.post.ina2rc220', r_accy + ',' + t_rc2no + ',0');
+					}
+				}
 			}
 
             function bbsSave(as) {
@@ -532,6 +555,13 @@
 
             function btnDele() {
             	t_ordhno=$('#txtOrdeno').val();
+            	t_deleno=$('#txtNoa').val();
+            	
+            	q_gt('view_ina', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
+				var as = _q_appendData("view_ina", "", true, true);
+				if (as[0] != undefined) {
+					t_rc2no=as[0].transtartno;
+				}
                 _btnDele();
             }
 
@@ -598,6 +628,47 @@
 						break;
 					case 'changeordhsgweight':
 						break;
+					case 'qtxt.query.ina2rc2.1':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							t_rc2no=as[0].rc2no;
+							//rc2.post內容
+							if(!emp(t_rc2no)){
+								q_func('rc2_post.post.ina2rc211', r_accy + ',' + t_rc2no + ',1');
+							}
+						}
+						break;
+					case 'rc2_post.post.ina2rc220':
+						q_func('qtxt.query.ina2rc2.2', 'ina.txt,ina2rc2_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_rc2'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+						break;
+					case 'qtxt.query.ina2rc2.2':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							t_rc2no=as[0].rc2no;
+							//rc2.post內容
+							if(!emp(t_rc2no)){
+								q_func('rc2_post.post.ina2rc221', r_accy + ',' + t_rc2no + ',1');
+							}
+						}
+						break;
+					case 'rc2_post.post.ina2rc230':
+						if(t_deleno != '#non'){							
+							var today = new Date();
+							var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
+							q_func('qtxt.query.ina2rc2.3', 'ina.txt,ina2rc2_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_deleno)+ ';' + encodeURI(q_getPara('sys.key_rc2'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+						}
+						t_deleno='#non';
+						break;
+					case 'qtxt.query.ina2rc2.3':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							t_rc2no=as[0].rc2no;
+							//rc2.post內容
+							if(!emp(t_rc2no)){
+								q_func('rc2_post.post.ina2rc231', r_accy + ',' + t_rc2no + ',1');
+							}
+						}
+						break;
 				}
 				if(t_func.indexOf('qtxt.query.rc2suno_')>-1){
 					var n=t_func.split('_')[1];
@@ -624,6 +695,7 @@
 	                	}
                 	}
 				}
+				t_rc2no='';
 			}
 		</script>
 		<style type="text/css">

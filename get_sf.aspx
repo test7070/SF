@@ -388,22 +388,20 @@
 				_btnOk(key_value, bbmKey[0], bbsKey[1], '', 2);
 			}
 			
-			var t_deleno='';
+			var t_deleno='',t_vccno='';
 			function q_stPost() {
 				t_ordhno=t_ordhno.length==0?'#non':t_ordhno;
 				t_deleno=t_deleno.length==0?'#non':t_deleno;
+				
 				if(q_cur==3){
 					if(t_ordhno != '#non'){
 						q_func('qtxt.query.changeordhtgweight', 'ordh.txt,changeordht_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_ordhno));
 					}
 					t_ordhno='#non';
 					
-					if(t_deleno != '#non'){
-						var today = new Date();
-						var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
-						q_func('qtxt.query.get2vcc.3', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_deleno)+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+					if(t_deleno != '#non' && t_vccno!=''){
+						q_func('vcc_post.post.get2vcc30', r_accy + ',' + t_vccno + ',0');
 					}
-					t_deleno='#non';
 				}
 				if (!(q_cur == 1 || q_cur == 2))
 					return false;
@@ -419,7 +417,13 @@
 					if(q_cur==1){
 						q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
 					}else if(q_cur==2){
-						q_func('qtxt.query.get2vcc.2', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+						q_gt('view_get', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
+						var as = _q_appendData("view_get", "", true, true);
+						if (as[0] != undefined) {
+							if(!emp(as[0].transtartno))
+								t_vccno=as[0].transtartno;
+						}
+						q_func('vcc_post.post.get2vcc20', r_accy + ',' + t_vccno + ',0');
 					}
 				}
 			}
@@ -519,6 +523,12 @@
 			function btnDele() {
 				t_ordhno=$('#txtIdno').val();
 				t_deleno=$('#txtNoa').val();
+				
+				q_gt('view_get', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
+				var as = _q_appendData("view_get", "", true, true);
+				if (as[0] != undefined) {
+					t_vccno=as[0].transtartno;
+				}
 				_btnDele();
 			}
 
@@ -543,7 +553,49 @@
 				switch(t_func) {
 					case 'changeordhtgweight':
 						break;
+					case 'qtxt.query.get2vcc.1':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							t_vccno=as[0].vccno;
+							//vcc.post內容
+							if(!emp(t_vccno)){
+								q_func('vcc_post.post.get2vcc11', r_accy + ',' + t_vccno + ',1');
+							}
+						}
+						break;
+					case 'vcc_post.post.get2vcc20':
+						q_func('qtxt.query.get2vcc.2', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+						break;
+					case 'qtxt.query.get2vcc.2':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							t_vccno=as[0].vccno;
+							//vcc.post內容
+							if(!emp(t_vccno)){
+								q_func('vcc_post.post.get2vcc21', r_accy + ',' + t_vccno + ',1');
+							}
+						}
+						break;
+					case 'vcc_post.post.get2vcc30':
+						if(t_deleno != '#non'){							
+							var today = new Date();
+							var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
+							q_func('qtxt.query.get2vcc.3', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_deleno)+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+						}
+						t_deleno='#non';
+						break;
+					case 'qtxt.query.get2vcc.3':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							t_vccno=as[0].vccno;
+							//vcc.post內容
+							if(!emp(t_vccno)){
+								q_func('vcc_post.post.get2vcc31', r_accy + ',' + t_vccno + ',1');
+							}
+						}
+						break;
 				}
+				t_vccno=''; 
 			}
 		</script>
 		<style type="text/css">
