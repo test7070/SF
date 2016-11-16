@@ -57,7 +57,8 @@
 				q_mask(bbmMask);
 				
 				bbmNum = [['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]]
-				bbsNum = [['txtLengthb', 10, 2, 1], ['txtMount', 10, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 10, q_getPara('vcc.weightPrecision'), 1]];
+				bbsNum = [['txtLengthb', 10, 2, 1], ['txtMount', 10, q_getPara('vcc.mountPrecision'), 1]
+				, ['txtWeight', 10, q_getPara('vcc.weightPrecision'), 1], ['txtMweight', 10, q_getPara('vcc.pricePrecision'), 1]];
 				
 				q_gt('ucc', "1=1", 0, 0, 0, "bbsucc");
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
@@ -282,7 +283,7 @@
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2)
-								$('#txtPaytype_'+b_seq).val($('#combUcolor_'+b_seq).find("option:selected").text());
+								$('#txtUcolor_'+b_seq).val($('#combUcolor_'+b_seq).find("option:selected").text());
 						});
 						
 						$('#combSpec_' + j).change(function() {
@@ -307,21 +308,21 @@
 							b_seq = t_IdSeq;
 							if ($(this).val().substr(0, 1) != '#')
                         		$(this).val('#' + $(this).val());
-                        	bbsweight(b_seq);
+                        	//bbsweight(b_seq);
 						});
 						
 						$('#txtLengthb_' + j).change(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-                        	bbsweight(b_seq);
+                        	//bbsweight(b_seq);
 						});
 						
 						$('#txtMount_' + j).change(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-                        	bbsweight(b_seq);
+                        	//bbsweight(b_seq);
 						});
 						
 						$('#txtUno__' + j).change(function() {
@@ -387,13 +388,22 @@
 				_btnOk(key_value, bbmKey[0], bbsKey[1], '', 2);
 			}
 			
+			var t_deleno='';
 			function q_stPost() {
 				t_ordhno=t_ordhno.length==0?'#non':t_ordhno;
+				t_deleno=t_deleno.length==0?'#non':t_deleno;
 				if(q_cur==3){
 					if(t_ordhno != '#non'){
 						q_func('qtxt.query.changeordhtgweight', 'ordh.txt,changeordht_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_ordhno));
 					}
 					t_ordhno='#non';
+					
+					if(t_deleno != '#non'){
+						var today = new Date();
+						var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
+						q_func('qtxt.query.get2vcc.3', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_deleno)+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+					}
+					t_deleno='#non';
 				}
 				if (!(q_cur == 1 || q_cur == 2))
 					return false;
@@ -402,6 +412,16 @@
 					q_func('qtxt.query.changeordhtgweight', 'ordh.txt,changeordht_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_ordhno));
 				}
 				t_ordhno='#non';
+				
+				if(!emp($('#txtNoa').val())){
+					var today = new Date();
+					var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
+					if(q_cur==1){
+						q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+					}else if(q_cur==2){
+						q_func('qtxt.query.get2vcc.2', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+					}
+				}
 			}
 
 			function bbsSave(as) {
@@ -498,6 +518,7 @@
 
 			function btnDele() {
 				t_ordhno=$('#txtIdno').val();
+				t_deleno=$('#txtNoa').val();
 				_btnDele();
 			}
 
@@ -714,7 +735,10 @@
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMemo" class="lbl" > </a></td>
-						<td colspan='3'><textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea></td>
+						<td colspan='3'>
+							<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
+							<!--<input id="txtTranstartno" type="hidden" class="txt c1"/>轉出貨單號-->
+						</td>
 					</tr>
 				</table>
 			</div>
@@ -733,6 +757,7 @@
 					<td style="width:90px; text-align: center;">廠牌</td>
 					<td style="width:70px; text-align: center;">數量</td>
 					<td style="width:80px; text-align: center;">重量kg</td>
+					<td style="width:80px; text-align: center;">單價</td>
 					<td style=" text-align: center;">單項備註</td>
 				</tr>
 				<tr  style='background:#cad3ff;'>
@@ -762,6 +787,7 @@
 					</td>
 					<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
+					<td><input id="txtMweight.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtMemo.*" type="text" class="txt c1"/></td>
 				</tr>
 			</table>
