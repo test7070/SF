@@ -36,10 +36,11 @@
             brwList = [];
             brwNowPage = 0;
             brwKey = 'Datea';
-            brwCount2 = 5;
+            brwCount2 = 6;
 
             aPop = new Array(
-	            ['txtTggno', 'lblTgg_sf', 'view_cust_tgg', 'noa,comp,nick', 'txtTggno,txtTgg,txtNick', 'custtgg_b.aspx'],
+	            ['txtTggno', 'lblTgg_sf', 'tgg', 'noa,comp,nick', 'txtTggno,txtTgg,txtNick', 'tgg_b.aspx'],
+	            ['txtCustno', 'lblCust_sf', 'cust', 'noa,comp,nick', 'txtCustno,txtCust,txtNick', 'cust_b.aspx'],
 	            ['txtCno', 'lblCno_sf', 'acomp', 'noa,acomp', 'txtCno,txtAcomp', 'acomp_b.aspx']
            	);
 
@@ -549,9 +550,9 @@
                 refreshBbm();
                 if(!emp($('#txtTggno').val())){
                 	if(q_getPara('sys.project').toUpperCase()=='VU'){
-						q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' order by noq desc^^ ", 0, 0, 0, "custms");
+						q_gt('custms', "where=^^noa='"+$('#txtCustno').val()+"' order by noq desc^^ ", 0, 0, 0, "custms");
 					}else{
-						q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' and isnull(enda,0)=0 order by noq desc ^^ ", 0, 0, 0, "custms");
+						q_gt('custms', "where=^^noa='"+$('#txtCustno').val()+"' and isnull(enda,0)=0 order by noq desc ^^ ", 0, 0, 0, "custms");
 					}
 				}
             }
@@ -675,9 +676,9 @@
 			   		case 'txtTggno':
 			   			if(!emp($('#txtTggno').val())){
 			   				if(q_getPara('sys.project').toUpperCase()=='VU'){
-								q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' order by noq desc^^ ", 0, 0, 0, "custms");
+								q_gt('custms', "where=^^noa='"+$('#txtCustno').val()+"' order by noq desc^^ ", 0, 0, 0, "custms");
 							}else{
-								q_gt('custms', "where=^^noa='"+$('#txtTggno').val()+"' and isnull(enda,0)=0  order by noq desc^^ ", 0, 0, 0, "custms");
+								q_gt('custms', "where=^^noa='"+$('#txtCustno').val()+"' and isnull(enda,0)=0  order by noq desc^^ ", 0, 0, 0, "custms");
 							}
 						}else{
 							$('#combAccount').text('');
@@ -943,6 +944,14 @@
 						<td colspan="2">
 							<input id="txtTgg"type="text" class="txt c1"/>
 							<input id="txtNick"  type="text" class="txt" style="display:none;"/>
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblCust_sf" class="lbl btn" >配合客戶</a></td>
+						<td><input id="txtCustno" type="text" class="txt c1"/></td>
+						<td colspan="2">
+							<input id="txtCust"type="text" class="txt c1"/>
+							<input id="txtNick2"  type="text" class="txt" style="display:none;"/>
 						</td>
 					</tr>
 					<tr>

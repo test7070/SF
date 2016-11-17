@@ -133,7 +133,7 @@
 								alert($('#txtIdno').val()+'互換合約已結案!');
 							}else if(dec(as[0].f9)<=0){
 								alert($('#txtIdno').val()+'互換合約已互換出貨完畢!');
-							}else if(!emp($('#txtCustno').val()) && $('#txtCustno').val()!=as[0].tggno){
+							}else if(!emp($('#txtCustno').val()) && $('#txtCustno').val()!=as[0].custno){
 								alert('互換合約廠商與互換出貨廠商不同!!');
 							}else{
 								$('#txtAddr').val(as[0].addr);
@@ -146,7 +146,7 @@
 						var as = _q_appendData("ordh", "", true);
 						if (as[0] != undefined) {
 							ordh_weight=dec(as[0].f7);
-							if(as[0].tggno!=$('#txtCustno').val()){
+							if(as[0].custno!=$('#txtCustno').val()){
 								alert('互換合約廠商與互換出貨廠商不同!!');
 							}else{
 								var t_where = "where=^^ idno='"+$('#txtIdno').val()+"' ^^"; //and noa!='"+$('#txtNoa').val()+"'
