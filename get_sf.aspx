@@ -17,7 +17,7 @@
 
 			q_tables = 's';
 			var q_name = "get";
-			var q_readonly = ['txtNoa', 'txtWorker','txtWorker2'];
+			var q_readonly = ['txtNoa', 'txtWorker','txtWorker2','txtTranstartno'];
 			var q_readonlys = [];
 			var bbmNum = [];
 			var bbsNum = [];
@@ -52,6 +52,7 @@
 			}
 
 			function mainPost() {
+				document.title='互換出貨作業';
 				q_getFormat();
 				bbmMask = [['txtDatea', r_picd]];
 				q_mask(bbmMask);
@@ -129,11 +130,11 @@
                 		var as = _q_appendData("ordh", "", true);
 						if (as[0] != undefined) {
 							if((as[0].enda)=="true"){
-								alert($('#txtIdno').val()+'合約已結案!');
+								alert($('#txtIdno').val()+'互換合約已結案!');
 							}else if(dec(as[0].f9)<=0){
-								alert($('#txtIdno').val()+'合約已入庫完畢!');
+								alert($('#txtIdno').val()+'互換合約已互換出貨完畢!');
 							}else if(!emp($('#txtCustno').val()) && $('#txtCustno').val()!=as[0].tggno){
-								alert('合約廠商與入庫廠商不同!!');
+								alert('互換合約廠商與互換出貨廠商不同!!');
 							}else{
 								$('#txtAddr').val(as[0].addr);
 							}
@@ -144,9 +145,9 @@
                 	case 'ordh_btnOk':
 						var as = _q_appendData("ordh", "", true);
 						if (as[0] != undefined) {
-							ordh_weight=dec(as[i].f7);
-							if(as[i].tggno!=$('#txtCustno').val()){
-								alert('合約廠商與入庫廠商不同!!');
+							ordh_weight=dec(as[0].f7);
+							if(as[0].tggno!=$('#txtCustno').val()){
+								alert('互換合約廠商與互換出貨廠商不同!!');
 							}else{
 								var t_where = "where=^^ idno='"+$('#txtIdno').val()+"' ^^"; //and noa!='"+$('#txtNoa').val()+"'
 								q_gt('view_get', t_where, 0, 0, 0, "ordh_view_get", r_accy);	
@@ -168,7 +169,7 @@
 							check_ordh=true;
 							btnOk();
 						}else{
-							var t_err='合約號碼【'+$('#txtIdno').val()+'】合約剩餘重量'+FormatNumber(ordh_weight)+'小於入庫重量'+FormatNumber($('#txtWeight').val());
+							var t_err='互換合約號碼【'+$('#txtIdno').val()+'】互換合約剩餘重量'+FormatNumber(ordh_weight)+'小於互換出貨重量'+FormatNumber($('#txtWeight').val());
 							alert(t_err);
 						}
 						ordh_weight=0;
@@ -420,8 +421,10 @@
 						q_gt('view_get', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
 						var as = _q_appendData("view_get", "", true, true);
 						if (as[0] != undefined) {
-							if(!emp(as[0].transtartno))
+							if(!emp(as[0].transtartno)){
+								$('#txtTranstartno').val(as[0].transtartno);
 								t_vccno=as[0].transtartno;
+							}
 						}
 						q_func('vcc_post.post.get2vcc20', r_accy + ',' + t_vccno + ',0');
 					}
@@ -527,6 +530,7 @@
 				q_gt('view_get', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
 				var as = _q_appendData("view_get", "", true, true);
 				if (as[0] != undefined) {
+					$('#txtTranstartno').val(as[0].transtartno);
 					t_vccno=as[0].transtartno;
 				}
 				_btnDele();
@@ -559,6 +563,7 @@
 							t_vccno=as[0].vccno;
 							//vcc.post內容
 							if(!emp(t_vccno)){
+								$('#txtTranstartno').val(t_vccno);
 								q_func('vcc_post.post.get2vcc11', r_accy + ',' + t_vccno + ',1');
 							}
 						}
@@ -572,6 +577,7 @@
 							t_vccno=as[0].vccno;
 							//vcc.post內容
 							if(!emp(t_vccno)){
+								$('#txtTranstartno').val(t_vccno);
 								q_func('vcc_post.post.get2vcc21', r_accy + ',' + t_vccno + ',1');
 							}
 						}
@@ -749,9 +755,9 @@
 						<td> </td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblDatea" class="lbl" > </a></td>
+						<td><span> </span><a id="lblDatea_sf" class="lbl" >互換出貨日期</a></td>
 						<td><input id="txtDatea" type="text" class="txt c3"/></td>
-						<td><span> </span><a id="lblNoa" class="lbl" > </a></td>
+						<td><span> </span><a id="lblNoa_sf" class="lbl" >互換出貨單號</a></td>
 						<td><input id="txtNoa" type="text" class="txt c1"/></td>
 					</tr>
 					<tr>
@@ -789,8 +795,11 @@
 						<td><span> </span><a id="lblMemo" class="lbl" > </a></td>
 						<td colspan='3'>
 							<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
-							<!--<input id="txtTranstartno" type="hidden" class="txt c1"/>轉出貨單號-->
 						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblTranstartno_sf" class="lbl">立帳單號</a></td>
+						<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
 					</tr>
 				</table>
 			</div>

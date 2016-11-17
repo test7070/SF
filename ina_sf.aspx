@@ -17,7 +17,7 @@
 
             q_tables = 's';
             var q_name = "ina";
-            var q_readonly = ['txtNoa','txtWorker','txtWorker2'];
+            var q_readonly = ['txtNoa','txtWorker','txtWorker2','txtTranstartno'];
             var q_readonlys = [];
             var bbmNum = [];
             var bbsNum = [];
@@ -52,6 +52,8 @@
             }
 
             function mainPost() {
+            	document.title='互換進貨作業';
+            	
                 q_getFormat();
                 bbmMask = [['txtDatea', r_picd]];
                 q_mask(bbmMask);
@@ -109,28 +111,28 @@
                 		var as = _q_appendData("ordh", "", true);
 						if (as[0] != undefined) {
 							if((as[0].enda)=="true"){
-								alert($('#txtOrdeno').val()+'合約已結案!');
+								alert($('#txtOrdeno').val()+'互換合約已結案!');
 							}else if(dec(as[0].f4)<=0){
-								alert($('#txtOrdeno').val()+'合約已入庫完畢!');
+								alert($('#txtOrdeno').val()+'互換合約已進貨完畢!');
 							}else if(!emp($('#txtTggno').val()) && $('#txtTggno').val()!=as[0].tggno){
-								alert('合約廠商與入庫廠商不同!!');
+								alert('互換合約廠商與互換進貨廠商不同!!');
 							}
 						}else{
-							alert($('#txtOrdeno').val()+'合約不存在!!!');
+							alert($('#txtOrdeno').val()+'互換合約不存在!!!');
 						}
                 		break;
                 	case 'ordh_btnOk':
 						var as = _q_appendData("ordh", "", true);
 						if (as[0] != undefined) {
-							ordh_weight=dec(as[i].f2);
-							if(as[i].tggno!=$('#txtTggno').val()){
-								alert('合約廠商與入庫廠商不同!!');
+							ordh_weight=dec(as[0].f2);
+							if(as[0].tggno!=$('#txtTggno').val()){
+								alert('互換合約廠商與互換進貨廠商不同!!');
 							}else{
 								var t_where = "where=^^ ordeno='"+$('#txtOrdeno').val()+"' ^^"; //and noa!='"+$('#txtNoa').val()+"'
 								q_gt('view_ina', t_where, 0, 0, 0, "ordh_view_ina", r_accy);	
 							}
 						}else{
-							alert($('#txtOrdeno').val()+'合約號碼不存在!!');
+							alert($('#txtOrdeno').val()+'互換合約號碼不存在!!');
 						}
 						break;
 					case 'ordh_view_ina':
@@ -146,7 +148,7 @@
 							check_ordh=true;
 							btnOk();
 						}else{
-							var t_err='合約號碼【'+$('#txtOrdeno').val()+'】合約剩餘重量'+FormatNumber(ordh_weight)+'小於入庫重量'+FormatNumber($('#txtWeight').val());
+							var t_err='互換合約號碼【'+$('#txtOrdeno').val()+'】互換合約剩餘重量'+FormatNumber(ordh_weight)+'小於互換進貨重量'+FormatNumber($('#txtWeight').val());
 							alert(t_err);
 						}
 						ordh_weight=0;
@@ -154,7 +156,7 @@
 					case 'checkInano_btnOk':
 						var as = _q_appendData("view_rc2", "", true);
                         if (as[0] != undefined) {
-                            alert('入庫單號已存在!!!');
+                            alert('互換進貨單號已存在!!!');
                         } else {
                             wrServer($('#txtNoa').val());
                         }
@@ -207,6 +209,7 @@
 			
 			var check_ordh=false;
 			var check_uno=false,check_uno_count=0,check_uno_err='';
+			var getnewuno=false;
             function btnOk() {
                 t_err = q_chkEmpField([['txtNoa', q_getMsg('lblNoa')]]);
                 if (t_err.length > 0) {
@@ -247,7 +250,7 @@
 				}
 				
 				//取得UNO
-				var needuno=false;
+				/*var needuno=false;
 				for (var i = 0; i < q_bbsCount; i++) {
 					if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
 						needuno=true;
@@ -256,7 +259,7 @@
 				if(!getnewuno && needuno){
 					q_func('qtxt.query.getnewuno', 'cuc_sf.txt,getnewuno,ina;'+$('#txtNoa').val()+';'+q_getPara('sys.key_ina')+';'+$('#txtDatea').val());
 					return;
-				}
+				}*/
 				
 				getnewuno=false;
                 check_uno=false;
@@ -294,7 +297,7 @@
                 for (var j = 0; j < q_bbsCount; j++) {
                 	$('#lblNo_' + j).text(j + 1);
                     if (!$('#btnMinus_' + j).hasClass('isAssign')) {
-                        //判斷是否重複或已存過入庫----------------------------------------
+                        //判斷是否重複或已存過互換進貨----------------------------------------
                         $('#txtUno_' + j).change(function() {
                             t_IdSeq = -1;
                             /// 要先給  才能使用 q_bodyId()
@@ -307,7 +310,7 @@
                                     $('#txtUno_' + b_seq).val('');
                                 }
                             }
-                            //判斷是否已存過入庫
+                            //判斷是否已存過互換進貨
                             var t_where = "where=^^ noa='" + $('#txtUno_' + b_seq).val() + "' ^^";
                             q_gt('uccb', t_where, 0, 0, 0, "", r_accy);
                         });
@@ -456,8 +459,10 @@
 						q_gt('view_ina', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
 						var as = _q_appendData("view_ina", "", true, true);
 						if (as[0] != undefined) {
-							if(!emp(as[0].transtartno))
+							if(!emp(as[0].transtartno)){
 								t_rc2no=as[0].transtartno;
+								$('#txtTranstartno').val(as[0].transtartno);
+							}
 						}
 						q_func('rc2_post.post.ina2rc220', r_accy + ',' + t_rc2no + ',0');
 					}
@@ -561,6 +566,7 @@
 				var as = _q_appendData("view_ina", "", true, true);
 				if (as[0] != undefined) {
 					t_rc2no=as[0].transtartno;
+					$('#txtTranstartno').val(as[0].transtartno);
 				}
                 _btnDele();
             }
@@ -634,6 +640,7 @@
 							t_rc2no=as[0].rc2no;
 							//rc2.post內容
 							if(!emp(t_rc2no)){
+								$('#txtTranstartno').val(t_rc2no);
 								q_func('rc2_post.post.ina2rc211', r_accy + ',' + t_rc2no + ',1');
 							}
 						}
@@ -647,6 +654,7 @@
 							t_rc2no=as[0].rc2no;
 							//rc2.post內容
 							if(!emp(t_rc2no)){
+								$('#txtTranstartno').val(t_rc2no);
 								q_func('rc2_post.post.ina2rc221', r_accy + ',' + t_rc2no + ',1');
 							}
 						}
@@ -851,9 +859,9 @@
 					<td> </td>
 				</tr>
 				<tr>
-					<td><span> </span><a id="lblDatea" class="lbl"> </a></td>
+					<td><span> </span><a id="lblDatea_sf" class="lbl">互換進貨日期</a></td>
 					<td><input id="txtDatea" type="text" class="txt c3"/></td>
-					<td><span> </span><a id="lblNoa" class="lbl" > </a></td>
+					<td><span> </span><a id="lblNoa_sf" class="lbl" >互換進貨單號</a></td>
 					<td><input id="txtNoa" type="text" class="txt c1"/></td>
 				</tr>
 				<tr>
@@ -886,8 +894,11 @@
 					<td><span> </span><a id="lblMemo_sf" class="lbl">備註</a></td>
 					<td colspan='3'>
 						<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
-						<!--<input id="txtTranstartno" type="hidden" class="txt c1"/>轉進貨單號-->
 					</td>
+				</tr>
+				<tr>
+					<td><span> </span><a id="lblTranstartno_sf" class="lbl">立帳單號</a></td>
+					<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
 				</tr>
 			</table>
 		</div>
