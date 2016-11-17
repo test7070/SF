@@ -4,6 +4,7 @@ declare @t_xmon nvarchar(20)
 declare @t_xperson nvarchar(20)
 declare @t_xkind nvarchar(20)
 declare @t_part nvarchar(50)
+declare @t_cno nvarchar(50)
 declare @t_bsno nvarchar(50)
 declare @t_esno nvarchar(50)
 
@@ -11,8 +12,9 @@ set @t_xmon = case when '#non' = [1] then '' else [1] end
 set @t_xperson = case when '#non' = [2] then '' else [2] end
 set @t_xkind = case when '#non' = [3] then '上期' else [3] end
 set @t_part = case when '#non' = [4] then '' else [4] end
-set @t_bsno = case when '#non' = [5] then '' else [5] end
-set @t_esno = case when '#non' = [6] then char(255) else [6] end
+set @t_cno = case when '#non' = [5] then '' else [5] end
+set @t_bsno = case when '#non' = [6] then '' else [6] end
+set @t_esno = case when '#non' = [7] then char(255) else [7] end
 ---------------------------------------------------------------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -77,6 +79,7 @@ from salary a left join salarys b on a.noa=b.noa left join sss c on b.sno=c.noa
 where a.mon=@t_xmon and a.monkind=@t_xkind
 and b.sno between @t_bsno and @t_esno
 and (len(@t_part)=0 or b.partno=@t_part) 
+and (len(@t_cno)=0 or c.cno=@t_cno) 
 
 --更換顯示欄位
 update #tmp set gno=case when person='日薪' then '4' else '2' end
@@ -216,8 +219,8 @@ set @t_xmon = case when '#non' = [1] then '' else [1] end
 set @t_xperson = case when '#non' = [2] then '' else [2] end
 set @t_xkind = case when '#non' = [3] then '上期' else [3] end
 set @t_part = case when '#non' = [4] then '' else [4] end
-set @t_bsno = case when '#non' = [5] then '' else [5] end
-set @t_esno = case when '#non' = [6] then char(255) else [6] end
+set @t_bsno = case when '#non' = [6] then '' else [6] end
+set @t_esno = case when '#non' = [7] then char(255) else [7] end
 ---------------------------------------------------------------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
