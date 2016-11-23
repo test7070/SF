@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
 	<head>
 		<title> </title>
@@ -19,9 +19,9 @@
 			var q_name = "get";
 			var q_readonly = ['txtNoa', 'txtWorker','txtWorker2','txtTranstartno'];
 			var q_readonlys = [];
-			var bbmNum = [];
+			var bbmNum = [['txtMount', 10, 0, 1], ['txtPrice', 10, 0, 1], ['txtTotal', 15, 0, 1]];
 			var bbsNum = [];
-			var bbmMask = [];
+			var bbmMask = [['txtTranstart','99:99']];
 			var bbsMask = [];
 			q_sqlCount = 6;
 			brwCount = 6;
@@ -54,10 +54,10 @@
 			function mainPost() {
 				document.title='互換出貨作業';
 				q_getFormat();
-				bbmMask = [['txtDatea', r_picd]];
+				bbmMask = [['txtDatea', r_picd],['txtTranstart','99:99']];
 				q_mask(bbmMask);
 				
-				bbmNum = [['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]]
+				bbmNum = [['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1],['txtMount', 10, 0, 1], ['txtPrice', 10, 0, 1], ['txtTotal', 15, 0, 1]]
 				bbsNum = [['txtLengthb', 10, 2, 1], ['txtMount', 10, q_getPara('vcc.mountPrecision'), 1]
 				, ['txtWeight', 10, q_getPara('vcc.weightPrecision'), 1], ['txtMweight', 10, q_getPara('vcc.pricePrecision'), 1]];
 				
@@ -85,6 +85,9 @@
 						var t_where="where=^^noa='"+$('#txtIdno').val()+"'^^ ";
 						q_gt('ordh', t_where, 0, 0, 0, "hno_chage", r_accy);
 					}
+				});
+				$('#txtPrice').change(function(){
+					sum();
 				});
 			}
 			
@@ -380,7 +383,7 @@
 			}
 
 			function btnPrint() {
-				//q_box('z_getp_sf.aspx' + "?;;;;" + r_accy + ";noa=" + trim($('#txtNoa').val()), '', "95%", "95%", q_getMsg("popPrint"));
+				q_box('z_getp_sf.aspx' + "?;;;;" + r_accy + ";noa=" + trim($('#txtNoa').val()), '', "95%", "95%", q_getMsg("popPrint"));
 			}
 
 			function wrServer(key_value) {
@@ -443,7 +446,7 @@
 			}
 
 			function sum() {
-				
+				$('#txtPrice').val(q_sub(dec($('#txtTotal').val()),dec($('#txtMount').val())));
 			}
 
 			function refresh(recno) {
@@ -775,9 +778,33 @@
 						</td>
 					</tr>
 					<tr>
+						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
+						<td colspan="3">
+							<input id="txtCardealno" type="text" class="txt c2"/>
+							<input id="txtCardeal" type="text" class="txt c3"/>
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
+						<td><input id="txtTranstart" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id="lblCarno" class="lbl"> </a></td>
+						<td>
+							<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
+							<select id="combCarno" style="width: 20%;"> </select>
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblTotal_sf" class="lbl">車總重</a></td>
+						<td><input id="txtTotal" type="text" class="txt num c1"/></td>
 						<td><span> </span><a id="lblAddr_sf" class="lbl" >交貨工地</a></td>
 						<td><input id="txtAddr"type="text" class="txt c1" style="width: 98%;"/></td>
 						<td><select id="combAccount" class="txt" style="width: 20px;"> </select></td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblMount_sf" class="lbl" >空重</a></td>
+						<td><input id="txtMount" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id="lblPrice_sf" class="lbl" >淨重</a></td>
+						<td><input id="txtPrice" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblIdno_sf" class="lbl btn">合約號碼</a></td>
