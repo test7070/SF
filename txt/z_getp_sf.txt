@@ -40,7 +40,7 @@ declare @tmp1 table(
 if (LEN(@t_xaddr2)!=0)
 begin
 	insert into @tmp1
-	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr,a.idno,sum(a.total),sum(a.mount),sum(a.price),'','',
+	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr,a.idno,sum(a.total),sum(cast(a.transtyle as float)),sum(a.mount),'','',
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,sum(b.mount),sum(b.weight),
 		   a.trantype,'','','',''
 	from view_get a
@@ -51,7 +51,7 @@ end
 else
 begin
 	insert into @tmp1
-	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.idno,a.total,a.mount,a.price,'','',
+	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.idno,a.total,cast(a.transtyle as float),a.mount,'','',
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
 		   a.trantype,a.transtart,a.cardeal,b.store,a.carno
 	from view_get a
@@ -74,7 +74,6 @@ declare @str nvarchar(max)
 declare @cnt int
 declare @i int
 
---後面一張出貨單只會有一個合約號碼
 update @tmp1 set qno = dbo.split(dbo.split(qno,'##',0),'@',0)
 
 declare @tmp2 table(

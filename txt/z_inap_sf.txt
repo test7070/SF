@@ -37,7 +37,7 @@ set @t_exnoa = case when '#non' = [3] then CHAR(255) else [3] end
 		carno nvarchar(20)
 	)
 	insert into @tmp1
-	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.ordeno,a.total,a.mount,a.price,'','',
+	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.ordeno,a.total,cast(a.transtyle as float),a.mount,'','',
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
 		   a.trantype,a.transtart,a.cardeal,b.store,a.carno
 	from view_ina a
