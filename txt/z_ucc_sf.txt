@@ -1652,6 +1652,7 @@ select '0','ucce',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor
 ,b.weight,b.price,b.total,b.storeno,b.price,b.total,'ucce_vu?noa=$noa'
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 
 --進
 insert #tmp
@@ -1661,6 +1662,7 @@ select '1','rc2s',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor
 ,case when a.typea='2' then -1 else 1 end*b.total,'rc2_sf?noa=$noa'
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 
 --銷
 insert #tmp
@@ -1670,6 +1672,7 @@ select '5','vccs',a.accy,a.noa,b.noq,a.datea,'',b.product,b.ucolor,b.spec,b.size
 from view_vcc a left join view_vccs b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
 and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
+and (len(@x_uno)=0)
 
 insert #tmp
 select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
@@ -1678,6 +1681,7 @@ select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor
 from view_vcc a left join view_vcct b on a.noa=b.noa
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 
 update  a
 set storeno=isnull(b.storeno,'')
