@@ -90,6 +90,17 @@
                     }, {
                         type : '6', //[20]
                         name : 'xordeno'
+                    }, {
+                        type : '5',
+                        name : 'xorde', //[21]
+                        value:("0@不含訂單,1@含訂單").split(',')
+                    },{
+						type : '5', //[22]
+						name : 'xsheet',
+						value :('N@不含板料,Y@含板料').split(',')
+					}, {
+                        type : '1',
+                        name : 'xdate' //[23][24]
                     }]
                 });
                 q_popAssign();
@@ -104,6 +115,11 @@
                 $('#txtXedate').mask(r_picd);
                 $('#txtXedate').val(q_date());
                 $('#txtXedate').datepicker();
+                
+                $('#txtXdate1').mask(r_picd);
+                $('#txtXdate2').mask(r_picd);
+                $('#txtXdate1').val(q_date().substr(0,r_lenm)+'/01');
+                $('#txtXdate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',35).substr(0,r_lenm)+'/01',-1));
                 
                 $("#Xlengthb").css('width', '302px');
                 $("#Xlengthb input").css('width', '90px');
