@@ -69,8 +69,10 @@
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
 				
 				$('#combAccount').change(function() {
-					if(q_cur==1 || q_cur==2)
+					if(q_cur==1 || q_cur==2){
 						$('#txtAddr').val($('#combAccount').find("option:selected").text());
+						$('#txtNamea').val($('#combAccount').val());
+					}
 				});
 				
 				$('#lblIdno_sf').click(function() {
@@ -436,6 +438,8 @@
 				$('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val('AUTO');
 				$('#txtDatea').val(q_date());
 				$('#txtDatea').focus();
+				//105/12/08空白倉庫預設A
+				$('#txtStoreno').val('A').change();
 			}
 
 			function btnModi() {
@@ -870,7 +874,11 @@
 					<tr>
 						<td><span> </span><a id="lblAddr_sf" class="lbl" >交貨工地</a></td>
 						<td><input id="txtAddr"type="text" class="txt c1" style="width: 98%;"/></td>
-						<td><select id="combAccount" class="txt" style="width: 20px;"> </select></td>
+						<td>
+							<select id="combAccount" class="txt" style="width: 20px;"> </select>
+							<span> </span><a id="lblNamea_sf" class="lbl" >聯絡人</a>
+						</td>
+						<td><input id="txtNamea" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblIdno_sf" class="lbl btn">合約號碼</a></td>

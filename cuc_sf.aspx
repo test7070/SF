@@ -107,7 +107,7 @@
 						t_where=t_where+"and custno='"+$('#txtCustno').val()+"' ";
 					}
 					
-					q_box("ordes_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'ordes_sf', "95%", "95%", $('#btnOrde').val());
+					q_box("orde_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where, 'orde_sf', "95%", "95%", $('#btnOrde').val());
 				});
 				
 				$('#btnImg').click(function() {
@@ -182,15 +182,26 @@
             function q_boxClose(s2) {///   q_boxClose 2/4
                 var ret;
                 switch (b_pop) {
-                	case 'ordes_sf':
+                	case 'orde_sf':
                 		if (q_cur > 0 && q_cur < 4) {
 							b_ret = getb_ret();
 							if (!b_ret || b_ret.length == 0)
 								return;
-							
-							ret = q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtSpec,txtSize,txtStyle,txtDime,txtWidth,txtRadius,txtLengthb,txtClass,txtScolor,txtUnit,txtPrice,txtMount,txtWeight,txtQuatno,txtNo3'
-							, b_ret.length, b_ret, 'product,spec,size,style,dime,width,radius,lengthb,class,scolor,unit,price,mount,weight,noa,no3', 'txtProduct,txtSpec');
-							/// 最後 aEmpField 不可以有【數字欄位】
+							if(b_ret[0]!= undefined){
+								$('#txtCustno').val(b_ret[0].custno);
+								$('#txtCust').val(b_ret[0].nick);
+								$('#txtMech').val(b_ret[0].addr2);
+								$('#txtBdate').val(b_ret[0].datea);
+								$('#txtMemo').val(b_ret[0].memo);
+								
+								if(b_ret[0].noa.length>0){
+									q_gt('view_ordes', "where=^^ noa='" + b_ret[0].noa + "'^^", 0, 0, 0, "getordes", r_accy,1);
+									var as = _q_appendData("view_ordes", "", true);
+									
+									ret = q_gridAddRow(bbsHtm, 'tbbs', 'txtOrdeno,txtNo2,txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtMemo'
+									, as.length, as, 'noa,no2,product,ucolor,spec,size,lengthb,class,mount,weight,memo', 'txtProduct,txtSpec');
+								}
+							}
 						}
                 		break;
                     case q_name + '_s':
@@ -1124,22 +1135,22 @@
 						<td><input id="txtNoa"  type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblDatea" class="lbl"> </a></td>
 						<td><input id="txtDatea"  type="text" class="txt c1"/></td>
-						<td><span> </span><a id="lblBdate" class="lbl"> </a</td>
-						<td>
-							<input id="txtBdate"  type="text" class="txt c1" style="width: 95%;"/>
-							<!--<input id="btnOrde" type="button" value="訂單匯入" style="display: none;" >-->
-						</td>
 						<td> </td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblCust" class="lbl btn"> </a></td>
 						<td><input id="txtCustno"  type="text" class="txt c1"/></td>
 						<td colspan="2"><input id="txtCust"  type="text" class="txt c1"/> </td>
+						<td align="center"><input id="btnOrde" type="button" value="訂單匯入" ></td>
+					</tr>
+					<tr>
 						<td><span> </span><a id="lblMech" class="lbl"> </a></td>
-						<td colspan="2">
+						<td colspan="3">
 							<input id="txtMech"  type="text" class="txt c1" style="width: 90%;"/>
 							<select id="combAccount" class="txt" style="width: 20px;"> </select>
 						</td>
+						<td><span> </span><a id="lblBdate" class="lbl"> </a</td>
+						<td><input id="txtBdate"  type="text" class="txt c1" style="width: 95%;"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMemo" class="lbl"> </a></td>

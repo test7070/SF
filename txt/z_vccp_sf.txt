@@ -17,6 +17,7 @@ declare @tmp1 table(
 	custno nvarchar(30),
 	cust nvarchar(100),
 	addr nvarchar(max),
+	conn nvarchar(50),
 	qno nvarchar(max),
 	tweight float,
 	eweight float,
@@ -44,19 +45,19 @@ declare @tmp1 table(
 if (LEN(@t_xaddr2)!=0)
 begin
 	insert into @tmp1
-	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr2,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),
+	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,sum(b.mount),sum(b.weight),
 		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,'','','',''
 	from view_vcc a
 	left join view_vccs b on a.noa = b. noa
 	where (a.noa between @t_bxnoa and @t_exnoa)
 	and (len(@t_xaddr2)!=0 and isnull(a.addr2,'')=@t_xaddr2)
-	group by a.datea,a.custno,a.comp,a.addr2,a.apvmemo,b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,a.trantype
+	group by a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,a.trantype
 end
 else
 begin
 	insert into @tmp1
-	select '0',a.noa,a.datea,a.custno,a.comp,a.addr2,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,
+	select '0',a.noa,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
 		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,a.paydate,a.cardeal,b.store,a.carno
 	from view_vcc a
@@ -131,6 +132,7 @@ declare @tmp2 table(
 	custno nvarchar(30),
 	cust nvarchar(100),
 	addr nvarchar(max),
+	conn nvarchar(50),
 	qno nvarchar(max),
 	tweight float,
 	eweight float,
@@ -173,8 +175,8 @@ begin
 	begin 
 		set @recno = 1
 		begin 
-			insert into @tmp2(gno,noa,datea,custno,cust,addr,qno,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,taxname,intime,cardeal,store,carno) 
-			select gno,noa,datea,custno,cust,addr,qno,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,taxname,intime,cardeal,store,carno
+			insert into @tmp2(gno,noa,datea,custno,cust,addr,conn,qno,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,taxname,intime,cardeal,store,carno) 
+			select gno,noa,datea,custno,cust,addr,conn,qno,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,taxname,intime,cardeal,store,carno
 			from @tmp1 where idno = @idno1
 		end
 		set @noa2 = @noa1 

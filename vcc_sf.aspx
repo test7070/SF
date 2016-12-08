@@ -626,7 +626,7 @@
 						if(ass[0] != undefined){
 							var t_item = " @ ";
 							for ( i = 0; i < ass.length; i++) {
-								t_item = t_item + (t_item.length > 0 ? ',' : '') + ass[i].account + '@' + ass[i].account;
+								t_item = t_item + (t_item.length > 0 ? ',' : '') + ass[i].bank + '@' + ass[i].account;
 							}
 							$('#combAddr').text('');
 							q_cmbParse("combAddr", t_item);
@@ -985,7 +985,15 @@
 				check_startdate=false;
 				
 				$('#txtApvmemo').val($('#textQno1').val()+'@'+dec($('#textQweight1').val())+'##'+$('#textQno2').val()+'@'+dec($('#textQweight2').val()));
-					
+				
+				//105/12/08空白倉庫預設A
+				for (var i = 0; i < q_bbsCount; i++) {
+					if(!emp($('#txtProduct_'+i).val()) && emp($('#txtStoreno_'+i).val())){
+						$('#txtStoreno_'+i).val('A');
+						$('#txtStore_'+i).val('三泰本倉');
+					}
+				}
+				
 				if (q_cur == 1){
 					$('#txtWorker').val(r_name);
 					if($('#txtPaydate').val().length==0 || $('#txtPaydate').val()=='AUTO'){
@@ -1032,7 +1040,8 @@
 
 			function combAddr_chg() {
 				if (q_cur == 1 || q_cur == 2) {
-					$('#txtAddr2').val($('#combAddr').find("option:selected").val());
+					$('#txtAddr2').val($('#combAddr').find("option:selected").text());
+					$('#txtZipname').val($('#combAddr').val());
 				}
 			}
 			
@@ -1356,7 +1365,7 @@
 										spec:$('#txtSpec__'+i).val(),
 										size:$('#txtSize__'+i).val(),
 										lengthb:0,//$('#txtLengthb__'+i).val()
-										class:$('#txtClass__'+i).val(),
+										class:'',//$('#txtClass__'+i).val()
 										mount:$('#txtMount__'+i).val(),
 										weight:$('#txtWeight__'+i).val(),
 										noa:'',//$('#txtOrdeno__'+i).val()
@@ -1947,18 +1956,24 @@
 						<td colspan='2'><input id="txtAddr2"  type="text" class="txt c1"/></td>
 						<td>
 							<select id="combAddr" style="width: 20px" onchange='combAddr_chg()'> </select>
-							<span> </span><a id='lblSales' class="lbl btn"> </a>
+							<span> </span><a id='lblZipname_sf' class="lbl">聯絡人</a>
 						</td>
-						<td><input id="txtSalesno" type="text" class="txt c1"/></td>
-						<td><input id="txtSales" type="text" class="txt c1"/></td>
+						<td colspan="2"><input id="txtZipname" type="text" class="txt num c1"/></td>
 						<td><span> </span><a id='lblInvono' class="lbl btn"> </a></td>
 						<td><input id="txtInvono" type="text" class="txt c1"/></td>
 					</tr>
 					<tr>
+						<td><span> </span><a id='lblSales' class="lbl btn"> </a></td>
+						<td><input id="txtSalesno" type="text" class="txt c1"/></td>
+						<td><input id="txtSales" type="text" class="txt c1"/></td>
 						<td><span> </span><a id='lblTranadd' class="lbl"> </a></td>
-						<td colspan="2"><input id="txtTranadd" type="text" class="txt num c1"/></td>
-						<td><span> </span><a id='lblBenifit' class="lbl"> </a></td>
-						<td colspan="2"><input id="txtBenifit" type="text" class="txt num c1"/></td>
+						<td colspan="2">
+							<input id="txtTranadd" type="text" class="txt num c1" style="width:35%;"/>
+							<span style="float: left"> </span>
+							<a style="float: left" id='lblBenifit' class="lbl"> </a>
+							<span style="float: left"> </span>
+							<input id="txtBenifit" type="text" class="txt num c1"  style="width:35%;"/>
+						</td>
 						<td><span> </span><a id='lblWeight' class="lbl"> </a></td>
 						<td><input id="txtWeight" type="text" class="txt num c1"/></td>
 					</tr>

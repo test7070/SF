@@ -84,15 +84,15 @@ where a.typea='2' and len(b.uno)>0 and a.noa!=@noa and not exists(select * from 
 
 if(@tablea='rc2')
 begin
-	set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from view_rc2s where uno like @noa+'-%'),'000')
+	set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from view_rc2s where noa!=@noa and uno like @noa+'-%'),'000')
 end
 else if(@tablea='cub')
 begin
-	set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from view_cubs where uno like @noa+'-%'),'000')
+	set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from view_cubs where noa!=@noa and uno like @noa+'-%'),'000')
 end
 else if(@tablea='ina')
 begin
-	set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from view_inas where uno like @noa+'-%'),'000')
+	set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from view_inas where noa!=@noa and uno like @noa+'-%'),'000')
 end
 else
 begin
@@ -150,57 +150,113 @@ create table #tmp(
 	store nvarchar(50),
 	memo nvarchar(MAX),
 	ordeno nvarchar(100),
-	no2 nvarchar(50)
+	no2 nvarchar(50),
+	typea nvarchar(10),
 ) 
 --盤點
 insert #tmp
 select a.accy,'ucces' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'',''
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'','','5'
 from view_ucces a left join view_ucce b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
 
-delete a
-from #tmp a outer apply (select MAX(datea) datea from #tmp 
-where product=a.product and spec=a.spec and size=a.size and lengthb =a.lengthb and class =a.class and storeno=a.storeno)b
-where a.datea!=b.datea
-
+--進貨
 insert #tmp
 select a.accy,'rc2s' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'',''
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'','','6'
 from view_rc2s a left join view_rc2 b on a.noa = b.noa 
-where b.typea!='2' and len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
-and not exists(select * from #tmp where uno=a.uno)
-union all
+where b.typea='1' and len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
+
+--入庫
+insert #tmp
 select a.accy,'cubs' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,a.ordeno,a.no2
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,a.ordeno,a.no2,'6'
 from view_cubs a left join view_cub b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
-and not exists(select * from #tmp where uno=a.uno)
-union all
+
+--互換進
+insert #tmp
 select a.accy,'inas' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'',''
+,a.mount,a.weight,0,a.storeno,a.store,a.memo,'','','6'
 from view_inas a left join view_ina b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
-and not exists(select * from #tmp where uno=a.uno)
 
 --出貨退回
 insert #tmp
 select a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,b.ordeno,b.no2
+,b.mount,b.weight,b.lengthc,'','',b.memo,b.ordeno,b.no2,'6'
 from view_vcc a left join view_vcct b on a.noa = b.noa 
 where a.typea='2' and len(b.uno)>0 and (len(@uno)=0 or b.uno=@uno) and a.noa!=@noa
-and not exists(select * from #tmp where uno=b.uno)
+
+--出貨
+insert #tmp
+select a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.mount,-1*b.weight,-1*b.lengthc,'','',b.memo,b.ordeno,b.no2,'7'
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='1' and len(b.uno)>0 and (len(@uno)=0 or b.uno=@uno) and a.noa!=@noa
+
+--領料
+insert #tmp
+select a.accy,'cubt' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,-1*a.mount,-1*a.weight,-1*a.lengthc,'','',a.memo,'','','7'
+from view_cubt a left join view_cub b on a.noa=b.noa
+where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
+
+--互換出
+insert #tmp
+select a.accy,'gets' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,-1*a.mount,-1*a.weight,0,a.storeno,a.store,a.memo,'','','7'
+from view_gets a left join view_get b on a.noa=b.noa
+where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
+
+--退貨
+insert #tmp
+select a.accy,'rc2t' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,-1*a.mount,-1*a.weight,-1*a.lengthc,a.storeno,a.store,a.memo,'','','7'
+from view_rc2s a left join view_rc2 b on a.noa = b.noa 
+where b.typea='2' and len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
+
 
 --批號一次會全部領 不會剩餘
+--update a
+--set mount=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.mount end
+--,weight=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.weight end
+--,lengthc=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.lengthc end
+--from #tmp a 
+--outer apply (select sum(case when va.typea!='2' then 1 else -1 end)vget from view_vcc va left join view_vcct vb on va.noa=vb.noa where vb.uno=a.uno and va.noa!=@noa)v
+--outer apply (select count(*)cget from view_cubt where uno=a.uno and noa!=@noa)c
+--outer apply (select count(*)gget from view_gets where uno=a.uno and noa!=@noa)g
+--outer apply (select sum(case when ra.typea='2' then 1 else 0 end)rget from view_rc2 ra left join view_rc2s rb on ra.noa=rb.noa where rb.uno=a.uno and ra.noa!=@noa)r
+
+--105/12/08 批號不會一次領完(批號只看總量)
+update #tmp
+set mount=ISNULL(mount,0),weight=ISNULL(weight,0),lengthc=ISNULL(lengthc,0)
+,storeno=ISNULL(storeno,''),store=ISNULL(store,'')
+
+insert #tmp(uno,typea)
+select uno,'0' from #tmp group by uno
+
 update a
-set mount=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.mount end
-,weight=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.weight end
-,lengthc=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.lengthc end
-from #tmp a 
-outer apply (select sum(case when va.typea!='2' then 1 else -1 end)vget from view_vcc va left join view_vcct vb on va.noa=vb.noa where vb.uno=a.uno and va.noa!=@noa)v
-outer apply (select count(*)cget from view_cubt where uno=a.uno and noa!=@noa)c
-outer apply (select count(*)gget from view_gets where uno=a.uno and noa!=@noa)g
-outer apply (select sum(case when ra.typea='2' then 1 else 0 end)rget from view_rc2 ra left join view_rc2s rb on ra.noa=rb.noa where rb.uno=a.uno and ra.noa!=@noa)r
+set accy=b.accy,tablea=b.tablea,noa=b.noa,noq=b.noq,datea=b.datea
+,product=b.product,ucolor=b.ucolor,spec=b.spec,size=b.size,lengthb=b.lengthb,class=b.class
+,storeno=b.storeno,store=b.store,memo=b.memo,ordeno=b.ordeno,no2=b.no2
+from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and typea!='0' order by datea,typea,noa,noq) b
+where a.typea='0'
+
+delete a
+from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+typea+'-'+noa) maxnoa from #tmp where uno=a.uno and tablea='ucces' and typea!='0')b
+where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.typea+'-'+a.noa< ISNULL(b.maxnoa,'')
+
+update a
+set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)
+from #tmp a outer apply (select SUM(mount)mount,SUM(weight)weight,sum(lengthc)lengthc from #tmp where uno=a.uno and typea!='0' ) b
+where a.typea='0'
+
+delete #tmp where typea!='0'
+
+--沒有排除單號 只顯示有數量和重量的批號
+if(len(@noa)=0)
+	delete #tmp where mount=0 and weight=0 and lengthc=0
 
 select * from #tmp
 

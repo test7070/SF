@@ -112,10 +112,38 @@
 				$('#lblWeight').text('淨重');
 				
 				$('#txtTranadd').change(function() {
-					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')))
+					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
+					$('#txtWeight').change();
 				});
 				$('#txtBenifit').change(function() {
-					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')))
+					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
+					$('#txtWeight').change();
+				});
+				
+				$('#txtWeight').change(function() {
+					//105/12/07 增加
+					var t_weight=dec($('#txtWeight').val());
+					if(t_weight!=0){
+						for (var i = 0; i < q_bbsCount; i++) {
+							if(dec($('#txtWeight_'+i).val())!=0){
+								t_weight=q_sub(t_weight,dec($('#txtWeight_'+i).val()));
+							}
+						}
+					}
+					if(t_weight!=0){
+						var t_n=-1;
+						for (var i = 0; i < q_bbsCount; i++) {
+							if(dec($('#txtWeight_'+i).val())==0){
+								t_n=i;
+								break;
+							}
+						}
+						if(t_n==-1){
+							t_n=q_bbsCount;
+							$('#btnPlus').click();
+						}
+						$('#txtWeight_'+t_n).val(t_weight);
+					}
 				});
 				
 				//限制帳款月份的輸入 只有在備註的第一個字為*才能手動輸入					
@@ -375,7 +403,6 @@
 			var carnoList = [];
 			var thisCarSpecno = '';
 			var ordcoverrate = [],rc2soverrate = [];
-			var q1_weight=0,q2_weight=0;
 			function q_gtPost(t_name) {
 				switch (t_name) {
 					case 'ucc':
@@ -409,105 +436,6 @@
 							t_class+=","+as[i].noa;
 						}
 						q_cmbParse("combClass", t_class,'s');
-						break;
-					case 'cont_btnOk':
-						//105/11/08 互換合約再另外作業處理 維持抓cont
-						var as = _q_appendData("cont", "", true);
-						var qno1_exists=(emp($('#textQno1').val())?true:false);
-						var qno2_exists=(emp($('#textQno2').val())?true:false);
-						var qtgg1='',qtgg2='';
-						for ( i = 0; i < as.length; i++) {
-							if(as[i].noa==$('#textQno1').val()){
-								qno1_exists=true;
-								//q1_weight=dec(as[i].weight);
-								q1_weight=dec(as[i].ordeweight);
-								qtgg1=trim(as[i].tggno);
-							}
-							if(as[i].noa==$('#textQno2').val()){
-								qno2_exists=true;
-								//q2_weight=dec(as[i].weight);
-								q2_weight=dec(as[i].ordeweight);
-								qtgg2=trim(as[i].tggno);
-							}
-						}
-						
-						if (!qno1_exists || !qno2_exists) {
-							var t_qno='';
-							if(!qno1_exists)
-								t_qno=$('#textQno1').val();
-							if(!qno2_exists)
-								t_qno=t_qno+(t_qno.length>0?',':'')+$('#textQno2').val();
-							alert(t_qno+'合約號碼不存在!!');
-						}else if((!emp($('#textQno1').val()) && qtgg1!=trim($('#txtTggno').val())) || (!emp($('#textQno2').val()) && qtgg2!=trim($('#txtTggno').val()))){
-							alert('合約廠商與進貨廠商不同!!');
-						}else{
-							var t_where = "where=^^ (1=0 "+(!emp($('#textQno1').val())?" or charindex('"+$('#textQno1').val()+"',transtart)>0 ":'')+(!emp($('#textQno2').val())?" or charindex('"+$('#textQno2').val()+"',transtart)>0 ":'')+ ") ^^"; //and noa!='"+$('#txtNoa').val()+"'
-							q_gt('view_rc2', t_where, 0, 0, 0, "cont_view_rc2", r_accy);
-						}
-						break;
-					case 'cont_view_rc2':
-						var as = _q_appendData("view_rc2", "", true);
-						for ( i = 0; i < as.length; i++) {
-							if(as[i].noa!=$('#txtNoa').val()){
-								var t_quat=as[i].transtart.split('##');
-								if(t_quat[0]!=undefined){
-									var r_quat=t_quat[0].split('@');
-									if(r_quat[0]==$('#textQno1').val()){
-										if(as[i].typea=='2'){
-											q1_weight=q_add(q1_weight,dec(r_quat[1]));
-										}else{
-											q1_weight=q_sub(q1_weight,dec(r_quat[1]));
-										}
-									}
-									if(r_quat[0]==$('#textQno2').val()){
-										if(as[i].typea=='2'){
-											q2_weight=q_add(q2_weight,dec(r_quat[1]));
-										}else{
-											q2_weight=q_sub(q2_weight,dec(r_quat[1]));
-										}
-									}
-								}
-								if(t_quat[1]!=undefined){
-									var r_quat=t_quat[1].split('@');
-									if(r_quat[0]==$('#textQno1').val()){
-										if(as[i].typea=='2'){
-											q1_weight=q_add(q1_weight,dec(r_quat[1]));
-										}else{
-											q1_weight=q_sub(q1_weight,dec(r_quat[1]));
-										}
-									}
-									if(r_quat[0]==$('#textQno2').val()){
-										if(as[i].typea=='2'){
-											q2_weight=q_add(q2_weight,dec(r_quat[1]));
-										}else{
-											q2_weight=q_sub(q2_weight,dec(r_quat[1]));
-										}
-									}
-								}
-							}else{
-								var t_quat=as[i].transtart.split('##');
-								if(t_quat[0]!=undefined){
-									var r_quat=t_quat[0].split('@');
-									t_cont1=r_quat[0];
-								}
-								if(t_quat[1]!=undefined){
-									var r_quat=t_quat[1].split('@');
-									t_cont2=r_quat[0];
-								}
-							}
-						}
-						if((q1_weight>=dec($('#textQweight1').val()) && q2_weight>=dec($('#textQweight2').val())) || $('#cmbTypea').val()=='2' ){
-							check_cont=true;
-							btnOk();
-						}else{
-							var t_err='';
-							if(q1_weight<dec($('#textQweight1').val()))
-								t_err+='合約號碼【'+$('#textQno1').val()+'】合約剩餘重量'+FormatNumber(q1_weight)+'小於進貨重量'+FormatNumber($('#textQweight1').val());
-							if(q2_weight<dec($('#textQweight2').val()))
-								t_err+=(t_err.length>0?'\n':'')+'合約號碼【'+$('#textQno2').val()+'】合約剩餘重量'+FormatNumber(q2_weight)+'小於進貨重量'+FormatNumber($('#textQweight2').val());
-							alert(t_err);
-						}
-						q1_weight=0,q2_weight=0;
 						break;
 					case 'getCardealCarno' :
 						var as = _q_appendData("cardeals", "", true);
@@ -626,31 +554,6 @@
 							$('#txtAddr2').val(ordc[0].addr2);
 						}
 						break;*/
-					case 'startdate':
-						var as = _q_appendData('tgg', '', true);
-						var t_startdate='';
-						if (as[0] != undefined) {
-							t_startdate=as[0].startdate;
-						}
-						if(t_startdate.length==0 || ('00'+t_startdate).slice(-2)=='00' || $('#txtDatea').val().substr(r_lenm+1, 2)<('00'+t_startdate).substr(-2)){
-							$('#txtMon').val($('#txtDatea').val().substr(0, r_lenm));
-						}else{
-							var t_date=$('#txtDatea').val();
-							var nextdate='';
-							if(r_len==4)
-								nextdate=new Date(dec(t_date.substr(0,4)),dec(t_date.substr(5,2))-1,1);
-							else
-								nextdate=new Date(dec(t_date.substr(0,3))+1911,dec(t_date.substr(4,2))-1,1);
-				    		nextdate.setMonth(nextdate.getMonth() +1)
-				    		if(r_len==4)
-				    			t_date=''+(nextdate.getFullYear())+'/'+(nextdate.getMonth()<9?'0':'')+(nextdate.getMonth()+1);
-				    		else
-				    			t_date=''+(nextdate.getFullYear()-1911)+'/'+(nextdate.getMonth()<9?'0':'')+(nextdate.getMonth()+1);
-							$('#txtMon').val(t_date);
-						}
-						check_startdate=true;
-						btnOk();
-						break;
 					case 'checkRc2no_btnOk':
 						var as = _q_appendData("view_rc2", "", true);
                         if (as[0] != undefined) {
@@ -733,8 +636,6 @@
 				t_cont1='#non',t_cont2='#non';
 			}
 			
-			var check_startdate=false;
-			var check_cont=false;
 			var check_uno=false,check_uno_count=0,check_uno_err='';
 			var getnewuno=false;
 			function btnOk() {
@@ -776,35 +677,158 @@
 				
 				//判斷起算日,寫入帳款月份
 				//104/09/30 如果備註沒有*字就重算帳款月份
-				//if(!check_startdate && emp($('#txtMon').val())){
-				if(!check_startdate && $('#txtMemo').val().substr(0,1)!='*'){	
+				//if( emp($('#txtMon').val())){
+				if($('#txtMemo').val().substr(0,1)!='*'){	
 					var t_where = "where=^^ noa='"+$('#txtTggno').val()+"' ^^";
-					q_gt('tgg', t_where, 0, 0, 0, "startdate", r_accy);
-					return;
+					q_gt('tgg', t_where, 0, 0, 0, "startdate", r_accy,1);
+					var as = _q_appendData('tgg', '', true);
+					var t_startdate='';
+					if (as[0] != undefined) {
+						t_startdate=as[0].startdate;
+					}
+					if(t_startdate.length==0 || ('00'+t_startdate).slice(-2)=='00' || $('#txtDatea').val().substr(r_lenm+1, 2)<('00'+t_startdate).substr(-2)){
+						$('#txtMon').val($('#txtDatea').val().substr(0, r_lenm));
+					}else{
+						var t_date=$('#txtDatea').val();
+						var nextdate='';
+						if(r_len==4)
+							nextdate=new Date(dec(t_date.substr(0,4)),dec(t_date.substr(5,2))-1,1);
+						else
+							nextdate=new Date(dec(t_date.substr(0,3))+1911,dec(t_date.substr(4,2))-1,1);
+				    	nextdate.setMonth(nextdate.getMonth() +1)
+				    	if(r_len==4)
+				    		t_date=''+(nextdate.getFullYear())+'/'+(nextdate.getMonth()<9?'0':'')+(nextdate.getMonth()+1);
+				    	else
+				    		t_date=''+(nextdate.getFullYear()-1911)+'/'+(nextdate.getMonth()<9?'0':'')+(nextdate.getMonth()+1);
+						$('#txtMon').val(t_date);
+					}
 				}
-				
+								
 				//檢查合約是否存在或已結案
 				//105/11/08 互換合約再另外作業處理 維持抓cont
-				/*if(!check_cont && (!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
+				var q1_weight=0,q2_weight=0;
+				/*if((!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
 					var t_where1 = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
 					var t_where2 = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
 					var t_where3 = "where=^^ 1=0 ^^";
 					var t_where4 = "where=^^ 1=0 ^^";
-					q_gt('cont_sf', t_where1+t_where2+t_where3+t_where4, 0, 0, 0, "cont_btnOk", r_accy);
+					q_gt('cont_sf', t_where1+t_where2+t_where3+t_where4, 0, 0, 0, "cont_btnOk", r_accy,1);
 					return;
 				}*/
-				if(!check_cont && (!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
+				if((!emp($('#textQno1').val()) || !emp($('#textQno2').val()))){
 					var t_where = "where=^^ 1=0 "+(!emp($('#textQno1').val())?" or noa='"+$('#textQno1').val()+"' ":'')+(!emp($('#textQno2').val())?" or noa='"+$('#textQno2').val()+"' ":'')+ " ^^";
-					q_gt('cont', t_where, 0, 0, 0, "cont_btnOk", r_accy);
-					return;
-				}
-				
-				//檢查批號重覆
-				for (var i = 0; i < q_bbsCount; i++) {
-					for (var j = i + 1; j < q_bbsCount; j++) {
-						if ($.trim($('#txtUno_' + i).val()).length > 0 && $.trim($('#txtUno_' + i).val()) == $.trim($('#txtUno_' + j).val())) {
-							alert('【' + $.trim($('#txtUno_' + i).val()) + '】批號重覆。\n' + (i + 1) + ', ' + (j + 1));
+					q_gt('cont', t_where, 0, 0, 0, "cont_btnOk", r_accy,1);
+					//105/11/08 互換合約再另外作業處理 維持抓cont
+					var as = _q_appendData("cont", "", true);
+					var qno1_exists=(emp($('#textQno1').val())?true:false);
+					var qno2_exists=(emp($('#textQno2').val())?true:false);
+					var qtgg1='',qtgg2='';
+					for ( i = 0; i < as.length; i++) {
+						if(as[i].noa==$('#textQno1').val()){
+							qno1_exists=true;
+							//q1_weight=dec(as[i].weight);
+							q1_weight=dec(as[i].ordeweight);
+							qtgg1=trim(as[i].tggno);
+						}
+						if(as[i].noa==$('#textQno2').val()){
+							qno2_exists=true;
+							//q2_weight=dec(as[i].weight);
+							q2_weight=dec(as[i].ordeweight);
+							qtgg2=trim(as[i].tggno);
+						}
+					}
+					
+					if (!qno1_exists || !qno2_exists) {
+						var t_qno='';
+						if(!qno1_exists)
+							t_qno=$('#textQno1').val();
+						if(!qno2_exists)
+							t_qno=t_qno+(t_qno.length>0?',':'')+$('#textQno2').val();
+						alert(t_qno+'合約號碼不存在!!');
+						return;
+					}else if((!emp($('#textQno1').val()) && qtgg1!=trim($('#txtTggno').val())) || (!emp($('#textQno2').val()) && qtgg2!=trim($('#txtTggno').val()))){
+						alert('合約廠商與進貨廠商不同!!');
+						return;
+					}else{
+						var t_where = "where=^^ (1=0 "+(!emp($('#textQno1').val())?" or charindex('"+$('#textQno1').val()+"',transtart)>0 ":'')+(!emp($('#textQno2').val())?" or charindex('"+$('#textQno2').val()+"',transtart)>0 ":'')+ ") ^^"; //and noa!='"+$('#txtNoa').val()+"'
+						q_gt('view_rc2', t_where, 0, 0, 0, "cont_view_rc2", r_accy,1);
+						var as = _q_appendData("view_rc2", "", true);
+						for ( i = 0; i < as.length; i++) {
+							if(as[i].noa!=$('#txtNoa').val()){
+								var t_quat=as[i].transtart.split('##');
+								if(t_quat[0]!=undefined){
+									var r_quat=t_quat[0].split('@');
+									if(r_quat[0]==$('#textQno1').val()){
+										if(as[i].typea=='2'){
+											q1_weight=q_add(q1_weight,dec(r_quat[1]));
+										}else{
+											q1_weight=q_sub(q1_weight,dec(r_quat[1]));
+										}
+									}
+									if(r_quat[0]==$('#textQno2').val()){
+										if(as[i].typea=='2'){
+											q2_weight=q_add(q2_weight,dec(r_quat[1]));
+										}else{
+											q2_weight=q_sub(q2_weight,dec(r_quat[1]));
+										}
+									}
+								}
+								if(t_quat[1]!=undefined){
+									var r_quat=t_quat[1].split('@');
+									if(r_quat[0]==$('#textQno1').val()){
+										if(as[i].typea=='2'){
+											q1_weight=q_add(q1_weight,dec(r_quat[1]));
+										}else{
+											q1_weight=q_sub(q1_weight,dec(r_quat[1]));
+										}
+									}
+									if(r_quat[0]==$('#textQno2').val()){
+										if(as[i].typea=='2'){
+											q2_weight=q_add(q2_weight,dec(r_quat[1]));
+										}else{
+											q2_weight=q_sub(q2_weight,dec(r_quat[1]));
+										}
+									}
+								}
+							}else{
+								var t_quat=as[i].transtart.split('##');
+								if(t_quat[0]!=undefined){
+									var r_quat=t_quat[0].split('@');
+									t_cont1=r_quat[0];
+								}
+								if(t_quat[1]!=undefined){
+									var r_quat=t_quat[1].split('@');
+									t_cont2=r_quat[0];
+								}
+							}
+						}
+						if((q1_weight>=dec($('#textQweight1').val()) && q2_weight>=dec($('#textQweight2').val())) || $('#cmbTypea').val()=='2' ){
+							
+						}else{
+							var t_err='';
+							if(q1_weight<dec($('#textQweight1').val()))
+								t_err+='合約號碼【'+$('#textQno1').val()+'】合約剩餘重量'+FormatNumber(q1_weight)+'小於進貨重量'+FormatNumber($('#textQweight1').val());
+							if(q2_weight<dec($('#textQweight2').val()))
+								t_err+=(t_err.length>0?'\n':'')+'合約號碼【'+$('#textQno2').val()+'】合約剩餘重量'+FormatNumber(q2_weight)+'小於進貨重量'+FormatNumber($('#textQweight2').val());
+							alert(t_err);
 							return;
+						}
+						q1_weight=0,q2_weight=0;
+					}
+				}
+					
+				//檢查批號重覆
+				//1051208 定尺批號一樣 定尺排除判斷
+				for (var i = 0; i < q_bbsCount; i++) {
+					if(!emp($('#txtProduct_' + i).val()) && $('#txtUcolor_'+i).val().indexOf('定尺')==-1
+					&& $.trim($('#txtUno_' + i).val()).length > 0){
+						for (var j = i + 1; j < q_bbsCount; j++) {
+							if ($.trim($('#txtUno_' + i).val()) == $.trim($('#txtUno_' + j).val())
+							&& $('#txtUcolor_'+j).val().indexOf('定尺')==-1
+							) {
+								alert('【' + $.trim($('#txtUno_' + i).val()) + '】批號重覆。\n' + (i + 1) + ', ' + (j + 1));
+								return;
+							}
 						}
 					}
 				}
@@ -832,6 +856,7 @@
 						needuno=true;
 					}
 				}
+				
 				if(!getnewuno && needuno){
 					q_func('qtxt.query.getnewuno', 'cuc_sf.txt,getnewuno,rc2;'+$('#txtNoa').val()+';'+q_getPara('sys.key_rc2')+';'+$('#txtDatea').val());
 					return;
@@ -839,12 +864,18 @@
 				
 				getnewuno=false;
 				check_uno=false;
-				check_startdate=false;
-				check_cont=false;
 				
 				$('#txtTranstart').val($('#textQno1').val()+'@'+dec($('#textQweight1').val())+'##'+$('#textQno2').val()+'@'+dec($('#textQweight2').val()));
 				
 				sum();
+				
+				//105/12/08空白倉庫預設A
+				for (var i = 0; i < q_bbsCount; i++) {
+					if(!emp($('#txtProduct_'+i).val()) && emp($('#txtStoreno_'+i).val())){
+						$('#txtStoreno_'+i).val('A');
+						$('#txtStore_'+i).val('三泰本倉');
+					}
+				}
 				
 				if (q_cur == 1)
 					$('#txtWorker').val(r_name);
@@ -915,6 +946,7 @@
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
 								else
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								$('#txtWeight').change();
 								sum();
 							}
 						});
@@ -1161,8 +1193,6 @@
 				
 				getnewuno=false;
 				check_uno=false;
-				check_startdate=false;
-				check_cont=false;
 			}
 
 			function readonly(t_para, empty) {
@@ -1276,6 +1306,7 @@
 			
 			function q_funcPost(t_func, result) {
 				switch(t_func) {
+					//105/12/08  定尺批號一樣
 					case 'qtxt.query.getnewuno':
 						var as = _q_appendData("tmp0", "", true, true);
 						if (as[0] != undefined) {
@@ -1284,6 +1315,18 @@
 							var whilenum=0;
 							if(t_noa!='' && ($('#txtNoa').val().length==0 || $('#txtNoa').val()=='AUTO'))
 								$('#txtNoa').val(t_noa);
+								
+							//定尺
+							for (var i = 0; i < q_bbsCount; i++) {
+								if(!emp($('#txtProduct_' + i).val()) && $('#txtUcolor_'+i).val().indexOf('定尺')>-1
+								&& emp($('#txtUno_'+i).val())){
+									if(t_noa!='' && ($('#txtNoa').val().length==0 || $('#txtNoa').val()=='AUTO'))
+										$('#txtUno_'+i).val(t_noa);
+									else
+										$('#txtUno_'+i).val($('#txtNoa').val());
+								}
+							}
+							
 							if(t_uno!=''){
 								//檢查是否與表身重覆
 								while(1==1 && whilenum<q_bbsCount*q_bbsCount) //避免無窮迴圈
@@ -1352,7 +1395,8 @@
 					var n=t_func.split('_')[1];
                 	var as = _q_appendData("tmp0", "", true, true);
                 	if (as[0] != undefined) {
-                		check_uno_err=check_uno_err+'批號【'+as[0].uno+'】已被領用\n';
+                		if(as[0].noa!=$('#txtNoa').val())
+                			check_uno_err=check_uno_err+'批號【'+as[0].uno+'】已被使用\n';
                 	}
                 	
                 	check_uno_count--;

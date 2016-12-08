@@ -480,6 +480,8 @@
                 $('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val('AUTO');
                 $('#txtDatea').val(q_date());
                 $('#txtDatea').focus();
+                //105/12/08空白倉庫預設A
+				$('#txtStoreno').val('A').change();
             }
 
             function btnModi() {

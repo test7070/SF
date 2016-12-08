@@ -968,20 +968,25 @@
 						<td colspan="5"><input id="txtMemo" type="text" class="txt c1" /></td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblWorker" class="lbl" > </a></td>
-						<td><input id="txtWorker"  type="text" class="txt c1" /></td>
-						<td><span> </span><a id="lblWorker2" class="lbl" > </a></td>
-						<td><input id="txtWorker2" type="text" class="txt c1" /></td>
 						<td><span> </span><a id='lblAtax_sf' class="lbl">含稅</a></td>
-						<td colspan="2">
+						<td colspan="4">
 							<input id="chkAtax" type="checkbox"/>
 							<span> </span><a id='lblTrans_sf' class="lbl" style="float: none;">含運</a>
 							<input id="chkIstran" type="checkbox"/>
 							<span> </span><a id='lblEnda_sf' class="lbl" style="float: none;">終止</a>
 							<input id="chkEnda" type="checkbox"/>
-							
+							<span> </span><a id='lblChka2' class="lbl" style="float: none;">自運</a>
+							<input id="chkChka2" type="checkbox"/>
+							<span> </span><a id='lblChka3' class="lbl" style="float: none;">收費</a>
+							<input id="chkChka3" type="checkbox"/>
 							<input id="txtTrans" type="hidden"/>
 						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblWorker" class="lbl" > </a></td>
+						<td><input id="txtWorker"  type="text" class="txt c1" /></td>
+						<td><span> </span><a id="lblWorker2" class="lbl" > </a></td>
+						<td><input id="txtWorker2" type="text" class="txt c1" /></td>
 						<td>
 							<input id="txtF1" type="hidden"><!--進貨損耗%-->
 							<input id="txtF2" type="hidden"><!--進貨總量Kg-->

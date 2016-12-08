@@ -525,6 +525,14 @@
                	//批號自己輸入
                 sum();
                 
+                //105/12/08空白倉庫預設A
+				for (var i = 0; i < q_bbsCount; i++) {
+					if(!emp($('#txtProduct_'+i).val()) && emp($('#txtStoreno_'+i).val())){
+						$('#txtStoreno_'+i).val('A');
+						$('#txtStore_'+i).val('三泰本倉');
+					}
+				}
+                
                 if(q_cur==1){
                 	$('#txtWorker').val(r_name);
                 }else{
