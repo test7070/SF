@@ -423,6 +423,11 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2)
 								$('#txtSpec__'+b_seq).val($('#combSpec__'+b_seq).find("option:selected").text());
+							refresh_bbt_total();
+						});
+						
+						$('#txtSpec__' + i).change(function() {
+							refresh_bbt_total();
 						});
 						
 						$('#combClass__' + i).change(function() {
@@ -455,9 +460,14 @@
 							b_seq = t_IdSeq;
                         	bbtweight(b_seq);
 						});
+						
+						$('#txtWeight__' + i).change(function() {
+                        	refresh_bbt_total();
+						});
                     }
                 }
                 _bbtAssign();
+                refresh_bbt_total();
             }
             
             function bbtweight(n) {
@@ -483,6 +493,7 @@
             	var t_mount=dec($('#txtMount__'+n).val());
             	
             	$('#txtWeight__'+n).val(round(q_mul(q_mul(t_weight,t_lengthb),t_mount),0));
+            	refresh_bbt_total();
             }
 
             function btnIns() {
@@ -607,6 +618,7 @@
                 		$('#combClass__'+i).removeAttr('disabled');
                 	}
                 }
+                refresh_bbt_total();
             }
 
             function btnMinus(id) {
@@ -704,6 +716,7 @@
                 $('#textF8').val(FormatNumber($('#txtF8').val()));
                 $('#textF9').val(FormatNumber($('#txtF9').val()));
                 $('#textMemo2').val($('#txtMemo2').val());
+                refresh_bbt_total();
             }
             
             function FormatNumber(n) {
@@ -716,6 +729,76 @@
 				var arr = n.split(".");
 				var re = /(\d{1,3})(?=(\d{3})+$)/g;
 				return xx + arr[0].replace(re, "$1,") + (arr.length == 2 ? "." + arr[1] : "");
+			}
+			
+			function refresh_bbt_total(){
+				var rowslength=document.getElementById("total_tbbt").rows.length;
+				if(q_cur==1 || q_cur==2){
+					rowslength=document.getElementById("total_tbbt2").rows.length;
+					for (var j = 1; j < rowslength; j++) {
+						document.getElementById("total_tbbt2").deleteRow(1);
+					}
+				}else{
+					rowslength=document.getElementById("total_tbbt").rows.length;
+					for (var j = 1; j < rowslength; j++) {
+						document.getElementById("total_tbbt").deleteRow(1);
+					}
+				}
+				
+				var bbttotal=[];
+				for (var i = 0; i < q_bbtCount; i++) {
+					if(!emp($('#txtSpec__'+i).val()) || !emp($('#txtIndate__'+i).val())){
+						var t_n=-1;
+						for (var j = 0; j < bbttotal.length; j++) {
+							if($('#txtSpec__'+i).val()==bbttotal[j].spec && $('#txtIndate__'+i).val()==bbttotal[j].size){
+								t_n=j;
+								bbttotal[j].mount=q_add(bbttotal[j].mount,dec($('#txtMount__'+i).val()));
+								bbttotal[j].weight=q_add(bbttotal[j].weight,dec($('#txtWeight__'+i).val()));
+								break;
+							}
+						}
+						if(t_n==-1){
+							bbttotal.push({
+								'spec':$('#txtSpec__'+i).val(),
+								'size':$('#txtIndate__'+i).val(),
+								'mount':dec($('#txtMount__'+i).val()),
+								'weight':dec($('#txtWeight__'+i).val())
+							});
+						}
+					}
+				}
+				
+				for (var j = 0; j < bbttotal.length; j++) {
+					var tr = document.createElement("tr");
+					tr.id = "bbttotal_"+j;
+					tr.innerHTML = "<td><input type='text' class='txt c1' value='"+bbttotal[j].spec+"' disabled='disabled'/></td>";
+					tr.innerHTML+="<td><input type='text' class='txt c1' value='"+bbttotal[j].size+"' disabled='disabled' /></td>";
+					tr.innerHTML+= "<td><input type='text' class='txt num c1' value='"+FormatNumber(bbttotal[j].mount)+"' disabled='disabled'/></td>";
+					tr.innerHTML+="<td><input type='text' class='txt num c1' value='"+FormatNumber(bbttotal[j].weight)+"' disabled='disabled' /></td>";
+					
+					if(q_cur==1 || q_cur==2)
+						var tmp = document.getElementById("total_tbbt_top2");
+					else
+						var tmp = document.getElementById("total_tbbt_top");
+					tmp.parentNode.appendChild(tr);
+				}
+				if(q_cur==1 || q_cur==2)
+					rowslength=document.getElementById("total_tbbt2").rows.length-1;
+				else
+					rowslength=document.getElementById("total_tbbt").rows.length-1;
+					
+				if(rowslength>0){
+					if(q_cur==1 || q_cur==2){
+						$('#total_tbbt2').show();
+						$('#total_tbbt').hide();
+					}else{
+						$('#total_tbbt').show();
+						$('#total_tbbt2').hide();
+					}
+				}else{
+					$('#total_tbbt2').hide();
+					$('#total_tbbt').hide();
+				}
 			}
 		</script>
 		<style type="text/css">
@@ -883,6 +966,36 @@
                 width: 100%;
             }
             #title_tbbt tr td {
+                text-align: center;
+                border: 2px #ffffff double;
+            }
+            #total_tbbt {
+                margin: 0;
+                padding: 2px;
+                border: 2px #FFDDDD double;
+                border-spacing: 1;
+                border-collapse: collapse;
+                font-size: medium;
+                color: blue;
+                background: #FFDDDD;
+                width: 460px;
+            }
+            #total_tbbt tr td {
+                text-align: center;
+                border: 2px #ffffff double;
+            }
+            #total_tbbt2 {
+                margin: 0;
+                padding: 2px;
+                border: 2px #FFDDDD double;
+                border-spacing: 1;
+                border-collapse: collapse;
+                font-size: medium;
+                color: blue;
+                background: #FFDDDD;
+                width: 460px;
+            }
+            #total_tbbt2 tr td {
                 text-align: center;
                 border: 2px #ffffff double;
             }
@@ -1095,6 +1208,14 @@
 					<td><input id="textMemo2" type="text" class="txt c1"/></td>
 				</tr>
 			</table>
+			<table id="total_tbbt" style=' text-align:center'>
+				<tr id="total_tbbt_top" style="height: 25px;">
+					<td style="width: 90px;">材質</td>
+					<td style="width: 80px;">號數</td>
+					<td style="width: 100px;">數量</td>
+					<td style="width: 100px;">重量kg</td>
+				</tr>
+			</table>
 		</div>
 		<div id="dbbt">
 			<table id="tbbt">
@@ -1140,6 +1261,16 @@
 					<td><input id="txtWeight..*" type="text" class="txt num c1"/></td>
 					<td><input id="txtPrice..*" type="text" class="txt num c1"/></td>
 					<td><input id="txtMemo..*" type="text" class="txt c1"/></td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<table id="total_tbbt2" style=' text-align:center'>
+				<tr id="total_tbbt_top2" style="height: 25px;">
+					<td style="width: 90px;">材質</td>
+					<td style="width: 80px;">號數</td>
+					<td style="width: 100px;">數量</td>
+					<td style="width: 100px;">重量kg</td>
 				</tr>
 			</table>
 		</div>

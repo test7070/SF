@@ -198,8 +198,18 @@
 									q_gt('view_ordes', "where=^^ noa='" + b_ret[0].noa + "'^^", 0, 0, 0, "getordes", r_accy,1);
 									var as = _q_appendData("view_ordes", "", true);
 									
+									for(var i = 0;i < as.length;i++){
+										for (var j = 0; j < q_bbsCount; j++) {
+											if(as[i].noa==$('#txtOrdeno_'+j).val() && as[i].no2==$('#txtNo2_'+j).val()){
+												as.splice(i, 1);
+												i--;
+												break;
+											}
+										}
+									}
+									
 									ret = q_gridAddRow(bbsHtm, 'tbbs', 'txtOrdeno,txtNo2,txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtMemo'
-									, as.length, as, 'noa,no2,product,ucolor,spec,size,lengthb,class,mount,weight,memo', 'txtProduct,txtSpec');
+									, as.length, as, 'noa,no2,product,ucolor,spec,size,lengthb,class,mount,weight,memo', 'txtProduct,txtOrdeno');
 								}
 							}
 						}
@@ -873,6 +883,12 @@
 
             function readonly(t_para, empty) {
                 _readonly(t_para, empty);
+                if(t_para){
+                	$('#btnOrde').attr('disabled', 'disabled');
+            	}else{
+            		$('#btnOrde').removeAttr('disabled');
+                }
+                
                 change_check();
             }
             
