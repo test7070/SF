@@ -228,16 +228,16 @@
 				var string = "<table id='cuct_table' style='width:1240px;word-break:break-all;'>";
 				string+='<tr id="cuct_header">';
 				string+='<td id="cuct_plut" align="center" style="width:40px; color:black;"><input id="btnPlut" type="button" style="font-size: medium; font-weight: bold;" value="＋"/></td>';
-				string+='<td id="cuct_product" align="center" style="width:200px; color:black;">批號</td>';
-				string+='<td id="cuct_product" align="center" style="width:110px; color:black;">品名</td>';
-				string+='<td id="cuct_ucolor" align="center" style="width:150px; color:black;">類別</td>';
-				string+='<td id="cuct_spec" align="center" style="width:120px; color:black;">材質</td>';
-				string+='<td id="cuct_size" align="center" style="width:70px; color:black;">號數</td>';
-				string+='<td id="cuct_lengthb" align="center" style="width:70px; color:black;">米數</td>';
-				string+='<td id="cuct_class" align="center" style="width:80px; color:black;">廠牌</td>';
-				string+='<td id="cuct_gmount" align="center" style="width:70px; color:black;">領料件數</td>';
-				string+='<td id="cuct_lengthc" align="center" style="width:70px; color:black;">領料支數</td>';
-				string+='<td id="cuct_gweight" align="center" style="width:90px; color:black;">領料重量</td>';
+				string+='<td id="cuct_product" align="center" style="width:210px; color:black;">批號</td>';
+				string+='<td id="cuct_product" align="center" style="width:120px; color:black;">品名</td>';
+				string+='<td id="cuct_ucolor" align="center" style="width:170px; color:black;">類別</td>';
+				string+='<td id="cuct_spec" align="center" style="width:140px; color:black;">材質</td>';
+				string+='<td id="cuct_size" align="center" style="width:90px; color:black;">號數</td>';
+				string+='<td id="cuct_lengthb" align="center" style="width:90px; color:black;">米數</td>';
+				string+='<td id="cuct_class" align="center" style="width:90px; color:black;">廠牌</td>';
+				string+='<td id="cuct_gmount" align="center" style="width:90px; color:black;">領料件數</td>';
+				string+='<td id="cuct_lengthc" align="center" style="width:90px; color:black;">領料支數</td>';
+				string+='<td id="cuct_gweight" align="center" style="width:110px; color:black;">領料重量</td>';
 				string+='</tr>';
 				string+='</table>';
 				$('#cuct').html(string);
@@ -250,16 +250,19 @@
 					for(var i=now_count;i<(now_count+bbtaddcount);i++){
 	    				string+='<tr id="cuct_tr'+i+'">';
 	    				string+='<td style="text-align: center;"><input id="btnMinut_'+i+'" class="minut" type="button" style="font-size: medium; font-weight: bold;" value="－"/></td>';
-	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textUno_'+i+'"  type="text" class="txt c1" value="" /></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textUno_'+i+'" type="text" class="txt c1" value="" /></td>';
 	    				string+='<td id=cuct_product'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
 	    				string+='<td id=cuct_ucolor'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
 	    				string+='<td id=cuct_spec'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
 	    				string+='<td id=cuct_size'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
 	    				string+='<td id=cuct_lengthb'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
 	    				string+='<td id=cuct_class'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
-	    				string+='<td id=cuct_mount'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
-	    				string+='<td id=cuct_lengthc'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
-	    				string+='<td id=cuct_weight'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textGmount_'+i+'" type="text" class="txt num c1" value="" /></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textGlengthc_'+i+'" type="text" class="txt num c1" value="" /></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textGweight_'+i+'" type="text" class="txt num c1" value="" /></td>';
+	    				//string+='<td id=cuct_mount'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
+	    				//string+='<td id=cuct_lengthc'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
+	    				//string+='<td id=cuct_weight'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
 	    				string+='</tr>';
 					}
 					$('#cuct_table').append(string);
@@ -277,9 +280,9 @@
 							$('#cuct_size'+ns).text('');
 							$('#cuct_lengthb'+ns).text('');
 							$('#cuct_class'+ns).text('');
-							$('#cuct_lengthc'+ns).text('');
-							$('#cuct_mount'+ns).text('');
-							$('#cuct_weight'+ns).text('');
+							//$('#cuct_lengthc'+ns).text('');
+							//$('#cuct_mount'+ns).text('');
+							//$('#cuct_weight'+ns).text('');
 						});
                     });
                     				
@@ -288,6 +291,17 @@
 					$('#cuct_table input[type="text"]').each(function() {
 						var objname=$(this).attr('id').split('_')[0];
 						var n=$(this).attr('id').split('_')[1];
+						
+						//只能輸入數值
+						if(objname=='textGmount' || objname=='textGlengthc' || objname=='textGweight'){
+							$(this).keyup(function(e) {
+								if(e.which>=37 && e.which<=40){return;}
+								var tmp=$(this).val();
+								tmp=tmp.match(/\d{1,}\.{0,1}\d{0,}/);
+								$(this).val(tmp);
+							});
+						}
+						
 						//變動事件
 						if(objname=='textUno')
 						$(this).change(function() {
@@ -323,16 +337,16 @@
 				string+="<table id='cuct_table2' style='width:1240px;border-bottom: none;'>";
 				string+='<tr id="cuct_header">';
 				string+='<td id="cuct_plut" align="center" style="width:40px; color:black;"><input id="btnPlut2" type="button" style="font-size: medium; font-weight: bold;" value="＋"/></td>';
-				string+='<td id="cuct_product" align="center" style="width:200px; color:black;">批號&nbsp;&nbsp;<input type="button" id="btnCub_nouno" value="領料" style="width:60px;font-size: medium; font-weight: bold"/></td>';
-				string+='<td id="cuct_product" align="center" style="width:110px; color:black;">品名</td>';
-				string+='<td id="cuct_ucolor" align="center" style="width:150px; color:black;">類別</td>';
-				string+='<td id="cuct_spec" align="center" style="width:120px; color:black;">材質</td>';
-				string+='<td id="cuct_size" align="center" style="width:70px; color:black;">號數</td>';
-				string+='<td id="cuct_lengthb" align="center" style="width:70px; color:black;">米數</td>';
-				string+='<td id="cuct_class" align="center" style="width:80px; color:black;">廠牌</td>';
-				string+='<td id="cuct_gmount" align="center" style="width:70px; color:black;">領料件數</td>';
-				string+='<td id="cuct_lengthc" align="center" style="width:70px; color:black;">領料支數</td>';
-				string+='<td id="cuct_gweight" align="center" style="width:90px; color:black;">領料重量</td>';
+				string+='<td id="cuct_product" align="center" style="width:210px; color:black;">批號&nbsp;&nbsp;<input type="button" id="btnCub_nouno" value="領料" style="width:60px;font-size: medium; font-weight: bold"/></td>';
+				string+='<td id="cuct_product" align="center" style="width:120px; color:black;">品名</td>';
+				string+='<td id="cuct_ucolor" align="center" style="width:170px; color:black;">類別</td>';
+				string+='<td id="cuct_spec" align="center" style="width:140px; color:black;">材質</td>';
+				string+='<td id="cuct_size" align="center" style="width:90px; color:black;">號數</td>';
+				string+='<td id="cuct_lengthb" align="center" style="width:90px; color:black;">米數</td>';
+				string+='<td id="cuct_class" align="center" style="width:90px; color:black;">廠牌</td>';
+				string+='<td id="cuct_gmount" align="center" style="width:90px; color:black;">領料件數</td>';
+				string+='<td id="cuct_lengthc" align="center" style="width:90px; color:black;">領料支數</td>';
+				string+='<td id="cuct_gweight" align="center" style="width:110px; color:black;">領料重量</td>';
 				string+='</tr>';
 				string+='</table>';
 				$('#cuct').append(string);
@@ -1606,15 +1620,6 @@
 						intervalupdate=setInterval("cucsupdata()",1000*60);
 						setInterval("dialog_show()",1000*5);
 						break;
-					case 'qtxt.query.cucttocubt':
-						var as = _q_appendData("tmp0", "", true, true);
-						if (as[0] != undefined) {
-                        	func_cubno=as[0].cubno;
-                        	q_func('cub_post.post.cubt', r_accy + ',' + encodeURI(func_cubno) + ',1');
-                        	Unlock();
-                        	alert('領料完成!!');
-                		}
-						break;
 					case 'cub_post.post.cubt':
 						//將領料資料清空
 						$('#cuct_table .minut').each(function() {
@@ -1695,6 +1700,8 @@
                 		if(dec(as[0].mount)<=0 || dec(as[0].weight)<=0 ){
                 			getunoerr=getunoerr+'批號【'+as[0].uno+'】已被領用\n';
                 		}
+                	}else{
+                		getunoerr=getunoerr+'無此批號【'+as[0].uno+'】\n';
                 	}
                 	
                 	getunocount=getunocount-1;
@@ -1707,7 +1714,7 @@
 							var bbtrow=document.getElementById("cuct_table").rows.length-1;
 							for(var j=0;j<bbtrow;j++){
 								if($('#textUno_'+j).val().length>0){
-									t_nouno=t_nouno+$('#textUno_'+j).val()+'#';
+									t_nouno=t_nouno+$('#textUno_'+j).val()+'@'+$('#textGmount_'+j).val()+'@'+$('#textGlengthc_'+j).val()+'@'+$('#textGweight_'+j).val()+'#';
 								}
 							}
 							if(t_nouno.length>0){
@@ -1731,289 +1738,17 @@
 							$('#cuct_size'+n).text(as[0].size);
 							$('#cuct_lengthb'+n).text(as[0].lengthb);
 							$('#cuct_class'+n).text(as[0].class);
-							$('#cuct_lengthc'+n).text(as[0].lengthc);
-							$('#cuct_mount'+n).text(as[0].mount);
-							$('#cuct_weight'+n).text(as[0].weight);
+							//$('#cuct_lengthc'+n).text(as[0].lengthc);
+							//$('#cuct_mount'+n).text(as[0].mount);
+							//$('#cuct_weight'+n).text(as[0].weight);
+							$('#textGmount_'+n).val(as[0].mount);
+							$('#textGlengthc_'+n).val(as[0].lengthc);
+							$('#textGweight_'+n).val(as[0].weight);
 						}
                 	}else{
                 		alert('無此批號!!');
                 		$('#btnMinut_'+n).click();
                 	}
-                }
-                /*if(t_func.indexOf('qtxt.query.getweight_')>-1){
-                	var n=t_func.split('_')[1];
-                	$('#textAvgweight_'+n).focusin();
-                	var as = _q_appendData("tmp0", "", true, true);
-					if (as[0] != undefined) {
-						var t_weight=0,t_mount=0;
-						for (var i=0;i<as.length;i++){
-							t_weight=q_add(t_weight,dec(as[0].weight));
-							t_mount=q_add(t_mount,dec(as[0].mount));
-						}
-						$('#lblMount_'+n).text(t_mount);
-						$('#lblWeight_'+n).text(t_weight);
-						$('#textAvgweight_'+n).val(round(q_div(t_weight,t_mount),3));
-						
-						if(dec($('#textGmount_'+n).val())>t_mount){
-							alert('領料件數大於庫存件數!!');
-							$('#textGmount_'+n).val(0);
-						}
-						
-						if(dec($('#textGweight_'+n).val())>t_weight){
-							alert('領料重量大於庫存重量!!');
-							$('#textGmount_'+n).val(0);
-						}
-						
-						$('#textGweight_'+n).val(q_mul(dec($('#textGmount_'+n).val()),round(q_div(t_weight,t_mount),3)));
-					}else{
-						$('#textAvgweight_'+n).val(0);
-						$('#textGweight_'+n).val(0);
-					}
-                }*/
-                if(t_func.indexOf('qtxt.query.getweight_')>-1){
-                	var n=t_func.split('_')[1];
-                	var as = _q_appendData("tmp0", "", true, true);
-					if (as[0] != undefined) {
-						var t_weight=0,t_mount=0;
-						for (var i=0;i<as.length;i++){
-							t_weight=q_add(t_weight,dec(as[0].weight));
-							t_mount=q_add(t_mount,dec(as[0].mount));
-						}
-						$('#lblMount_'+n).text(t_mount);
-						$('#lblWeight_'+n).text(t_weight);
-						if(t_mount<=0){
-							$('#textAvgweight_'+n).val(0);
-						}else{
-							$('#textAvgweight_'+n).val(round(q_div(t_weight,t_mount),3));
-						}
-						
-						if(dec($('#textGmount_'+n).val())>t_mount){
-							alert('領料件數大於庫存件數!!');
-							$('#textGmount_'+n).val(0);
-							$('#textMemo_'+n).focus();
-						}
-						
-						if(dec($('#textGmount_'+n).val())>0 && dec($('#textGmount_'+n).val())==t_mount && dec($('#textGweight_'+n).val())!=t_weight){
-							$('#textGweight_'+n).val(t_weight);
-						}
-						
-						if(dec($('#textGweight_'+n).val())>t_weight){
-							alert('領料重量大於庫存重量!!');
-							$('#textGmount_'+n).val(0);
-							$('#textMemo_'+n).focus();
-						}
-						
-						if(dec($('#textGmount_'+n).val())>0 && dec($('#textGmount_'+n).val())==t_mount){
-							$('#textGweight_'+n).val(t_weight);
-						}else{
-							$('#textGweight_'+n).val(q_mul(dec($('#textGmount_'+n).val()),round(q_div(t_weight,t_mount),3)));
-						}
-					}else{
-						alert('無此物品!!');
-						$('#textMemo_'+n).focus();
-						$('#textGweight_'+n).val(0);
-						$('#textGmount_'+n).val(0);
-						$('#textAvgweight_'+n).val(0);
-					}
-                }
-                if(t_func.indexOf('qtxt.query.cuctstkupdate_')>-1 && stkupdate>0){
-                	stkupdate=stkupdate-1;
-                	var n=t_func.split('_')[1];
-                	$('#textAvgweight_'+n).focusin();
-                	var as = _q_appendData("tmp0", "", true, true);
-					if (as[0] != undefined) {
-						var t_weight=0,t_mount=0;
-						for (var i=0;i<as.length;i++){
-							t_weight=q_add(t_weight,dec(as[0].weight));
-							t_mount=q_add(t_mount,dec(as[0].mount));
-						}
-						$('#lblMount_'+n).text(t_mount);
-						$('#lblWeight_'+n).text(t_weight);
-						if(t_mount<=0)
-							$('#textAvgweight_'+n).val(0);
-						else
-							$('#textAvgweight_'+n).val(round(q_div(t_weight,t_mount),3));
-						
-						if(dec($('#textGmount_'+n).val())>t_mount){
-							$('#textGmount_'+n).val(0);
-						}
-						
-						if(dec($('#textGmount_'+n).val())>0 && dec($('#textGmount_'+n).val())==t_mount && dec($('#textGweight_'+n).val())!=t_weight){
-							$('#textGweight_'+n).val(t_weight);
-						}
-						
-						if(dec($('#textGweight_'+n).val())>t_weight){
-							$('#textGmount_'+n).val(0);
-						}
-						
-						if(dec($('#textGmount_'+n).val())>0 && dec($('#textGmount_'+n).val())==t_mount ){
-							$('#textGweight_'+n).val(t_weight);
-						}else{
-							$('#textGweight_'+n).val(q_mul(dec($('#textGmount_'+n).val()),round(q_div(t_weight,t_mount),3)));
-						}
-					}else{
-						$('#textAvgweight_'+n).val(0);
-						$('#textGweight_'+n).val(0);
-						$('#textGmount_'+n).val(0);
-					}
-					
-					if(stkupdate==0){
-						//直接將cuct 加到cuct
-						var t_datea=emp($('#textDatea').val())?'#non':$('#textDatea').val();
-	                    var t_mechno=emp($('#combMechno').val())?'#non':$('#combMechno').val();
-	                    var t_memo=emp($('#textMemo').val())?'#non':$('#textMemo').val();
-						var ts_bbt='';
-	                    var bbtrow=document.getElementById("cuct_table").rows.length-1;
-	                    var hasbbs=false;
-	                    for(var j=0;j<bbtrow;j++){
-	                    	var ts_product=$('#textProduct_'+j).val();
-		                	var ts_ucolor=$('#textUcolor_'+j).val();
-							var ts_spec=$('#textSpec_'+j).val();
-							var ts_size=$('#textSize_'+j).val();
-							var ts_lengthb=$('#textLengthb_'+j).val();
-							var ts_class=$('#textClass_'+j).val();
-							var ts_gmount=$('#textGmount_'+j).val();
-							var ts_gweight=$('#textGweight_'+j).val();
-							var ts_avgweight=$('#textAvgweight_'+j).val();
-							var ts_memo=$('#textMemo_'+j).val();
-																
-							if(!emp(ts_product) || !emp(ts_ucolor) || !emp(ts_spec) || !emp(ts_size) || !emp(ts_lengthb) || !emp(ts_class)){
-								hasbbs=true; //有資料
-								if (dec(ts_gweight)>0 && dec(ts_avgweight)>0){ //重量>0
-									ts_bbt=ts_bbt
-									+ts_product+"^@^"
-									+ts_ucolor+"^@^"
-									+ts_spec+"^@^"
-									+ts_size+"^@^"
-									+dec(ts_lengthb)+"^@^"
-									+ts_class+"^@^"
-									+dec(ts_gmount)+"^@^"
-									+dec(ts_gweight)+"^@^"
-									+ts_memo+"^@^"
-									+"^#^";
-		                    	}
-							}
-	                    }
-	                    if(!hasbbs){
-							alert('無領料資料');
-							Unlock();
-	                    }else if(ts_bbt.length==0){
-	                    	alert('領料重量等於零。');
-	                    	Unlock();
-	                    }else{
-	                    	q_func('qtxt.query.cucttocubt', 'cuc_sf.txt,cucttocubt,'
-	                   		+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno+';'+r_name+';'+ts_bbt);
-	                    }
-					}
-                }
-                //bbsbbt有資料 轉cub 檢查庫存
-                if(t_func.indexOf('qtxt.query.cucsstkcuct_')>-1 && stkupdate>0){
-                	stkupdate=stkupdate-1;
-                	var n=t_func.split('_')[1];
-                	$('#textAvgweight_'+n).focusin();
-                	var as = _q_appendData("tmp0", "", true, true);
-					if (as[0] != undefined) {
-						var t_weight=0,t_mount=0;
-						for (var i=0;i<as.length;i++){
-							t_weight=q_add(t_weight,dec(as[0].weight));
-							t_mount=q_add(t_mount,dec(as[0].mount));
-						}
-						$('#lblMount_'+n).text(t_mount);
-						$('#lblWeight_'+n).text(t_weight);
-						if(t_mount<=0)
-							$('#textAvgweight_'+n).val(0);
-						else
-							$('#textAvgweight_'+n).val(round(q_div(t_weight,t_mount),3));
-						
-						if(dec($('#textGmount_'+n).val())>t_mount){
-							alert('領料件數大於庫存件數!!');
-							$('#textGmount_'+n).val(0);
-							stkupdate=-1;
-						}
-						
-						if(dec($('#textGmount_'+n).val())>0 && dec($('#textGmount_'+n).val())==t_mount && dec($('#textGweight_'+n).val())!=t_weight){
-							$('#textGweight_'+n).val(t_weight);
-						}
-						
-						if(dec($('#textGweight_'+n).val())>t_weight){
-							alert('領料重量大於庫存重量!!');
-							$('#textGmount_'+n).val(0);
-							$('#textGweight_'+n).val(0);
-							stkupdate=-1;
-						}
-						if(dec($('#textGmount_'+n).val())>0 && dec($('#textGmount_'+n).val())==t_mount){
-							$('#textGweight_'+n).val(t_weight);
-						}else{
-							$('#textGweight_'+n).val(q_mul(dec($('#textGmount_'+n).val()),round(q_div(t_weight,t_mount),3)));
-						}
-					}else{
-						$('#textAvgweight_'+n).val(0);
-						$('#textGweight_'+n).val(0);
-						$('#textGmount_'+n).val(0);
-						alert('物品已被領料完!!');
-						stkupdate=-1;
-					}
-					
-					if(stkupdate==0){
-						var t_datea=emp($('#textDatea').val())?'#non':$('#textDatea').val();
-	                    var t_mechno=emp($('#combMechno').val())?'#non':$('#combMechno').val();
-	                    var t_memo=emp($('#textMemo').val())?'#non':$('#textMemo').val();
-	                    
-	                    var t_noa='';
-                    	var t_noq='';
-                    	var t_xmount='';
-                    	var t_xcount='';
-                    	var t_xweight='';
-                    	var t_err='';
-                    	for (var i=0;i<chk_cucs.length;i++){
-                    		if(dec(chk_cucs[i]['xmount'])>0 || dec(chk_cucs[i]['xweight'])>0){
-	                    		t_noa=t_noa+chk_cucs[i]['noa']+'^';
-								t_noq=t_noq+chk_cucs[i]['noq']+'^';
-								t_xmount=t_xmount+dec(chk_cucs[i]['xmount'])+'^';
-			    				t_xcount=t_xcount+dec(chk_cucs[i]['xcount'])+'^';
-								t_xweight=t_xweight+dec(chk_cucs[i]['xweight'])+'^';
-							}
-                    	}
-	                    			
-	                    //表身資料
-	                    var ts_bbt='';
-	                    var bbtrow=document.getElementById("cuct_table").rows.length-1;
-	                    for(var j=0;j<bbtrow;j++){
-	                    	var ts_product=$('#textProduct_'+j).val();
-		                	var ts_ucolor=$('#textUcolor_'+j).val();
-							var ts_spec=$('#textSpec_'+j).val();
-							var ts_size=$('#textSize_'+j).val();
-							var ts_lengthb=$('#textLengthb_'+j).val();
-							var ts_class=$('#textClass_'+j).val();
-							var ts_gmount=$('#textGmount_'+j).val();
-							var ts_gweight=$('#textGweight_'+j).val();
-							var ts_avgweight=$('#textAvgweight_'+j).val();
-							var ts_memo=$('#textMemo_'+j).val();
-										
-							if(	(!emp(ts_product) || !emp(ts_ucolor) || !emp(ts_spec) || !emp(ts_size) || !emp(ts_lengthb) || !emp(ts_class))
-							&&dec(ts_gweight)>0 && dec(ts_avgweight)>0){
-								ts_bbt=ts_bbt
-								+ts_product+"^@^"
-								+ts_ucolor+"^@^"
-								+ts_spec+"^@^"
-								+ts_size+"^@^"
-								+dec(ts_lengthb)+"^@^"
-								+ts_class+"^@^"
-								+dec(ts_gmount)+"^@^"
-								+dec(ts_gweight)+"^@^"
-								+ts_memo+"^@^"
-								+"^#^";
-							}
-						}
-	                    if(ts_bbt.length==0){
-	                    	ts_bbt='#non'
-						}
-	                    q_func('qtxt.query.cucstocub', 'cuc_sf.txt,cucstocub,'
-	                    +r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'
-	                    +r_userno+';'+r_name+';'+t_noa+';'+t_noq+';'+t_xmount+';'+t_xcount+';'+t_xweight+';'+ts_bbt);
-	                    //取消刷新
-	                    //clearInterval(intervalupdate);
-					}
                 }
 			}
 			
