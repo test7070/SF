@@ -86,7 +86,7 @@
             			];
                 
                 document.title = '互換/委外代工/來料加工 合約作業';
-                q_cmbParse("cmbTypea", ',委外代工,來料,互換');
+                q_cmbParse("cmbTypea", ',委外代工,來料加工,互換');
                 
 				q_gt('ucc', "1=1", 0, 0, 0, "bbsucc");
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");

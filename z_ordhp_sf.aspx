@@ -44,7 +44,7 @@
                     }, {
                         type : '5',
                         name : 'xtypea',
-                        value :'#non@全部,委外代工,來料,互換'.split(',')
+                        value :'#non@全部,委外代工,來料加工,互換'.split(',')
                     }, {
                         type : '2',
                         name : 'xtggno',
@@ -52,9 +52,8 @@
                         index : 'noa,comp',
                         src : 'custtgg_b.aspx'
                     }, {
-                        type : '5',
-                        name : 'xorder',
-                        value :''
+                        type : '6',
+                        name : 'xnoa'
                     }]
                 });
                 q_popAssign();

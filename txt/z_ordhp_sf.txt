@@ -134,13 +134,183 @@ dbo.getComma(f10,-1) f10,
 case when fx>=0 then dbo.getComma(abs(fx),-1) else '<font color=red>('+dbo.getComma(abs(fx),-1)+')</font>' end fx,
 dbo.getComma(tweight,-1) tweight,
 case when gno='0' and len(noa)>0 then 'ordh_sf?noa=$noa' else '' end qhref,
-dbo.charbr(addr,5) addr,
+dbo.charbr(addr,10) addr,
 * from #tmp order by gno,idno
 
 IF OBJECT_ID('tempdb..#tmpa')is not null
 BEGIN
 	drop table #tmpa
 END
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	drop table #tmp
+END
+;
+--*******************************************************************************************************
+z_ordhp_sf02:--z_ordhp_sf02
+SET QUOTED_IDENTIFIER OFF 
+declare @t_bdate nvarchar(30)
+declare @t_edate nvarchar(30)
+declare @t_typea nvarchar(30)
+declare @t_btggno nvarchar(30)
+declare @t_etggno nvarchar(30)
+declare @t_noa nvarchar(30)
+
+set @t_bdate = case when '#non'=[1] then '' else [1] end 
+set @t_edate = case when '#non'=[2] then char(255) else [2] end 
+set @t_typea = case when '#non'=[3] then '' else [3] end
+set @t_btggno = case when '#non'=[4] then '' else [4] end 
+set @t_etggno = case when '#non'=[5] then char(255) else [5] end 
+set @t_noa = case when '#non'=[6] then '' else [6] end 
+-----------------------------------------------------------------------------------
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	drop table #tmp
+END
+
+create table #tmp(
+	gno nvarchar(2),
+	noa nvarchar(50),
+	datea nvarchar(50),
+	typea nvarchar(50),
+	tggno  nvarchar(50),
+	comp nvarchar(100),
+	addr nvarchar(150),
+	weight float,
+	amemo nvarchar(MAX),
+	bmemo nvarchar(MAX),
+	
+	a float, --#3 280
+	b float, --#3 280w
+	c float, --#3 420w
+	d float, --#4 280
+	e float, --#4 280w
+	f float, --#4 420w
+	g float, --#5 280
+	h float, --#5 280w
+	i float, --#5 420w
+	j float, --#6 420W
+	k float, --#7 420W
+	l float, --#8 420W
+	m float, --#9 420W
+	n float, --#10 420W
+	o float, --#11 420W
+	total float
+)	
+CREATE INDEX tmp_index ON #tmp (noa)
+
+--已進貨
+insert #tmp (gno,noa,datea,typea,tggno,comp,addr,weight,amemo
+,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,total)
+select '1',noa,datea,typea,tggno,nick,addr,weight,memo
+,isnull(a,0),isnull(b,0),isnull(c,0),isnull(d,0),isnull(e,0),isnull(f,0)
+,isnull(g,0),isnull(h,0),isnull(i,0),isnull(j,0),isnull(k,0),isnull(l,0)
+,isnull(m,0),isnull(n,0),isnull(o,0)
+,isnull(a,0)+isnull(b,0)+isnull(c,0)+isnull(d,0)+isnull(e,0)+isnull(f,0)
++isnull(g,0)+isnull(h,0)+isnull(i,0)+isnull(j,0)+isnull(k,0)+isnull(l,0)
++isnull(m,0)+isnull(n,0)+isnull(o,0)
+from ordh a outer apply (
+	select sum(case when ib.size='#3' and ib.spec='SD280' then ib.weight else 0 end)a
+	,sum(case when ib.size='#3' and ib.spec='SD280W' then ib.weight else 0 end)b
+	,sum(case when ib.size='#3' and ib.spec='SD420W' then ib.weight else 0 end)c
+	,sum(case when ib.size='#4' and ib.spec='SD280' then ib.weight else 0 end)d
+	,sum(case when ib.size='#4' and ib.spec='SD280W' then ib.weight else 0 end)e
+	,sum(case when ib.size='#4' and ib.spec='SD420W' then ib.weight else 0 end)f
+	,sum(case when ib.size='#5' and ib.spec='SD280' then ib.weight else 0 end)g
+	,sum(case when ib.size='#5' and ib.spec='SD280W' then ib.weight else 0 end)h
+	,sum(case when ib.size='#5' and ib.spec='SD420W' then ib.weight else 0 end)i
+	,sum(case when ib.size='#6' and ib.spec='SD420W' then ib.weight else 0 end)j
+	,sum(case when ib.size='#7' and ib.spec='SD420W' then ib.weight else 0 end)k
+	,sum(case when ib.size='#8' and ib.spec='SD420W' then ib.weight else 0 end)l
+	,sum(case when ib.size='#9' and ib.spec='SD420W' then ib.weight else 0 end)m
+	,sum(case when ib.size='#10' and ib.spec='SD420W' then ib.weight else 0 end)n
+	,sum(case when ib.size='#11' and ib.spec='SD420W' then ib.weight else 0 end)o
+	from view_ina ia left join view_inas ib on ia.noa=ib.noa where ia.ordeno=a.noa
+)xb
+where (datea between @t_bdate and @t_edate) and (len(@t_typea)=0 or typea=@t_typea)
+and (tggno between @t_btggno and @t_etggno) and (len(@t_noa)=0 or noa=@t_noa)
+
+--已出貨
+insert #tmp (gno,noa,datea,typea,tggno,comp,addr,weight,amemo
+,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,total)
+select '2',noa,datea,typea,tggno,nick,addr,weight,memo
+,isnull(a,0),isnull(b,0),isnull(c,0),isnull(d,0),isnull(e,0),isnull(f,0)
+,isnull(g,0),isnull(h,0),isnull(i,0),isnull(j,0),isnull(k,0),isnull(l,0)
+,isnull(m,0),isnull(n,0),isnull(o,0)
+,isnull(a,0)+isnull(b,0)+isnull(c,0)+isnull(d,0)+isnull(e,0)+isnull(f,0)
++isnull(g,0)+isnull(h,0)+isnull(i,0)+isnull(j,0)+isnull(k,0)+isnull(l,0)
++isnull(m,0)+isnull(n,0)+isnull(o,0)
+from ordh a outer apply (
+	select sum(case when gb.size='#3' and gb.spec='SD280' then gb.weight else 0 end)a
+	,sum(case when gb.size='#3' and gb.spec='SD280W' then gb.weight else 0 end)b
+	,sum(case when gb.size='#3' and gb.spec='SD420W' then gb.weight else 0 end)c
+	,sum(case when gb.size='#4' and gb.spec='SD280' then gb.weight else 0 end)d
+	,sum(case when gb.size='#4' and gb.spec='SD280W' then gb.weight else 0 end)e
+	,sum(case when gb.size='#4' and gb.spec='SD420W' then gb.weight else 0 end)f
+	,sum(case when gb.size='#5' and gb.spec='SD280' then gb.weight else 0 end)g
+	,sum(case when gb.size='#5' and gb.spec='SD280W' then gb.weight else 0 end)h
+	,sum(case when gb.size='#5' and gb.spec='SD420W' then gb.weight else 0 end)i
+	,sum(case when gb.size='#6' and gb.spec='SD420W' then gb.weight else 0 end)j
+	,sum(case when gb.size='#7' and gb.spec='SD420W' then gb.weight else 0 end)k
+	,sum(case when gb.size='#8' and gb.spec='SD420W' then gb.weight else 0 end)l
+	,sum(case when gb.size='#9' and gb.spec='SD420W' then gb.weight else 0 end)m
+	,sum(case when gb.size='#10' and gb.spec='SD420W' then gb.weight else 0 end)n
+	,sum(case when gb.size='#11' and gb.spec='SD420W' then gb.weight else 0 end)o
+	from view_get ga left join view_gets gb on ga.noa=gb.noa where ga.idno=a.noa
+)xb
+where (datea between @t_bdate and @t_edate) and (len(@t_typea)=0 or typea=@t_typea)
+and (tggno between @t_btggno and @t_etggno) and (len(@t_noa)=0 or noa=@t_noa)
+
+--餘量
+insert #tmp (gno,noa,datea,typea,tggno,comp,addr,weight,amemo
+,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,total)
+select '3',noa,datea,typea,tggno,comp,addr,weight,amemo
+,sum(case when gno='1' then 1 else -1 end*a)
+,sum(case when gno='1' then 1 else -1 end*b)
+,sum(case when gno='1' then 1 else -1 end*c)
+,sum(case when gno='1' then 1 else -1 end*d)
+,sum(case when gno='1' then 1 else -1 end*e)
+,sum(case when gno='1' then 1 else -1 end*f)
+,sum(case when gno='1' then 1 else -1 end*g)
+,sum(case when gno='1' then 1 else -1 end*h)
+,sum(case when gno='1' then 1 else -1 end*i)
+,sum(case when gno='1' then 1 else -1 end*j)
+,sum(case when gno='1' then 1 else -1 end*k)
+,sum(case when gno='1' then 1 else -1 end*l)
+,sum(case when gno='1' then 1 else -1 end*m)
+,sum(case when gno='1' then 1 else -1 end*n)
+,sum(case when gno='1' then 1 else -1 end*o)
+,sum(case when gno='1' then 1 else -1 end*total)
+from #tmp group by noa,datea,typea,tggno,comp,addr,weight,amemo
+
+--if(@t_typea!='委外代工')
+--begin
+
+--end
+
+insert #tmp (gno,noa)
+select '6',noa from #tmp group by noa
+
+select 
+dbo.getComma(weight,-1) weight,
+dbo.getComma(a,-1) a,
+dbo.getComma(b,-1) b,
+dbo.getComma(c,-1) c,
+dbo.getComma(d,-1) d,
+dbo.getComma(e,-1) e,
+dbo.getComma(f,-1) f,
+dbo.getComma(g,-1) g,
+dbo.getComma(h,-1) h,
+dbo.getComma(i,-1) i,
+dbo.getComma(j,-1) j,
+dbo.getComma(k,-1) k,
+dbo.getComma(l,-1) l,
+dbo.getComma(m,-1) m,
+dbo.getComma(n,-1) n,
+dbo.getComma(o,-1) o,
+dbo.getComma(total,-1) total,
+* from #tmp order by noa,gno
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN

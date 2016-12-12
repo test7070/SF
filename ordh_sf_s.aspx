@@ -31,7 +31,7 @@
 
 				$('#txtBdate').focus();
 				
-				q_cmbParse("cmbTypea", '@全部,委外代工,來料,互換');
+				q_cmbParse("cmbTypea", '@全部,委外代工,來料加工,互換');
 			}
 
 			function q_seekStr() {

@@ -45,6 +45,7 @@ create table #tmp(
 	accy nvarchar(50),
 	tablea nvarchar(50), 
 	noa nvarchar(50),
+	noq nvarchar(50),
 	datea nvarchar(50),
 	uno nvarchar(50),
 	product nvarchar(50),
@@ -60,96 +61,107 @@ create table #tmp(
 	store nvarchar(50),
 	memo nvarchar(MAX),
 	custno nvarchar(50),
-	comp nvarchar(100)
+	comp nvarchar(100),
+	ordeno nvarchar(50),
 )
 
 --盤點
 insert #tmp
-select '0',a.accy,'ucces' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'',''
+select '5',a.accy,'ucces' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
 from view_ucce a left join view_ucces b on a.noa = b.noa 
 where len(b.uno)>0 and a.datea<=@t_edate
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
 
 insert #tmp
-select '1',a.accy,'rc2s' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'',''
+select '6',a.accy,'rc2s' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
 from view_rc2 a left join view_rc2s b on a.noa = b.noa 
 where a.typea!='2' and len(b.uno)>0 and a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
-union all
-select '2',a.accy,'cubs' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,b.custno,b.comp
+
+insert #tmp
+select '6',a.accy,'cubs' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,b.custno,b.comp,b.ordeno
 from view_cub a left join view_cubs b on a.noa=b.noa
 where len(b.uno)>0 and a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
-and (len(isnull(b.ordeno,''))=(case when @t_xorde='0' then 0 else len(isnull(b.ordeno,'')) end))
-union all
-select '3',a.accy,'inas' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'',''
+
+insert #tmp
+select '6',a.accy,'inas' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
 from view_ina a left join view_inas b on a.noa=b.noa
 where len(b.uno)>0 and a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
 
 --出貨退回
 insert #tmp
-select '4',a.accy,'vcct' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,a.custno,a.nick
+select '6',a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,'','',b.memo,a.custno,a.nick,''
 from view_vcc a left join view_vcct b on a.noa = b.noa 
-where a.typea='2' and len(b.uno)>0 and a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
 
---更新最新盤點最後的客戶編號
+--出貨
+insert #tmp
+select '7',a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.mount,-1*b.weight,-1*b.lengthc,'','',b.memo,a.custno,a.nick,''
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='1' and len(b.uno)>0 and a.datea<=@t_edate 
+
+--領料
+insert #tmp
+select '7',a.accy,'cubt' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.gmount,-1*b.gweight,-1*b.lengthc,'','',b.memo,'','',''
+from view_cub a left join view_cubt b on a.noa=b.noa
+where len(b.uno)>0 and a.datea<=@t_edate 
+
+--互換出
+insert #tmp
+select '7',a.accy,'gets' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.mount,-1*b.weight,-1*b.lengthc,b.storeno,b.store,b.memo,'','',''
+from view_get a left join view_gets b on a.noa=b.noa
+where len(b.uno)>0 and a.datea<=@t_edate 
+
+--退貨
+insert #tmp
+select '7',a.accy,'rc2t' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.mount,-1*b.weight,-1*b.lengthc,b.storeno,b.store,b.memo,'','',''
+from view_rc2 a left join view_rc2s b on a.noa = b.noa 
+where a.typea='2' and len(b.uno)>0 and a.datea<=@t_edate 
+
+update #tmp
+set mount=ISNULL(mount,0),weight=ISNULL(weight,0),lengthc=ISNULL(lengthc,0)
+,storeno=ISNULL(storeno,''),store=ISNULL(store,''),custno=ISNULL(custno,''),comp=ISNULL(comp,''),ordeno=ISNULL(ordeno,'')
+
+insert #tmp(uno,gno)
+select uno,'0' from #tmp group by uno
+
 update a
-set custno=isnull(b.custno,''),comp=isnull(b.comp,'')
-from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and (tablea='cubs' or tablea='vcct') order by datea desc,gno desc,noa desc)b 
-where a.tablea!='cubs' and  a.tablea!='vcct'
+set accy=b.accy,tablea=b.tablea,noa=b.noa,noq=b.noq,datea=b.datea
+,product=b.product,ucolor=b.ucolor,spec=b.spec,size=b.size,lengthb=b.lengthb,class=b.class
+,storeno=b.storeno,store=b.store,memo=b.memo,custno=b.custno,comp=b.comp,ordeno=b.ordeno
+from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and gno!='0' order by datea,gno,noa,noq) b
+where a.gno='0'
 
 --刪除多次批號的資料 只保留最後一次批號(同一天依gno,noa順序)
 delete a
-from #tmp a outer apply (select MAX(datea+'-'+gno+'-'+noa)datea from #tmp 
-where uno=a.uno)b
-where a.datea+'-'+a.gno+'-'+a.noa!=b.datea
+from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+gno+'-'+noa+'-'+noq) maxnoa from #tmp where uno=a.uno and tablea='ucces' and gno!='0')b
+where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.gno+'-'+a.noa+'-'+noq< ISNULL(b.maxnoa,'')
 
-update #tmp set gno='0'
-
-delete #tmp where custno not between @t_bcustno and @t_ecustno
-
---批號一次會全部領 不會剩餘
 update a
-set mount=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.mount end
-,weight=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.weight end
-,lengthc=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.lengthc end
-from #tmp a 
-outer apply (select sum(case when va.typea!='2' then 1 else -1 end)vget from view_vcc va left join view_vcct vb on va.noa=vb.noa where vb.uno=a.uno)v
-outer apply (select count(*)cget from view_cubt where uno=a.uno)c
-outer apply (select count(*)gget from view_gets where uno=a.uno)g
-outer apply (select sum(case when ra.typea='2' then 1 else 0 end)rget from view_rc2 ra left join view_rc2s rb on ra.noa=rb.noa where rb.uno=a.uno )r
+set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)
+from #tmp a outer apply (select SUM(mount)mount,SUM(weight)weight,sum(lengthc)lengthc from #tmp where uno=a.uno and gno!='0' ) b
+where a.gno='0'
+
+delete #tmp where gno!='0'
+
+delete #tmp where 
+not ((len(@t_pno)=0 or isnull(product,'')=@t_pno) 
+	and (len(@t_ucolor)=0 or isnull(ucolor,'')=@t_ucolor)
+	and (len(@t_spec)=0 or isnull(spec,'')=@t_spec) and (len(@t_size)=0 or isnull(size,'')=@t_size)
+	and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
+	and (len(@t_class)=0 or isnull(class,'')=@t_class) and (isnull(storeno,'') between @t_bstoreno and @t_estoreno)
+	and (len(@t_uno)=0 or uno=@t_uno)
+	and (isnull(ucolor,'')!='板料' or @t_xsheet='Y')
+	and (custno between @t_bcustno and @t_ecustno)
+	and (len(@t_ordeno)=0 or ordeno=@t_ordeno)
+	and len(ordeno)=(case when @t_xorde='0' then 0 else len(ordeno) end)
+)
 
 delete #tmp where mount<=0 and weight<=0
 
@@ -157,16 +169,15 @@ if((select count(*) from #tmp)>0)
 begin
 	--小計
 	insert #tmp
-	select '1','','','',char(255),char(255),product,char(255),spec,size,999,char(255)
-	,sum(mount),sum(weight),sum(lengthc),'','','','',''
+	select '1','','','','',char(255),char(255),product,char(255),spec,size,999,char(255)
+	,sum(mount),sum(weight),sum(lengthc),'','','','','',''
 	from #tmp where gno='0' group by product,spec,size
 	
 	--總計
 	insert #tmp
-	select '2','','','',char(255),char(255),char(255),char(255),char(255),char(255),999,char(255)
-	,sum(mount),sum(weight),sum(lengthc),'','','','',''
+	select '2','','','','',char(255),char(255),char(255),char(255),char(255),char(255),999,char(255)
+	,sum(mount),sum(weight),sum(lengthc),'','','','','',''
 	from #tmp where gno='0' 
-	
 end
 
 select ROW_NUMBER() over (partition by product,spec,size order by product,spec,cast(dbo.get_num(size) as int),ucolor,lengthb,class,gno,uno,datea) rr
@@ -231,6 +242,7 @@ create table #tmp(
 	accy nvarchar(50),
 	tablea nvarchar(50), 
 	noa nvarchar(50),
+	noq nvarchar(50),
 	datea nvarchar(50),
 	uno nvarchar(50),
 	product nvarchar(50),
@@ -246,115 +258,128 @@ create table #tmp(
 	store nvarchar(50),
 	memo nvarchar(MAX),
 	custno nvarchar(50),
-	comp nvarchar(100)
+	comp nvarchar(100),
+	ordeno nvarchar(50),
 )
 
 --盤點
 insert #tmp
-select '0',a.accy,'ucces' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'',''
+select '5',a.accy,'ucces' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
 from view_ucce a left join view_ucces b on a.noa = b.noa 
 where len(b.uno)>0 and a.datea<=@t_edate
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
 
 insert #tmp
-select '1',a.accy,'rc2s' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'',''
+select '6',a.accy,'rc2s' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
 from view_rc2 a left join view_rc2s b on a.noa = b.noa 
 where a.typea!='2' and len(b.uno)>0 and a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
-union all
-select '2',a.accy,'cubs' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,b.custno,b.comp
+
+insert #tmp
+select '6',a.accy,'cubs' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,b.custno,b.comp,b.ordeno
 from view_cub a left join view_cubs b on a.noa=b.noa
 where len(b.uno)>0 and a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
-and (len(isnull(b.ordeno,''))=(case when @t_xorde='0' then 0 else len(isnull(b.ordeno,'')) end))
-union all
-select '3',a.accy,'inas' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'',''
+
+insert #tmp
+select '6',a.accy,'inas' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
 from view_ina a left join view_inas b on a.noa=b.noa
 where len(b.uno)>0 and a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
 
 --出貨退回
 insert #tmp
-select '4',a.accy,'vcct' tablea,a.noa,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,a.custno,a.nick
+select '6',a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,'','',b.memo,a.custno,a.nick,''
 from view_vcc a left join view_vcct b on a.noa = b.noa 
-where a.typea='2' and len(b.uno)>0 and a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and (len(@t_uno)=0 or b.uno=@t_uno)
-and (isnull(b.ucolor,'')!='板料' or @t_xsheet='Y')
 
---更新最新盤點最後的客戶編號
+--出貨
+insert #tmp
+select '7',a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.mount,-1*b.weight,-1*b.lengthc,'','',b.memo,a.custno,a.nick,''
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='1' and len(b.uno)>0 and a.datea<=@t_edate 
+
+--領料
+insert #tmp
+select '7',a.accy,'cubt' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.gmount,-1*b.gweight,-1*b.lengthc,'','',b.memo,'','',''
+from view_cub a left join view_cubt b on a.noa=b.noa
+where len(b.uno)>0 and a.datea<=@t_edate 
+
+--互換出
+insert #tmp
+select '7',a.accy,'gets' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.mount,-1*b.weight,-1*b.lengthc,b.storeno,b.store,b.memo,'','',''
+from view_get a left join view_gets b on a.noa=b.noa
+where len(b.uno)>0 and a.datea<=@t_edate 
+
+--退貨
+insert #tmp
+select '7',a.accy,'rc2t' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.mount,-1*b.weight,-1*b.lengthc,b.storeno,b.store,b.memo,'','',''
+from view_rc2 a left join view_rc2s b on a.noa = b.noa 
+where a.typea='2' and len(b.uno)>0 and a.datea<=@t_edate 
+
+update #tmp
+set mount=ISNULL(mount,0),weight=ISNULL(weight,0),lengthc=ISNULL(lengthc,0)
+,storeno=ISNULL(storeno,''),store=ISNULL(store,''),custno=ISNULL(custno,''),comp=ISNULL(comp,''),ordeno=ISNULL(ordeno,'')
+
+insert #tmp(uno,gno)
+select uno,'0' from #tmp group by uno
+
 update a
-set custno=isnull(b.custno,''),comp=isnull(b.comp,'')
-from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and (tablea='cubs' or tablea='vcct') order by datea desc,gno desc,noa desc)b 
-where a.tablea!='cubs' and  a.tablea!='vcct'
+set accy=b.accy,tablea=b.tablea,noa=b.noa,noq=b.noq,datea=b.datea
+,product=b.product,ucolor=b.ucolor,spec=b.spec,size=b.size,lengthb=b.lengthb,class=b.class
+,storeno=b.storeno,store=b.store,memo=b.memo,custno=b.custno,comp=b.comp,ordeno=b.ordeno
+from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and gno!='0' order by datea,gno,noa,noq) b
+where a.gno='0'
 
 --刪除多次批號的資料 只保留最後一次批號(同一天依gno,noa順序)
 delete a
-from #tmp a outer apply (select MAX(datea+'-'+gno+'-'+noa)datea from #tmp 
-where uno=a.uno)b
-where a.datea+'-'+a.gno+'-'+a.noa!=b.datea
+from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+gno+'-'+noa+'-'+noq) maxnoa from #tmp where uno=a.uno and tablea='ucces' and gno!='0')b
+where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.gno+'-'+a.noa+'-'+noq< ISNULL(b.maxnoa,'')
 
-update #tmp set gno='9'
-
-delete #tmp where custno not between @t_bcustno and @t_ecustno
-
---批號一次會全部領 不會剩餘
 update a
-set mount=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.mount end
-,weight=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.weight end
-,lengthc=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.lengthc end
-from #tmp a 
-outer apply (select sum(case when va.typea!='2' then 1 else -1 end)vget from view_vcc va left join view_vcct vb on va.noa=vb.noa where vb.uno=a.uno)v
-outer apply (select count(*)cget from view_cubt where uno=a.uno)c
-outer apply (select count(*)gget from view_gets where uno=a.uno)g
-outer apply (select sum(case when ra.typea='2' then 1 else 0 end)rget from view_rc2 ra left join view_rc2s rb on ra.noa=rb.noa where rb.uno=a.uno )r
+set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)
+from #tmp a outer apply (select SUM(mount)mount,SUM(weight)weight,sum(lengthc)lengthc from #tmp where uno=a.uno and gno!='0' ) b
+where a.gno='0'
+
+delete #tmp where gno!='0'
+
+delete #tmp where 
+not ((len(@t_pno)=0 or isnull(product,'')=@t_pno) 
+	and (len(@t_ucolor)=0 or isnull(ucolor,'')=@t_ucolor)
+	and (len(@t_spec)=0 or isnull(spec,'')=@t_spec) and (len(@t_size)=0 or isnull(size,'')=@t_size)
+	and ((@t_blengthb='' and @t_elengthb=char(255)) or isnull(lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
+	and (len(@t_class)=0 or isnull(class,'')=@t_class) and (isnull(storeno,'') between @t_bstoreno and @t_estoreno)
+	and (len(@t_uno)=0 or uno=@t_uno)
+	and (isnull(ucolor,'')!='板料' or @t_xsheet='Y')
+	and (custno between @t_bcustno and @t_ecustno)
+	and (len(@t_ordeno)=0 or ordeno=@t_ordeno)
+	and len(ordeno)=(case when @t_xorde='0' then 0 else len(ordeno) end)
+)
 
 delete #tmp where mount<=0 and weight<=0
+
+update #tmp set gno='9'
 
 if((select count(*) from #tmp)>0)
 begin
 	--小計
 	insert #tmp
-	select '0','','','',char(255),char(255),product,ucolor,spec,size,lengthb,class,sum(mount),sum(weight),sum(lengthc),'','','','',''
+	select '0','','','','',char(255),char(255),product,ucolor,spec,size,lengthb,class,sum(mount),sum(weight),sum(lengthc),'','','','','',''
 	from #tmp where gno='9' group by product,ucolor,spec,size,lengthb,class
 
 	--總計
 	insert #tmp
-	select '1','','','',char(255),char(255),char(255),char(255),char(255),char(255),999,char(255),sum(mount),sum(weight),sum(lengthc),'','','','',''
+	select '1','','','','',char(255),char(255),char(255),char(255),char(255),char(255),999,char(255),sum(mount),sum(weight),sum(lengthc),'','','','','',''
 	from #tmp where gno='9' 
 end
 
 delete #tmp where gno='9'
 
-select ROW_NUMBER() over (order by product,ucolor,spec,cast(dbo.get_num(size) as int),lengthb,class,gno,datea) rr
+select ROW_NUMBER() over (order by product,spec,cast(dbo.get_num(size) as int),ucolor,lengthb,class,gno,datea) rr
 ,dbo.getComma(mount,[2])mount
 ,dbo.getComma(weight,[3])weight
 ,dbo.getComma(lengthc,-1)lengthc
@@ -567,18 +592,18 @@ set @avgweight=0
 set @aprice=0
 
 declare cursor_table cursor for
-select tablea,isnull(storeno,''),isnull(product,''),isnull(ucolor,''),isnull(spec,''),isnull(size,''),isnull(lengthb,''),isnull(class,''),isnull(mount,0),isnull(weight,0) from #tmp 
-order by isnull(storeno,''),isnull(product,''),isnull(ucolor,''),isnull(size,''),isnull(spec,''),isnull(lengthb,''),isnull(class,''),isnull(datea,''),gno,noa
+select tablea,isnull(storeno,''),isnull(product,''),isnull(spec,''),isnull(size,''),isnull(lengthb,''),isnull(class,''),isnull(mount,0),isnull(weight,0) from #tmp 
+order by isnull(storeno,''),isnull(product,''),isnull(size,''),isnull(spec,''),isnull(lengthb,''),isnull(class,''),isnull(datea,''),gno,noa
 open cursor_table
 fetch next from cursor_table
-into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@mount,@weight
+into @tablea,@storeno,@product,@spec,@size,@lengthb,@class,@mount,@weight
 while(@@FETCH_STATUS <> -1)
 begin
 	
-	if(@x_product!='~!@#$%^&*' and (@x_storeno!=@storeno or @x_product!=@product or @x_ucolor!=@ucolor or @x_size!=@size or @x_spec!=@spec or @x_lengthb!=@lengthb or @x_class!=@class))
+	if(@x_product!='~!@#$%^&*' and (@x_storeno!=@storeno or @x_product!=@product or @x_size!=@size or @x_spec!=@spec or @x_lengthb!=@lengthb or @x_class!=@class))
 	begin
-		insert #tmp(gno,tablea,datea,noa,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight)
-		select '2','datea',CHAR(255),CHAR(255),@x_product,@x_ucolor,@x_spec,@x_size,@x_lengthb,@x_class,@x_storeno,@t_mount,@t_weight,@avgweight
+		insert #tmp(gno,tablea,datea,noa,product,spec,size,lengthb,class,storeno,mount,weight,avgweight)
+		select '2','datea',CHAR(255),CHAR(255),@x_product,@x_spec,@x_size,@x_lengthb,@x_class,@x_storeno,@t_mount,@t_weight,@avgweight
 	
 		set @t_mount=0
 		set @t_weight=0
@@ -612,14 +637,14 @@ begin
 	set @x_class=@class
 	
 	fetch next from cursor_table
-	into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@mount,@weight
+	into @tablea,@storeno,@product,@spec,@size,@lengthb,@class,@mount,@weight
 end
 close cursor_table
 deallocate cursor_table
 
 --最後一筆
 insert #tmp(gno,tablea,datea,noa,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight)
-select '2','datea',CHAR(255),CHAR(255),@x_product,@x_ucolor,@x_spec,@x_size,@x_lengthb,@x_class,@x_storeno,@t_mount,@t_weight,@avgweight
+select '2','datea',CHAR(255),CHAR(255),@x_product,'',@x_spec,@x_size,@x_lengthb,@x_class,@x_storeno,@t_mount,@t_weight,@avgweight
 
 delete #tmp where (mount=0 and weight=0) or gno!='2'
 
