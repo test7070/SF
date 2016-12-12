@@ -78,6 +78,22 @@
                         q_gt('view_cuc', t_where, 0, 0, 0, "checkCucno_change", r_accy);
                     }
                 });
+                
+                $('#txtTypea').change(function() {
+                	$('#txtTypea').val(trim($('#txtTypea').val()));
+                    if ($(this).val().length > 0) {
+                        var t_where1="where=^^noa='"+$(this).val()+"'^^";//cont
+						var t_where2="where[1]=^^noa='"+$(this).val()+"'^^";//ordhs
+						var t_where3="where[2]=^^noa='"+$(this).val()+"'^^";//quat
+						var t_where4="where[3]=^^noa='"+$(this).val()+"' order by datea,noa ^^";//ordbht
+                        q_gt('cont_sf', t_where1+t_where2+t_where3+t_where4, 0, 0, 0, "getcont", r_accy,1);
+                        var as = _q_appendData("cont", "", true);
+                        if (as[0] == undefined) {
+                        	alert('合約號碼【'+$(this).val()+'】不存在!!!');
+                        }
+                    }
+                	
+                });
 				
 				$('#checkGen').click(function() {
 					if(q_cur==1 || q_cur==2){
@@ -151,6 +167,7 @@
                 $('#lblBdate').text('預訂交貨日');
                 $('#lblMech').text('工地名稱');
                 $('#lblWeight').text('料單總重量');
+                $('#lblTypea').text('合約號碼');
             }
             
             function bbswidth() {
@@ -1173,22 +1190,24 @@
 						<td colspan="6"><input id="txtMemo"  type="text" class="txt c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
-						<td><input id="txtWorker" type="text" class="txt c1"/></td>
-						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
-						<td><input id="txtWorker2" type="text" class="txt c1"/></td>
-						<td align="center"><input id="btnPic" type="button" value="成型參數顯示"></td>
-						<td align="center"><input id="btnPic2" type="button" value="續接參數顯示"></td>
-						<td align="center"><input id="btnImg" type="button" value="圖型關閉"></td>
-					</tr>
-					<tr>
+						<td><span> </span><a id="lblTypea" class="lbl"> </a></td>
+						<td><input id="txtTypea"  type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblGen" class="lbl"> </a></td>
 						<td>
 							<input id="checkGen" type="checkbox"/>
 							<input id="txtGen" type="hidden"/>
 						</td>
+						<td align="center"><input id="btnPic" type="button" value="成型參數顯示"></td>
+						<td align="center"><input id="btnPic2" type="button" value="續接參數顯示"></td>
+						<td align="center"><input id="btnImg" type="button" value="圖型關閉"></td>
+					</tr>
+					<tr>
 						<td><span> </span><a id="lblWeight" class="lbl"> </a></td>
 						<td><input id="textWeight" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
+						<td><input id="txtWorker" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
+						<td><input id="txtWorker2" type="text" class="txt c1"/></td>
 					</tr>
 				</table>
 			</div>
