@@ -176,10 +176,12 @@ create table #tmp(
 	typea nvarchar(50),
 	tggno  nvarchar(50),
 	comp nvarchar(100),
-	addr nvarchar(150),
 	weight float,
 	amemo nvarchar(MAX),
-	bmemo nvarchar(MAX),
+	
+	cucnoa nvarchar(50),
+	addr nvarchar(150),
+	cmemo nvarchar(MAX),
 	
 	a float, --#3 280
 	b float, --#3 280w
@@ -284,10 +286,71 @@ select '3',noa,datea,typea,tggno,comp,addr,weight,amemo
 ,sum(case when gno='1' then 1 else -1 end*total)
 from #tmp group by noa,datea,typea,tggno,comp,addr,weight,amemo
 
---if(@t_typea!='委外代工')
---begin
+insert #tmp(gno,noa,datea,typea,tggno,comp,weight,amemo
+,cucnoa,addr,cmemo,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,total)
+select '4',a.noa,a.datea,a.typea,a.tggno,a.nick,a.weight,a.memo
+,b.noa,b.mech,c.memo
+,isnull(a,0),isnull(b,0),isnull(c,0),isnull(d,0),isnull(e,0),isnull(f,0)
+,isnull(g,0),isnull(h,0),isnull(i,0),isnull(j,0),isnull(k,0),isnull(l,0)
+,isnull(m,0),isnull(n,0),isnull(o,0)
+,isnull(a,0)+isnull(b,0)+isnull(c,0)+isnull(d,0)+isnull(e,0)+isnull(f,0)
++isnull(g,0)+isnull(h,0)+isnull(i,0)+isnull(j,0)+isnull(k,0)+isnull(l,0)
++isnull(m,0)+isnull(n,0)+isnull(o,0)
+from ordh a left join view_cuc b on a.noa=b.typea
+outer apply (select memo
+,sum(case when size='#3' and spec='SD280' then weight else 0 end)a
+,sum(case when size='#3' and spec='SD280W' then weight else 0 end)b
+,sum(case when size='#3' and spec='SD420W' then weight else 0 end)c
+,sum(case when size='#4' and spec='SD280' then weight else 0 end)d
+,sum(case when size='#4' and spec='SD280W' then weight else 0 end)e
+,sum(case when size='#4' and spec='SD420W' then weight else 0 end)f
+,sum(case when size='#5' and spec='SD280' then weight else 0 end)g
+,sum(case when size='#5' and spec='SD280W' then weight else 0 end)h
+,sum(case when size='#5' and spec='SD420W' then weight else 0 end)i
+,sum(case when size='#6' and spec='SD420W' then weight else 0 end)j
+,sum(case when size='#7' and spec='SD420W' then weight else 0 end)k
+,sum(case when size='#8' and spec='SD420W' then weight else 0 end)l
+,sum(case when size='#9' and spec='SD420W' then weight else 0 end)m
+,sum(case when size='#10' and spec='SD420W' then weight else 0 end)n
+,sum(case when size='#11' and spec='SD420W' then weight else 0 end)o
+from view_cucs where noa=b.noa group by memo)c	
+where (a.datea between @t_bdate and @t_edate) and (len(@t_typea)=0 or a.typea=@t_typea)
+and (a.tggno between @t_btggno and @t_etggno) and (len(@t_noa)=0 or a.noa=@t_noa)
+and b.noa is not null
+and a.typea!='委外代工'
 
---end
+insert #tmp(gno,noa,datea,typea,tggno,comp,weight,amemo
+,cucnoa,addr,cmemo,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,total)
+select '5',a.noa,a.datea,a.typea,a.tggno,a.nick,a.weight,a.memo
+,b.noa,b.mech,''
+,isnull(a,0),isnull(b,0),isnull(c,0),isnull(d,0),isnull(e,0),isnull(f,0)
+,isnull(g,0),isnull(h,0),isnull(i,0),isnull(j,0),isnull(k,0),isnull(l,0)
+,isnull(m,0),isnull(n,0),isnull(o,0)
+,isnull(a,0)+isnull(b,0)+isnull(c,0)+isnull(d,0)+isnull(e,0)+isnull(f,0)
++isnull(g,0)+isnull(h,0)+isnull(i,0)+isnull(j,0)+isnull(k,0)+isnull(l,0)
++isnull(m,0)+isnull(n,0)+isnull(o,0)
+from ordh a left join view_cuc b on a.noa=b.typea
+outer apply (select 
+sum(case when size='#3' and spec='SD280' then weight else 0 end)a
+,sum(case when size='#3' and spec='SD280W' then weight else 0 end)b
+,sum(case when size='#3' and spec='SD420W' then weight else 0 end)c
+,sum(case when size='#4' and spec='SD280' then weight else 0 end)d
+,sum(case when size='#4' and spec='SD280W' then weight else 0 end)e
+,sum(case when size='#4' and spec='SD420W' then weight else 0 end)f
+,sum(case when size='#5' and spec='SD280' then weight else 0 end)g
+,sum(case when size='#5' and spec='SD280W' then weight else 0 end)h
+,sum(case when size='#5' and spec='SD420W' then weight else 0 end)i
+,sum(case when size='#6' and spec='SD420W' then weight else 0 end)j
+,sum(case when size='#7' and spec='SD420W' then weight else 0 end)k
+,sum(case when size='#8' and spec='SD420W' then weight else 0 end)l
+,sum(case when size='#9' and spec='SD420W' then weight else 0 end)m
+,sum(case when size='#10' and spec='SD420W' then weight else 0 end)n
+,sum(case when size='#11' and spec='SD420W' then weight else 0 end)o
+from view_cucs where noa=b.noa)c	
+where (a.datea between @t_bdate and @t_edate) and (len(@t_typea)=0 or a.typea=@t_typea)
+and (a.tggno between @t_btggno and @t_etggno) and (len(@t_noa)=0 or a.noa=@t_noa)
+and b.noa is not null
+and a.typea!='委外代工'
 
 insert #tmp (gno,noa)
 select '6',noa from #tmp group by noa
