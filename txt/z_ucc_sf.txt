@@ -1441,6 +1441,7 @@ gno,product,spec,size,ucolor,dbo.getComma(lengthb,-1)lengthb,class
 ,dbo.getComma(lo,0)lo
 ,dbo.getComma(lp,2)lp
 ,dbo.getComma(lm,2)lm
+,REPLACE(CONVERT (NVARCHAR(10), GETDATE(),20 ),'-','/') today
 from #tmpa order by gno,product,spec
 
 IF OBJECT_ID('tempdb..#tmp')is not null
