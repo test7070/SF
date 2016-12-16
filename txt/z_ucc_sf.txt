@@ -1124,7 +1124,7 @@ end
 
 delete #tmpa where gno='9'
 ---------------------------------------------------------------------------------------------------------
---數量
+--數量 看號數
 delete #tmp
 --盤
 insert #tmp
@@ -1141,7 +1141,7 @@ select '1','rc2s',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,case when a.typea='2' then -1 else 1 end*b.total,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 and (isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
 
 --銷
@@ -1150,7 +1150,7 @@ select '5','vccs',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,case when a.typea='2' then -1 else 1 end*b.mount,0,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,0,0
 from view_vcc a left join view_vccs b on a.noa=b.noa
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and (isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
 
@@ -1160,7 +1160,7 @@ select '5','vcct',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,case when a.typea='2' then -1 else 1 end*b.mount*c.price,0,0
 from view_vcc a left join view_vcct b on a.noa=b.noa
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 and (isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
 
 --------------------------------------------------------------------
@@ -1396,20 +1396,20 @@ set do=round(lo-(bo+ro-vo),4)
 
 delete #tmpa where bo=0 and ro=0 and vo=0 and do=0 and lo=0 and gno='9'
 
-insert #tmpa (gno,product,spec,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
-select '5'gno,product,spec
+insert #tmpa (gno,product,size,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
+select '5'gno,product,size
 ,sum(bo),sum(bm),sum(ro),sum(rm)
 ,sum(vo),sum(vc),sum(vm)
 ,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
 ,sum(do),sum(dm),sum(lo),case when sum(lo)=0 then 0 else round(sum(lm)/sum(lo),4) end,sum(lm)
-from #tmpa where gno='9' group by product,spec
+from #tmpa where gno='9' group by product,size
 
 if((select count(*) from #tmpa where gno='5')>0)
 begin
 	insert #tmpa (gno)
 	select '4'gno
 	
-	insert #tmpa (gno,product,spec,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
+	insert #tmpa (gno,product,size,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
 	select '6'gno,CHAR(255),CHAR(255)
 	,sum(bo),sum(bm),sum(ro),sum(rm)
 	,sum(vo),sum(vc),sum(vm)
@@ -1442,7 +1442,7 @@ gno,product,spec,size,ucolor,dbo.getComma(lengthb,-1)lengthb,class
 ,dbo.getComma(lp,2)lp
 ,dbo.getComma(lm,2)lm
 ,REPLACE(CONVERT (NVARCHAR(10), GETDATE(),20 ),'-','/') today
-from #tmpa order by gno,product,spec
+from #tmpa order by gno,product,spec,size
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN

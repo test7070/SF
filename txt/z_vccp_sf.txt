@@ -25,6 +25,7 @@ declare @tmp1 table(
 	price float,
 	total float,
 	memo nvarchar(MAX),
+	cartrips float,
  	
 	class nvarchar(30),
 	spec nvarchar(100),
@@ -46,19 +47,19 @@ declare @tmp1 table(
 if (LEN(@t_xaddr2)!=0)
 begin
 	insert into @tmp1
-	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),a.memo,
+	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),a.memo,a.cartrips,
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,sum(b.mount),sum(b.weight),
 		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,'','','',''
 	from view_vcc a
 	left join view_vccs b on a.noa = b. noa
 	where (a.noa between @t_bxnoa and @t_exnoa)
 	and (len(@t_xaddr2)!=0 and isnull(a.addr2,'')=@t_xaddr2)
-	group by a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.memo,b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,a.trantype
+	group by a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.memo,a.cartrips,b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,a.trantype
 end
 else
 begin
 	insert into @tmp1
-	select '0',a.noa,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,a.memo,
+	select '0',a.noa,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,a.memo,a.cartrips,
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
 		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,a.paydate,a.cardeal,b.store,a.carno
 	from view_vcc a
@@ -141,6 +142,7 @@ declare @tmp2 table(
 	price float,
 	total float,
 	memo nvarchar(MAX),
+	cartrips float,
  	
 	class1 nvarchar(30),class2 nvarchar(30),class3 nvarchar(30),class4 nvarchar(30),class5 nvarchar(30),class6 nvarchar(30),
 	spec1 nvarchar(100),spec2 nvarchar(100),spec3 nvarchar(100),spec4 nvarchar(100),spec5 nvarchar(100),spec6 nvarchar(100),
@@ -177,8 +179,8 @@ begin
 	begin 
 		set @recno = 1
 		begin 
-			insert into @tmp2(gno,noa,datea,custno,cust,addr,conn,qno,memo,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,taxname,intime,cardeal,store,carno) 
-			select gno,noa,datea,custno,cust,addr,conn,qno,memo,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,taxname,intime,cardeal,store,carno
+			insert into @tmp2(gno,noa,datea,custno,cust,addr,conn,qno,memo,cartrips,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,taxname,intime,cardeal,store,carno) 
+			select gno,noa,datea,custno,cust,addr,conn,qno,memo,cartrips,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,taxname,intime,cardeal,store,carno
 			from @tmp1 where idno = @idno1
 		end
 		set @noa2 = @noa1 
@@ -252,6 +254,8 @@ end
 close cursor_table 
 deallocate cursor_table 
 
-select *,tweight twei,eweight ewei,nweight nwei,pweight1 pwei1,pweight2 pwei2,pweight3 pwei3,
+select 
+case when isnull(cartrips,0)!=0 then '應收運費:'+dbo.getComma(cartrips,0)+'　　' else '' end+'備註:'+memo  memo
+	,*,tweight twei,eweight ewei,nweight nwei,pweight1 pwei1,pweight2 pwei2,pweight3 pwei3,
 	   pweight4 pwei4,pweight5 pwei5,pweight6 pwei6
-from @tmp2 order by noa,gno  ;
+from @tmp2 order by noa,gno;

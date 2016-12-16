@@ -83,6 +83,9 @@
 					t_tax = q_float('txtTax');
 					t_total = q_add(t_money, t_tax);
 				}
+				
+				t_total = q_add(t_total, dec($('#txtCartrips').val()));
+				
 				$('#txtMoney').val(FormatNumber(t_money));
 				$('#txtTax').val(FormatNumber(t_tax));
 				$('#txtTotal').val(FormatNumber(t_total));
@@ -96,7 +99,7 @@
 				bbmNum = [['txtTranmoney', 11, 0, 1], ['txtMoney', 15, 0, 1], ['txtTax', 15, 0, 1],['txtTotal', 15, 0, 1]
 				,['txtTranadd', 15, q_getPara('vcc.weightPrecision'), 1],['txtBenifit', 15, q_getPara('vcc.weightPrecision'), 1],['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]
 				,['textQweight1', 15, q_getPara('vcc.weightPrecision'), 1],['textQweight2', 15, q_getPara('vcc.weightPrecision'), 1]
-				,['txtPrice', 12, 3, 1]];
+				,['txtPrice', 12, 3, 1],['txtCartrips', 11, 0, 1]];
 				bbsNum = [['txtPrice', 12, q_getPara('vcc.pricePrecision'), 1], ['txtMount', 9, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]];
 				bbtNum = [['txtMount', 10, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1]];
 				//q_cmbParse("cmbTranstyle", q_getPara('sys.transtyle'));
@@ -315,6 +318,10 @@
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
 					}
 				});
+				
+				$('#txtCartrips').change(function() {
+					sum();
+				});
 			}
 			
 			function totalreadonly() { //1214小計開放修改
@@ -406,8 +413,13 @@
 								break;
 							}
 							
-							ret = q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtSpec,txtSize,txtLengthb,txtClass,txtUnit,txtPrice,txtMount,txtWeight,txtOrdeno,txtNo2'
-							, b_ret.length, b_ret, 'product,spec,size,lengthb,class,unit,price,mount,weight,noa,no2', 'txtProduct,txtSpec');
+							ret = q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtUnit,txtPrice,txtMount,txtWeight,txtOrdeno,txtNo2'
+							, b_ret.length, b_ret, 'product,ucolor,spec,size,lengthb,class,unit,price,mount,weight,noa,no2', 'txtProduct,txtSpec');
+							
+							for (var i = 0; i < q_bbsCount; i++) {
+								$('#txtMount_'+i).change();	
+							}
+							
 							//寫入訂單號碼
 							var t_oredeno = '',t_quatno='';
 							for (var i = 0; i < b_ret.length; i++) {
@@ -424,6 +436,7 @@
 
 							$('#txtOrdeno').val(t_oredeno);
 							$('#txtZipcode').val(t_quatno);
+							bbssum();
 							sum();
 						}
 						break;
@@ -776,6 +789,7 @@
 									}
 								}
 							}
+							bbssum();
 							sum();
 						}/*else{
 							alert('無訂單資料!!');
@@ -943,7 +957,7 @@
 					return;
 				}
 				
-				var nostore=false;
+				/*var nostore=false;
 				for (var i = 0; i < q_bbsCount; i++) {
 					if((dec($('#txtMount_'+i).val())>0 || dec($('#txtWeight_'+i).val())>0) && emp($('#txtStoreno_'+i).val()))
 						nostore=true;
@@ -952,6 +966,14 @@
 				if(nostore){
 					alert('出貨倉庫未填入!!');
 					return;
+				}*/
+				
+				//105/12/08空白倉庫預設A
+				for (var i = 0; i < q_bbsCount; i++) {
+					if(!emp($('#txtProduct_'+i).val()) && emp($('#txtStoreno_'+i).val())){
+						$('#txtStoreno_'+i).val('A');
+						$('#txtStore_'+i).val('三泰本倉');
+					}
 				}
 				
 				//判斷起算日,寫入帳款月份
@@ -985,14 +1007,6 @@
 				check_startdate=false;
 				
 				$('#txtApvmemo').val($('#textQno1').val()+'@'+dec($('#textQweight1').val())+'##'+$('#textQno2').val()+'@'+dec($('#textQweight2').val()));
-				
-				//105/12/08空白倉庫預設A
-				for (var i = 0; i < q_bbsCount; i++) {
-					if(!emp($('#txtProduct_'+i).val()) && emp($('#txtStoreno_'+i).val())){
-						$('#txtStoreno_'+i).val('A');
-						$('#txtStore_'+i).val('三泰本倉');
-					}
-				}
 				
 				if (q_cur == 1){
 					$('#txtWorker').val(r_name);
@@ -1065,21 +1079,16 @@
 								t_IdSeq = -1;
 								q_bodyId($(this).attr('id'));
 								b_seq = t_IdSeq;
-								if($('#txtProduct_'+b_seq).val()!='運費'){
-									if($('#txtProduct_'+b_seq).val().indexOf('費')>-1)
-										$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
-									else
-										$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
-								}
-								sum();
 								
-								if($('#txtProduct_'+b_seq).val()=='運費'){
-									var sot_weight=0;
-									for (var i = 0; i < q_bbsCount; i++) {
-										sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
-									}
-									$('#txtTotal_'+b_seq).val(round(q_mul(dec($('#txtPrice_'+b_seq).val()),sot_weight),0));
-								}
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接器')>-1 || tproduct.indexOf('水泥方塊')>-1)
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								else
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								
+								bbssum();
+								sum();
 							}
 						});
 						$('#txtTotal_' + i).change(function() {
@@ -1092,14 +1101,15 @@
 								t_IdSeq = -1;
 								q_bodyId($(this).attr('id'));
 								b_seq = t_IdSeq;
-								if($('#txtProduct_'+b_seq).val()!='運費'){
-									if($('#txtProduct_'+b_seq).val().indexOf('費')>-1)
-										$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
-									else
-										$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
-								}
-								sum();
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接器')>-1 || tproduct.indexOf('水泥方塊')>-1)
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								else
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+									
 								bbssum();
+								sum();
 							}
 						});
 						
@@ -1108,14 +1118,15 @@
 								t_IdSeq = -1;
 								q_bodyId($(this).attr('id'));
 								b_seq = t_IdSeq;
-								if($('#txtProduct_'+b_seq).val()!='運費'){
-									if($('#txtProduct_'+b_seq).val().indexOf('費')>-1)
-										$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
-									else
-										$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
-								}
-								sum();
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接器')>-1 || tproduct.indexOf('水泥方塊')>-1)
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								else
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								
 								bbssum();
+								sum();
 							}
 						});
 						
@@ -1163,13 +1174,7 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
-								if($('#txtProduct_'+b_seq).val()=='運費'){
-									var sot_weight=0;
-					                for (var i = 0; i < q_bbsCount; i++) {
-						                sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
-									}
-									$('#txtTotal_'+b_seq).val(round(q_mul(dec($('#txtPrice_'+b_seq).val()),sot_weight),0));
-								}
+								
 								totalreadonly();
 							}
 						});
@@ -1179,13 +1184,6 @@
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
 							totalreadonly();
-							if($('#txtProduct_'+b_seq).val()=='運費'){
-								var sot_weight=0;
-								for (var i = 0; i < q_bbsCount; i++) {
-									sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
-								}
-								$('#txtTotal_'+b_seq).val(round(q_mul(dec($('#txtPrice_'+b_seq).val()),sot_weight),0));
-							}
 						});
 						
 						$('#btnMinus_' + i).click(function() {
@@ -2029,6 +2027,8 @@
 						<td colspan='2'><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 						<td colspan='2'><input id="txtWorker2" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblCartrips_sf" class="lbl">應收運費</a></td>
+						<td><input id="txtCartrips" type="text" class="txt num c1"/></td>
 						<td style="display: none;"><span> </span><a id='lblAccc' class="lbl btn"> </a></td>
 						<td style="display: none;"><input id="txtAccno" type="text" class="txt c1"/></td>
 					</tr>

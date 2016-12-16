@@ -68,11 +68,11 @@
 			function sum() {
 				var t1 = 0, t_unit, t_mount=0, t_weight = 0;
 				for (var j = 0; j < q_bbsCount; j++) {
-					t_unit = trim($('#txtUnit_' + j).val());
-					if (t_unit.length == 0 || t_unit == 'KG' || t_unit == 'M2' || t_unit == 'M' || t_unit == '批' || t_unit == '公斤' || t_unit == '噸' || t_unit == '頓' || t_unit == 'T') {
-						t_mount = $('#txtWeight_' + j).val();
-					}else{
+					var tproduct=$('#txtProduct_'+j).val();
+					if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接器')>-1 || tproduct.indexOf('水泥方塊')>-1){
 						t_mount = $('#txtMount_' + j).val();
+					}else{
+						t_mount = $('#txtWeight_' + j).val();
 					}
 					$('#txtTotal_' + j).val(round(q_mul(dec($('#txtPrice_' + j).val()), dec(t_mount)), 0));//小計	
 					t_weight = t_weight + dec( $('#txtWeight_' + j).val()) ; // 重量合計
@@ -318,40 +318,7 @@
 							focus_addr = '';
 						}
 						break;
-					case 'nouno_getuno':
-						var as = _q_appendData("view_cubs", "", true);
-						if (as[0] != undefined) {
-							var rowslength=document.getElementById("table_nouno").rows.length-2;
-							for (var j = 0; j < rowslength; j++) {
-								document.getElementById("table_nouno").deleteRow(1);
-							}
-							for (var i = 0; i < as.length; i++) {
-								var tr = document.createElement("tr");
-								tr.id = "nouno_"+j;
-								tr.innerHTML = "<td id='uno_"+i+"'>"+as[i].uno+"</td>";
-								if(dec(as[i].vtcount)>0)
-									tr.innerHTML+="<td>已出貨</td>";
-								if(dec(as[i].mount)<=0 || dec(as[i].weight)<=0)
-									tr.innerHTML+="<td>已領料</td>";
-								else
-									tr.innerHTML+="<td><input id='btnNouno_"+i+"' type='button' class='btnuno' value='領料'></td>";
-								var tmp = document.getElementById("nouno_close");
-								tmp.parentNode.insertBefore(tr,tmp);
-							}
-							
-							$('#div_nouno').show();
-						}else{
-							alert("無生產批號!!");
-						}
-						//事件
-						$('#div_nouno .btnuno').each(function(index) {
-							$(this).click(function() {
-								var n=$(this).attr('id').split('_')[1];
-								var tt_nouno=$('#uno_'+n).text();
-								q_func('qtxt.query.cubnouno', 'cub.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI('#non')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
-							});
-						});
-						break;
+					
 					case q_name:
 						if (q_cur == 4)
 							q_Seek_gtPost();
@@ -412,7 +379,6 @@
 				cmb.value = '';
 			}
 			
-
 			function combAddr_chg() {
 				if (q_cur == 1 || q_cur == 2) {
 					$('#txtAddr2').val($('#combAddr').find("option:selected").val());
@@ -438,19 +404,10 @@
 							//q_change($(this), 'ucc', 'noa', 'noa,product,unit');
 						});
 
-						$('#txtUnit_' + j).focusout(function() {
-							sum();
-						});
 						$('#txtWeight_' + j).focusout(function () { sum(); });
-						$('#txtPrice_' + j).focusout(function() {
-							sum();
-						});
-						$('#txtMount_' + j).focusout(function() {
-							sum();
-						});
-						$('#txtTotal_' + j).focusout(function() {
-							sum();
-						});
+						$('#txtPrice_' + j).focusout(function() {sum();});
+						$('#txtMount_' + j).focusout(function() {sum();});
+						$('#txtTotal_' + j).focusout(function() {sum();});
 						$('#combUcolor_' + j).change(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
@@ -486,19 +443,6 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2)
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
-						});
-						
-						$('#btnCub_nouno_'+j).click(function() {
-							t_IdSeq = -1;
-							q_bodyId($(this).attr('id'));
-							b_seq = t_IdSeq;
-							var t_noa=$('#txtNoa').val();
-							var t_no2=$('#txtNo2_'+b_seq).val();
-							if(q_cur!=1 && q_cur!=2 && t_no2.length>0){
-								$('#div_nouno').css('top',($(this).offset().top-$('#div_nouno').height())+"px").css('left',($(this).offset().left-$('#div_nouno').width())+"px");
-								var t_where = "where=^^ a.ordeno='"+t_noa+"' and a.no2='"+t_no2+"' and isnull(a.uno,'')!='' ^^";
-								q_gt('cubs_vcct', t_where, 0, 0, 0, "nouno_getuno", r_accy);
-							}
 						});
 					}
 				}
@@ -564,7 +508,7 @@
 					return;
 				}
 				q_nowf();
-				as['type'] = abbm2['type'];
+				as['typea'] = abbm2['typea'];
 				as['mon'] = abbm2['mon'];
 				as['noa'] = abbm2['noa'];
 				as['odate'] = abbm2['odate'];
@@ -691,20 +635,9 @@
                 }
             }
             
-             var nouno_noa=[];
             function q_funcPost(t_func, result) {
 				switch(t_func) {
-					case 'qtxt.query.cubnouno':
-						var as = _q_appendData("tmp0", "", true, true);
-						if (as[0] != undefined) {
-							var t_cubno=as[0].cubno;
-							q_func('cub_post.post', r_accy + ',' + encodeURI(t_cubno) + ',1');
-						}
-						break;
-					case 'cub_post.post':
-						$('#div_nouno').hide();
-						alert("批號領料完成!!");
-						break;
+					
 				}
 			}
 		</script>
