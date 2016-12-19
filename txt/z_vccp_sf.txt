@@ -35,7 +35,6 @@ declare @tmp1 table(
 	long float,
 	pmount float,
 	pweight float,
-
 	
 	trantype nvarchar(10),
 	taxname nvarchar(10),
@@ -256,6 +255,11 @@ deallocate cursor_table
 
 select 
 case when isnull(cartrips,0)!=0 then '應收運費:'+dbo.getComma(cartrips,0)+'　　' else '' end+'備註:'+memo  memo
-	,*,tweight twei,eweight ewei,nweight nwei,pweight1 pwei1,pweight2 pwei2,pweight3 pwei3,
-	   pweight4 pwei4,pweight5 pwei5,pweight6 pwei6
+	,*,tweight twei,eweight ewei,nweight nwei
+	,case when product1 like '續接器%' or product1 like '水泥方塊%' then pmount1 else pweight1 end pwei1
+	,case when product2 like '續接器%' or product2 like '水泥方塊%' then pmount2 else pweight2 end pwei2
+	,case when product3 like '續接器%' or product3 like '水泥方塊%' then pmount3 else pweight3 end pwei3
+	,case when product4 like '續接器%' or product4 like '水泥方塊%' then pmount4 else pweight4 end pwei4
+	,case when product5 like '續接器%' or product5 like '水泥方塊%' then pmount5 else pweight5 end pwei5
+	,case when product6 like '續接器%' or product6 like '水泥方塊%' then pmount6 else pweight6 end pwei6
 from @tmp2 order by noa,gno;

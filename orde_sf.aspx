@@ -51,9 +51,11 @@
 				q_brwCount();
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 				q_gt('acomp', 'stop=1 ', 0, 0, 0, "cno_acomp");
+				q_gt('ucc', '1=1 ', 0, 0, 0, "bbsucc");
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
 				q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
+				q_gt('adspec', '1=1 ', 0, 0, 0, "bbsspec2");
 				$('#txtOdate').focus();
 			});
 
@@ -107,9 +109,6 @@
 				q_cmbParse("combPaytype", q_getPara('vcc.paytype'));
 				q_cmbParse("cmbTrantype", q_getPara('sys.tran'));
 				
-				var t_where = "where=^^ 1=1 ^^";
-				q_gt('ucc', t_where, 0, 0, 0, "");
-				
 				$('#lblAddr2').text('工地名稱');
 				$('#lblTranadd').text('車空重');
 				$('#lblBenifit').text('車總重');
@@ -150,16 +149,6 @@
 						var t_where = "where=^^ noa='" + $('#txtCustno').val() + "' ^^";
 						q_gt('custm', t_where, 0, 0, 0, "");
 					}
-				});
-
-				$('#btnCredit').click(function() {
-					if (!emp($('#txtCustno').val())) {
-						q_box("z_credit.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";custno='" + $('#txtCustno').val() + "';" + r_accy + ";" + q_cur, 'ordei', "95%", "95%", q_getMsg('btnCredit'));
-					}
-				});
-				
-				$('#btnOrdem').click(function() {
-					q_box("ordem_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";noa='" + $('#txtNoa').val() + "';" + r_accy + ";" + q_cur, 'ordem', "95%", "95%", q_getMsg('popOrdem'));
 				});
 				
 				$('#chkCancel').click(function(){
@@ -240,12 +229,13 @@
 
 			var focus_addr = '';
 			var z_cno = r_cno, z_acomp = r_comp, z_nick = r_comp.substr(0, 2);
+			var a_spec='@',a_spec2='@';
 			function q_gtPost(t_name) {
 				switch (t_name) {
-					case 'ucc':
+					case 'bbsucc':
 						var as = _q_appendData("ucc", "", true);
 						var t_ucc='@';
-						for ( i = 0; i < as.length; i++) {
+						for (var i = 0; i < as.length; i++) {
 							t_ucc+=","+as[i].product;
 						}
 						q_cmbParse("combProduct", t_ucc,'s');
@@ -253,15 +243,23 @@
 					case 'bbsspec':
 						var as = _q_appendData("spec", "", true);
 						var t_spec='@';
-						for ( i = 0; i < as.length; i++) {
+						for (var i = 0; i < as.length; i++) {
 							t_spec+=","+as[i].noa;
+							a_spec+=","+as[i].noa;
 						}
 						q_cmbParse("combSpec", t_spec,'s');
+						break;
+					case 'bbsspec2':
+						var as = _q_appendData("adspec", "", true);
+						var t_spec='@';
+						for (var i = 0; i < as.length; i++) {
+							a_spec2+=","+as[i].spec;
+						}
 						break;
 					case 'bbscolor':
 						var as = _q_appendData("color", "", true);
 						var t_color='@';
-						for ( i = 0; i < as.length; i++) {
+						for (var i = 0; i < as.length; i++) {
 							t_color+=","+as[i].color;
 						}
 						q_cmbParse("combUcolor", t_color,'s');
@@ -269,7 +267,7 @@
 					case 'bbsclass':
 						var as = _q_appendData("class", "", true);
 						var t_class='@';
-						for ( i = 0; i < as.length; i++) {
+						for (var i = 0; i < as.length; i++) {
 							t_class+=","+as[i].noa;
 						}
 						q_cmbParse("combClass", t_class,'s');
@@ -324,6 +322,14 @@
 							q_Seek_gtPost();
 						break;
 				}
+			}
+			
+			function chgcombSpec(n) {
+				$('#combSpec_'+n).text('');
+				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+					q_cmbParse("combSpec_"+n, a_spec2);
+				else
+					q_cmbParse("combSpec_"+n, a_spec);
 			}
 			
 			function btnOk() {
@@ -391,19 +397,7 @@
 						$('#btnMinus_' + j).click(function() {
 							btnMinus($(this).attr('id'));
 						});
-						$('#btnProductno_' + j).click(function() {
-							t_IdSeq = -1;
-							q_bodyId($(this).attr('id'));
-							b_seq = t_IdSeq;
-							pop('ucc');
-						});
-						$('#txtProductno_' + j).change(function() {
-							t_IdSeq = -1;
-							q_bodyId($(this).attr('id'));
-							b_seq = t_IdSeq;
-							//q_change($(this), 'ucc', 'noa', 'noa,product,unit');
-						});
-
+						
 						$('#txtWeight_' + j).focusout(function () { sum(); });
 						$('#txtPrice_' + j).focusout(function() {sum();});
 						$('#txtMount_' + j).focusout(function() {sum();});
@@ -441,8 +435,18 @@
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-							if(q_cur==1 || q_cur==2)
+							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
+								chgcombSpec(b_seq);
+							}
+						});
+						$('#txtProduct_' + j).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								chgcombSpec(b_seq);
+							}
 						});
 					}
 				}
@@ -460,6 +464,12 @@
 				$('#lblUno_s').text('批號');
 				$('#lblMount_s').text('數量(件)');
 				$('#lblWeight_s').text('重量(KG)');
+				
+				if(q_cur==1 || q_cur==2){
+					for (var j = 0; j < q_bbsCount; j++) {
+						chgcombSpec(j);
+					}
+				}
 			}
 
 			function btnIns() {
@@ -533,15 +543,11 @@
 			function readonly(t_para, empty) {
 				_readonly(t_para, empty);
 				if (t_para) {
-					$('#btnOrdei').removeAttr('disabled');
 					$('#combAddr').attr('disabled', 'disabled');
 					//$('#txtOdate').datepicker( 'destroy' );
-					$('#btnOrdem').removeAttr('disabled');
 				} else {
-					$('#btnOrdei').attr('disabled', 'disabled');
 					$('#combAddr').removeAttr('disabled');
 					//$('#txtOdate').datepicker();
-					$('#btnOrdem').attr('disabled', 'disabled');
 				}	
 				$('#chkIsproj').attr('disabled', 'disabled');
 				refreshBbm();

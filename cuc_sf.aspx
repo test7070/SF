@@ -67,6 +67,8 @@
                 bbsMask = [];
                 q_mask(bbmMask);
 				//q_cmbParse("combProduct", q_getPara('vccs_vu.product'),'s');
+				q_cmbParse("cmbBtime", ',棕,紅,白,黃,綠,灰,藍','s');
+				q_cmbParse("cmbEtime", ',棕,紅,白,黃,綠,灰,藍','s');
 				
 				var t_where = "where=^^ 1=1 ^^";
 				q_gt('ucc', t_where, 0, 0, 0, "");
@@ -171,7 +173,7 @@
             }
             
             function bbswidth() {
-				var t_width=1650;
+				var t_width=1750;
 				if($('#btnImg').val()=='圖型關閉'){ //圖型顯示
 					t_width=t_width+200;
 				}
@@ -562,6 +564,45 @@
 							weighttotal();
 						});
 						
+						$('#checkRadius_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								if($('#checkRadius_'+b_seq).prop('checked'))
+									$('#txtRadius_'+b_seq).val(1);
+								else
+									$('#txtRadius_'+b_seq).val(0);
+							}
+							weighttotal();
+						});
+						
+						$('#checkWidth_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								if($('#checkWidth_'+b_seq).prop('checked'))
+									$('#txtWidth_'+b_seq).val(1);
+								else
+									$('#txtWidth_'+b_seq).val(0);
+							}
+							weighttotal();
+						});
+						
+						$('#checkDime_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								if($('#checkDime_'+b_seq).prop('checked'))
+									$('#txtDime_'+b_seq).val(1);
+								else
+									$('#txtDime_'+b_seq).val(0);
+							}
+							weighttotal();
+						});
+						
 						$('#txtPicno_' + j).bind('contextmenu', function(e) {
                             /*滑鼠右鍵*/
                             e.preventDefault();
@@ -678,6 +719,11 @@
 				$('#lblParaf_s').text('續接參數F');
 				$('#lblParag_s').text('續接參數G');
 				$('#lblPic_s').text('形狀');
+				$('#lblBtime_s').text('顏色1');
+				$('#lblEtime_s').text('顏色2');
+				$('#lblRadius_s').text('裁剪');
+				$('#lblWidth_s').text('續接');
+				$('#lblDime_s').text('成型');
 				
 				if($('#btnImg').val()=='圖型關閉顯示'){
 					$('.img').hide();
@@ -986,10 +1032,18 @@
 						$('#checkMins_'+i).removeAttr('disabled');
 						$('#checkHours_'+i).removeAttr('disabled');
 						$('#checkWaste_'+i).removeAttr('disabled');
+						
+						$('#checkRadius_'+i).removeAttr('disabled');
+						$('#checkWidth_'+i).removeAttr('disabled');
+						$('#checkDime_'+i).removeAttr('disabled');
 					}else{
 						$('#checkMins_'+i).attr('disabled', 'disabled');
 						$('#checkHours_'+i).attr('disabled', 'disabled');
 						$('#checkWaste_'+i).attr('disabled', 'disabled');
+						
+						$('#checkRadius_'+i).attr('disabled', 'disabled');
+						$('#checkWidth_'+i).attr('disabled', 'disabled');
+						$('#checkDime_'+i).attr('disabled', 'disabled');
 					}
 					if($('#txtMins_'+i).val()==0){
 						$('#checkMins_'+i).prop('checked',false);
@@ -1005,6 +1059,22 @@
 						$('#checkHours_'+i).prop('checked',false);
 					}else{
 						$('#checkHours_'+i).prop('checked',true);
+					}
+					
+					if($('#txtRadius_'+i).val()==0){
+						$('#checkRadius_'+i).prop('checked',false);
+					}else{
+						$('#checkRadius_'+i).prop('checked',true);
+					}
+					if($('#txtWidth_'+i).val()==0){
+						$('#checkWidth_'+i).prop('checked',false);
+					}else{
+						$('#checkWidth_'+i).prop('checked',true);
+					}
+					if($('#txtDime_'+i).val()==0){
+						$('#checkDime_'+i).prop('checked',false);
+					}else{
+						$('#checkDime_'+i).prop('checked',true);
 					}
 				}
 			}
@@ -1112,7 +1182,7 @@
                 font-size: medium;
             }
             .dbbs {
-                width: 1650px;
+                width: 1750px;
             }
             .dbbs .tbbs {
                 margin: 0;
@@ -1261,8 +1331,13 @@
 							<a id='lblSize2_s'> </a>
 							<input class="btn"  id="btnSize2Copy" type="button" value='≡' style="font-weight: bold;"  />
 						</td>
-						<td style="width:150px;"><a id='lblMech_s'>剪裁機台</a></td>
-						<td style="width:150px;"><a id='lblMech2_s'>成型機台</a></td>
+						<!--<td style="width:150px;"><a id='lblMech_s'>剪裁機台</a></td>
+						<td style="width:150px;"><a id='lblMech2_s'>成型機台</a></td>-->
+						<td style="width:50px;"><a id='lblBtime_s'> </a></td>
+						<td style="width:50px;"><a id='lblEtime_s'> </a></td>
+						<td style="width:40px;"><a id='lblRadius_s'> </a></td>
+						<td style="width:40px;"><a id='lblWidth_s'> </a></td>
+						<td style="width:40px;"><a id='lblDime_s'> </a></td>
 						<td style="width:40px;"><a id='lblMins_s'> </a></td>
 						<td style="width:40px;"><a id='lblHours_s'> </a></td>
 						<td style="width:40px;"><a id='lblWaste_s'> </a></td>
@@ -1324,7 +1399,7 @@
 						</td>
 						<td><input id="txtMemo.*" type="text" class="txt c1"/></td>
 						<td><input id="txtSize2.*" type="text" class="txt c1"/></td>
-						<td>
+						<!--<td>
 							<input id="txtMechno.*" type="text" class="txt c1"/>
 							<input id="txtMech.*" type="text" class="txt c1"/>
 							<input id="btnMechno.*" type="button" style="display:none;">
@@ -1333,6 +1408,20 @@
 							<input id="txtMechno2.*" type="text" class="txt c1"/>
 							<input id="txtMech2.*" type="text" class="txt c1"/>
 							<input id="btnMechno2.*" type="button" style="display:none;">
+						</td>-->
+						<td><select id="cmbBtime.*" class="txt c1"> </select></td>
+						<td><select id="cmbEtime.*" class="txt c1"> </select></td>
+						<td>
+							<input id="checkRadius.*" type="checkbox"/>
+							<input id="txtRadius.*" type="hidden"/>
+						</td>
+						<td>
+							<input id="checkWidth.*" type="checkbox"/>
+							<input id="txtWidth.*" type="hidden"/>
+						</td>
+						<td>
+							<input id="checkDime.*" type="checkbox"/>
+							<input id="txtDime.*" type="hidden"/>
 						</td>
 						<td>
 							<input id="checkMins.*" type="checkbox"/>

@@ -20,20 +20,20 @@
             	q_getId();
                 q_gf('', 'z_cucp_sf');       
             });
-			 function getLocation(){
-            		var parser = document.createElement('a');
-					parser.href = document.URL;
-					return parser.protocol+'//'+parser.host;
-					/*
-					parser.href = "http://example.com:3000/pathname/?search=test#hash";
-					parser.protocol; // => "http:"
-					parser.host;     // => "example.com:3000"
-					parser.hostname; // => "example.com"
-					parser.port;     // => "3000"
-					parser.pathname; // => "/pathname/"
-					parser.hash;     // => "#hash"
-					parser.search;   // => "?search=test"*/			
-			 }
+			function getLocation(){
+            	var parser = document.createElement('a');
+				parser.href = document.URL;
+				return parser.protocol+'//'+parser.host;
+				/*
+				parser.href = "http://example.com:3000/pathname/?search=test#hash";
+				parser.protocol; // => "http:"
+				parser.host;     // => "example.com:3000"
+				parser.hostname; // => "example.com"
+				parser.port;     // => "3000"
+				parser.pathname; // => "/pathname/"
+				parser.hash;     // => "#hash"
+				parser.search;   // => "?search=test"*/			
+			}
             function q_gfPost() {
                 $('#q_report').q_report({
                     fileName :'z_cucp_sf',
