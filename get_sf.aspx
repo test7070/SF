@@ -848,23 +848,23 @@
 	<body>
 		<!--#include file="../inc/toolbar.inc"-->
 		<div id='dmain' style="width: 1260px;">
-			<div class="dview" id="dview" style="float: left; width:32%;" >
+			<div class="dview" id="dview" style="float: left; width:30%;" >
 				<table class="tview" id="tview" border="1" cellpadding='2' cellspacing='0' style="background-color: #FFFF66;">
 					<tr>
 						<td align="center" style="width:1%"><a id='vewChk'> </a></td>
 						<td align="center" style="width:25%"><a id='vewDatea'> </a></td>
-						<td align="center" style="width:35%"><a id='vewCust'>客戶</a></td>
-						<td align="center" style="width:35%"><a id='vewIdno_sf'>合約號碼</a></td>
+						<td align="center" style="width:25%"><a id='vewCust'>客戶</a></td>
+						<td align="center" style="width:48%"><a id='vewIdno_sf'>合約號碼</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox" style=' '/></td>
 						<td align="center" id='datea'>~datea</td>
-						<td align="center" id='comp,8'>~comp,8</td>
+						<td align="center" id='comp,4'>~comp,4</td>
 						<td align="center" id='idno'>~idno</td>
 					</tr>
 				</table>
 			</div>
-			<div class='dbbm' style="width: 68%;float:left">
+			<div class='dbbm' style="width: 70%;float:left">
 				<table class="tbbm" id="tbbm" border="0" cellpadding='2' cellspacing='0'>
 					<tr style="height: 1px;">
 						<td> </td>
@@ -875,9 +875,11 @@
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblDatea_sf" class="lbl" >互換出貨日期</a></td>
-						<td><input id="txtDatea" type="text" class="txt c3"/></td>
+						<td><input id="txtDatea" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblNoa_sf" class="lbl" >互換出貨單號</a></td>
 						<td><input id="txtNoa" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
+						<td><input id="txtTranstart" type="text" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblCustno" class="lbl btn" > </a></td>
@@ -887,27 +889,13 @@
 						</td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblStore" class="lbl btn"> </a></td>
-						<td colspan="3">
-							<input id="txtStoreno" type="text" class="txt c2" />
-							<input id="txtStore" type="text" class="txt c3"/>
-						</td>
-					</tr>
-					<tr>
-						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
-						<td colspan="3">
-							<input id="txtCardealno" type="text" class="txt c2"/>
-							<input id="txtCardeal" type="text" class="txt c3"/>
-						</td>
-					</tr>
-					<tr>
-						<td><span> </span><a id="lblCarno" class="lbl"> </a></td>
+						<td><span> </span><a id="lblAddr_sf" class="lbl" >交貨工地</a></td>
+						<td colspan="3"><input id="txtAddr"type="text" class="txt c1" style="width: 98%;"/></td>
 						<td>
-							<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
-							<select id="combCarno" style="width: 20px;"> </select>
+							<select id="combAccount" class="txt" style="width: 20px;"> </select>
+							<span> </span><a id="lblNamea_sf" class="lbl" >聯絡人</a>
 						</td>
-						<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
-						<td><input id="txtTranstart" type="text" class="txt c1"/></td>
+						<td><input id="txtNamea" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
@@ -916,7 +904,22 @@
 						<td><input id="txtTweight" type="text" class="txt num c1"/></td>
 						<td><span> </span><a id="lblMount_sf" class="lbl" >淨重</a></td>
 						<td><input id="txtMount" type="text" class="txt num c1"/></td>
-
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
+						<td>
+							<input id="txtCardealno" type="text" class="txt c2"/>
+							<input id="txtCardeal" type="text" class="txt c3"/>
+						</td>
+						<td><span> </span><a id="lblCarno" class="lbl"> </a></td>
+						<td>
+							<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
+							<select id="combCarno" style="width: 20px;"> </select>
+						</td>
+						<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
+						<td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>
+						<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
+						<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMoney_sf" class="lbl">應收</a></td>
@@ -929,30 +932,20 @@
 						<td><input id="txtTotal" type="text" class="txt num c1 istax"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
-						<td><input id="txtPrice" type="text" class="txt num c1" style="width: 130px;"/>/KG</td>
-						<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
-						<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
-					</tr>
-					<tr>
-						<td><span> </span><a id="lblAddr_sf" class="lbl" >交貨工地</a></td>
-						<td><input id="txtAddr"type="text" class="txt c1" style="width: 98%;"/></td>
-						<td>
-							<select id="combAccount" class="txt" style="width: 20px;"> </select>
-							<span> </span><a id="lblNamea_sf" class="lbl" >聯絡人</a>
+						<td><span> </span><a id="lblMemo" class="lbl" > </a></td>
+						<td colspan='5'>
+							<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
 						</td>
-						<td><input id="txtNamea" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblIdno_sf" class="lbl btn">合約號碼</a></td>
 						<td><input id="txtIdno" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblWeight_sf" class="lbl">合約重量</a></td>
 						<td><input id="txtWeight" type="text" class="txt num c1"/></td>
-					</tr>
-					<tr>
-						<td><span> </span><a id="lblMemo" class="lbl" > </a></td>
-						<td colspan='5'>
-							<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
+						<td><span> </span><a id="lblStore" class="lbl btn"> </a></td>
+						<td>
+							<input id="txtStoreno" type="text" class="txt c2" />
+							<input id="txtStore" type="text" class="txt c3"/>
 						</td>
 					</tr>
 					<tr>

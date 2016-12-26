@@ -980,9 +980,11 @@
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblDatea_sf" class="lbl">互換進貨日期</a></td>
-					<td><input id="txtDatea" type="text" class="txt c3"/></td>
+					<td><input id="txtDatea" type="text" class="txt c1"/></td>
 					<td><span> </span><a id="lblNoa_sf" class="lbl" >互換進貨單號</a></td>
 					<td><input id="txtNoa" type="text" class="txt c1"/></td>
+					<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
+					<td><input id="txtTranstart" type="text" class="txt c1"/></td>
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblTgg" class="lbl btn"> </a></td>
@@ -992,36 +994,28 @@
 					</td>
 				</tr>
 				<tr>
-					<td><span> </span><a id="lblStore" class="lbl btn" > </a></td>
-					<td colspan="3">
-						<input id="txtStoreno"  type="text"  class="txt c2"/>
-						<input id="txtStore"  type="text" class="txt c3"/>
-					</td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
-					<td colspan="3">
-						<input id="txtCardealno" type="text" class="txt c2"/>
-						<input id="txtCardeal" type="text" class="txt c3"/>
-					</td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblCarno" class="lbl"> </a></td>
-					<td>
-						<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
-						<select id="combCarno" style="width: 20px;"> </select>
-					</td>
-					<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
-					<td><input id="txtTranstart" type="text" class="txt c1"/></td>
-				</tr>
-				<tr>
 					<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
 					<td><input id="txtTranstyle" type="text" class="txt num c1"/></td>
 					<td><span> </span><a id="lblTweight_sf" class="lbl">車總重</a></td>
 					<td><input id="txtTweight" type="text" class="txt num c1"/></td>
 					<td><span> </span><a id="lblMount_sf" class="lbl" >淨重</a></td>
 					<td><input id="txtMount" type="text" class="txt num c1"/></td>
-
+				</tr>
+				<tr>
+					<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
+					<td>
+						<input id="txtCardealno" type="text" class="txt c2"/>
+						<input id="txtCardeal" type="text" class="txt c3"/>
+					</td>
+					<td><span> </span><a id="lblCarno" class="lbl"> </a></td>
+					<td>
+						<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
+						<select id="combCarno" style="width: 20px;"> </select>
+					</td>
+					<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
+					<td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>
+					<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
+					<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblMoney_sf" class="lbl">應收</a></td>
@@ -1034,21 +1028,20 @@
 					<td><input id="txtTotal" type="text" class="txt num c1 istax"/></td>
 				</tr>
 				<tr>
-					<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
-					<td><input id="txtPrice" type="text" class="txt num c1" style="width: 130px;"/>/KG</td>
-					<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
-					<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
+					<td><span> </span><a id="lblMemo_sf" class="lbl">備註</a></td>
+					<td colspan='5'>
+						<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
+					</td>
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblOrdeno_sf" class="lbl btn">合約號碼</a></td>
 					<td><input id="txtOrdeno" type="text" class="txt c1"/></td>
 					<td><span> </span><a id="lblWeight_sf" class="lbl">合約重量</a></td>
 					<td><input id="txtWeight" type="text" class="txt num c1"/></td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblMemo_sf" class="lbl">備註</a></td>
-					<td colspan='5'>
-						<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
+					<td><span> </span><a id="lblStore" class="lbl btn" > </a></td>
+					<td>
+						<input id="txtStoreno"  type="text"  class="txt c2"/>
+						<input id="txtStore"  type="text" class="txt c3"/>
 					</td>
 				</tr>
 				<tr>
