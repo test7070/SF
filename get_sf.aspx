@@ -910,12 +910,13 @@
 						<td><input id="txtTranstart" type="text" class="txt c1"/></td>
 					</tr>
 					<tr>
+						<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
+						<td><input id="txtTranstyle" type="text" class="txt num c1"/></td>
 						<td><span> </span><a id="lblTweight_sf" class="lbl">車總重</a></td>
 						<td><input id="txtTweight" type="text" class="txt num c1"/></td>
 						<td><span> </span><a id="lblMount_sf" class="lbl" >淨重</a></td>
 						<td><input id="txtMount" type="text" class="txt num c1"/></td>
-						<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
-						<td><input id="txtTranstyle" type="text" class="txt num c1"/></td>
+
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMoney_sf" class="lbl">應收</a></td>
