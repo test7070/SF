@@ -696,6 +696,17 @@
 				return xx + arr[0].replace(re, "$1,") + (arr.length == 2 ? "." + arr[1] : "");
 			}
 			
+			function refreshBbm() {
+                if (q_cur == 1 || q_cur==2) {
+					if($('#chkAtax').prop('checked'))
+						$('#txtTax').css('color', 'green').css('background', 'RGB(237,237,237)').attr('readonly', 'readonly');
+					else
+						$('#txtTax').css('color', 'black').css('background', 'white').removeAttr('readonly');  
+                }else{
+                	$('#txtTax').css('color', 'green').css('background', 'RGB(237,237,237)').attr('readonly', 'readonly');
+                }
+            }
+			
 			function q_funcPost(t_func, result) {
 				switch(t_func) {
 					case 'qtxt.query.getnewuno':
@@ -1000,28 +1011,25 @@
 						<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
 						<select id="combCarno" style="width: 20px;"> </select>
 					</td>
-				</tr>
-				<tr>
 					<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
 					<td><input id="txtTranstart" type="text" class="txt c1"/></td>
-					<td><span> </span><a id="lblTweight_sf" class="lbl">車總重</a></td>
-					<td><input id="txtTweight" type="text" class="txt num c1"/></td>
 				</tr>
 				<tr>
-					<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
-					<td><input id="txtTranstyle" type="text" class="txt num c1"/></td>
+					<td><span> </span><a id="lblTweight_sf" class="lbl">車總重</a></td>
+					<td><input id="txtTweight" type="text" class="txt num c1"/></td>
 					<td><span> </span><a id="lblMount_sf" class="lbl" >淨重</a></td>
 					<td><input id="txtMount" type="text" class="txt num c1"/></td>
+					<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
+					<td><input id="txtTranstyle" type="text" class="txt num c1"/></td>
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblMoney_sf" class="lbl">應收</a></td>
 					<td><input id="txtMoney" type="text" class="txt num c1"/></td>
 					<td><span> </span><a id='lblTax_sf' class="lbl">營業稅</a></td>
 					<td><input id="txtTax" type="text" class="txt num c1 istax"/></td>
-					<td><input id="chkAtax" type="checkbox" onchange='sum()' /></td>
-				</tr>
-				<tr>
-					<td><span> </span><a id='lblTotal_sf' class="lbl istax">總計</a></td>
+					<td><input id="chkAtax" type="checkbox" onchange='sum()' />
+						<a id='lblTotal_sf' class="lbl istax">總計<span> </span></a>
+					</td>
 					<td><input id="txtTotal" type="text" class="txt num c1 istax"/></td>
 				</tr>
 				<tr>
@@ -1038,7 +1046,7 @@
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblMemo_sf" class="lbl">備註</a></td>
-					<td colspan='3'>
+					<td colspan='5'>
 						<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
 					</td>
 				</tr>
@@ -1047,8 +1055,6 @@
 					<td><input id="txtWorker" type="text" class="txt c1"/></td>
 					<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 					<td><input id="txtWorker2" type="text" class="txt c1"/></td>
-				</tr>
-				<tr>
 					<td><span> </span><a id="lblTranstartno_sf" class="lbl">立帳單號</a></td>
 					<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
 				</tr>
