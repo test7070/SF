@@ -50,6 +50,30 @@
 				}
 				mainForm(1);
 			}
+			
+			function sum() {
+				var t1 = 0, t_price = 0, t_mount, t_weight = 0,t_money=0, t_tax = 0, t_total = 0;
+				for (var j = 0; j < q_bbsCount; j++) {
+					t_weight=$('#txtWeight_' + j).val();
+					t_price=$('#txtMweight_' + j).val();
+					t_money = q_mul(dec(t_weight), dec(t_price));
+					t1=q_add(t1,t_money);
+				}
+				if($('#chkAtax').prop('checked')){
+					var t_taxrate = q_div(parseFloat(q_getPara('sys.taxrate')), 100);
+					t_tax = round(q_mul(t1, t_taxrate), 0);
+					t_total = q_add(t1, t_tax);
+				}else{
+					t_tax = q_float('txtTax');
+					t_total = q_add(t1, t_tax);
+				}
+				
+				t_total = q_add(t_total, dec($('#txtCartrips').val()));
+				
+				$('#txtMoney').val(FormatNumber(t1));
+				$('#txtTax').val(FormatNumber(t_tax));
+				$('#txtTotal').val(FormatNumber(t_total));
+			}
 
 			function mainPost() {
 				document.title='互換出貨作業';
@@ -57,8 +81,8 @@
 				bbmMask = [['txtDatea', r_picd],['txtTranstart','99:99']];
 				q_mask(bbmMask);
 				
-				bbmNum = [['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]
-				, ['txtMount', 15, q_getPara('vcc.weightPrecision'), 1], ['txtTranstyle', 15, q_getPara('vcc.weightPrecision'), 1], ['txtTotal', 15, q_getPara('vcc.weightPrecision'), 1]
+				bbmNum = [['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1], ['txtMoney', 15, 0, 1], ['txtTax', 15, 0, 1],['txtTotal', 15, 0, 1]
+				, ['txtMount', 15, q_getPara('vcc.weightPrecision'), 1], ['txtTranstyle', 15, q_getPara('vcc.weightPrecision'), 1], ['txtTweight', 15, q_getPara('vcc.weightPrecision'), 1]
             	, ['txtPrice', 12, 3, 1], ['txtTranmoney', 15, 0, 1]]
 				bbsNum = [['txtLengthb', 10, 2, 1], ['txtMount', 10, q_getPara('vcc.mountPrecision'), 1]
 				, ['txtWeight', 10, q_getPara('vcc.weightPrecision'), 1], ['txtMweight', 10, q_getPara('vcc.pricePrecision'), 1]];
@@ -98,15 +122,15 @@
 					q_gt('cardeal', t_where, 0, 0, 0, "getCardealCarno");
 				});
 				
-				$('#txtTotal').change(function() {
+				$('#txtTweight').change(function() {
 					if(q_cur==1 || q_cur==2){
-						$('#txtMount').val(q_sub(dec($('#txtTotal').val()),dec($('#txtTranstyle').val())));
+						$('#txtMount').val(q_sub(dec($('#txtTweight').val()),dec($('#txtTranstyle').val())));
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
 					}
 				});
 				$('#txtTranstyle').change(function() {
 					if(q_cur==1 || q_cur==2){
-						$('#txtMount').val(q_sub(dec($('#txtTotal').val()),dec($('#txtTranstyle').val())));
+						$('#txtMount').val(q_sub(dec($('#txtTweight').val()),dec($('#txtTranstyle').val())));
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
 					}
 				});
@@ -120,7 +144,19 @@
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
 					}
 				});
+				$('#chkAtax').click(function() {
+					refreshBbm();
+					sum();
+				});
+				$('#txtTax').change(function() {
+					sum();
+				});
+				$('#txtCartrips').change(function() {
+					sum();
+				});
 			}
+			
+			
 			
 			function q_popPost(s1) {
 				switch (s1) {
@@ -403,6 +439,12 @@
 								q_gt('view_gets', t_where, 0, 0, 0, "getunogets_"+b_seq);
 							}
 						});
+						$('#txtWeight_' + j).focusout(function() {
+							sum();
+						});
+						$('#txtMweight_' + j).focusout(function() {
+							sum();
+						});
 					}
 				}
 				_bbsAssign();
@@ -546,6 +588,7 @@
 
 			function btnMinus(id) {
 				_btnMinus(id);
+				sum();
 			}
 
 			function btnPlus(org_htm, dest_tag, afield) {
@@ -856,8 +899,8 @@
 					<tr>
 						<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
 						<td><input id="txtTranstart" type="text" class="txt c1"/></td>
-						<td><span> </span><a id="lblTotal_sf" class="lbl">車總重</a></td>
-						<td><input id="txtTotal" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id="lblTweight_sf" class="lbl">車總重</a></td>
+						<td><input id="txtTweight" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
@@ -870,6 +913,17 @@
 						<td><input id="txtPrice" type="text" class="txt num c1" style="width: 130px;"/>/KG</td>
 						<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
 						<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblMoney_sf" class="lbl">應收</a></td>
+						<td><input id="txtMoney" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id='lblTax_sf' class="lbl">營業稅</a></td>
+						<td><input id="txtTax" type="text" class="txt num c1 istax"/></td>
+						<td><input id="chkAtax" type="checkbox" onchange='sum()' /></td>
+					</tr>
+					<tr>
+						<td><span> </span><a id='lblTotal_sf' class="lbl istax">總計</a></td>
+						<td><input id="txtTotal" type="text" class="txt num c1 istax"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblAddr_sf" class="lbl" >交貨工地</a></td>
