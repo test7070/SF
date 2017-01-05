@@ -60,6 +60,8 @@
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
 				q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
+				q_gt('adpro', '1=1 ', 0, 0, 0, "bbspro");
+				q_gt('img', "where=^^ noa='A01' or noa='B01' ^^ ", 0, 0, 0, "bbsimg");
 			});
 
 			function main() {
@@ -324,19 +326,6 @@
 				});
 			}
 			
-			function totalreadonly() { //1214小計開放修改
-				for (var i = 0; i < q_bbsCount; i++) {
-	                /*if (q_cur == 1 || q_cur==2) {
-						if($('#txtProduct_'+i).val().indexOf('費')>-1)
-							$('#txtTotal_'+i).css('color', 'black').css('background', 'white').removeAttr('readonly');  
-						else
-							$('#txtTotal_'+i).css('color', 'green').css('background', 'RGB(237,237,237)').attr('readonly', 'readonly');
-	                }else{
-	                	$('#txtTotal_'+i).css('color', 'green').css('background', 'RGB(237,237,237)').attr('readonly', 'readonly');
-	                }*/
-                }
-            }
-			
 			function refreshBbm() {
                 if (q_cur == 1 || q_cur==2) {
 					if($('#chkAtax').prop('checked'))
@@ -457,6 +446,8 @@
 			var carnoList = [];
 			var thisCarSpecno = '';
 			var q1_weight=0,q2_weight=0;
+			var a_spec='@',a_color='@',a_pro='@',a_class='@'; //106/01/04 續接器 類別 材質改抓續接參數 廠牌 =直彎
+			var oimg1='',para1='',oimg2='',para2='';//直,彎
 			function q_gtPost(t_name) {
 				var as;
 				switch (t_name) {
@@ -474,6 +465,7 @@
 						var t_spec='@';
 						for ( i = 0; i < as.length; i++) {
 							t_spec+=","+as[i].noa;
+							a_spec+=","+as[i].noa;
 						}
 						q_cmbParse("combSpec", t_spec,'s');
 						q_cmbParse("combSpec", t_spec,'t');
@@ -483,6 +475,7 @@
 						var t_color='@';
 						for ( i = 0; i < as.length; i++) {
 							t_color+=","+as[i].color;
+							a_color+=","+as[i].color;
 						}
 						q_cmbParse("combUcolor", t_color,'s');
 						q_cmbParse("combUcolor", t_color,'t');
@@ -492,9 +485,30 @@
 						var t_class='@';
 						for ( i = 0; i < as.length; i++) {
 							t_class+=","+as[i].noa;
+							a_class+=","+as[i].noa;
 						}
 						q_cmbParse("combClass", t_class,'s');
 						q_cmbParse("combClass", t_class,'t');
+						break;
+					case 'bbspro':
+						var as = _q_appendData("adpro", "", true);
+						a_pro='@';
+						for (var i = 0; i < as.length; i++) {
+							a_pro+=","+as[i].product;
+						}
+						break;
+					case 'bbsimg':
+						var as = _q_appendData("img", "", true);
+						for (var i = 0; i < as.length; i++) {
+							if(as[i].noa=='A01'){
+								oimg1=as[i].org;
+								para1=as[i].para
+							}
+							if(as[i].noa=='B01'){
+								oimg2=as[i].org;
+								para2=as[i].para
+							}
+						}
 						break;
 					case 'quat_btnOk':
 						//105/11/08 互換合約再另外作業處理 維持抓quat
@@ -938,6 +952,95 @@
 				}
 			}
 			
+			function chgcombSpec(n) {
+				$('#combSpec_'+n).text('');
+				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+					q_cmbParse("combSpec_"+n, a_pro);
+				else
+					q_cmbParse("combSpec_"+n, a_spec);
+			}
+			
+			function chgcombUcolor(n) {
+				$('#combUcolor_'+n).text('');
+				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+					q_cmbParse("combUcolor_"+n, a_pro);
+				else
+					q_cmbParse("combUcolor_"+n, a_color);
+			}
+			
+			function chgcombClass(n) {
+				$('#combClass_'+n).text('');
+				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+					q_cmbParse("combClass_"+n, ',直,彎');
+				else
+					q_cmbParse("combClass_"+n, a_class);
+			}
+			
+			function chgimg(n) {
+				if($('#txtProduct_'+n).val().indexOf('續接器')>-1
+				&& ($('#txtClass_'+n).val()=='直' || $('#txtClass_'+n).val()=='彎' )){
+					var t_para='';
+					var t_imgorg='';
+					if($('#txtClass_'+n).val()=='直'){
+						if(oimg1.length==0){
+							return;
+						}
+						t_para = JSON.parse(para1);
+						t_imgorg = oimg1;
+					}else{
+						if(oimg2.length==0){
+							return;
+						}
+						t_para = JSON.parse(para2);
+						t_imgorg = oimg2;
+					}
+					
+					$('#imgPic_'+n).attr('src',t_imgorg);
+					var imgwidth = 300;
+					var imgheight = 100;
+					$('#canvas_'+n).width(imgwidth).height(imgheight);
+					var c = document.getElementById("canvas_"+n);
+					var ctx = c.getContext("2d");		
+					c.width = imgwidth;
+					c.height = imgheight;
+					ctx.drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight);
+					var t_length = 0;
+					
+					var t_paraa=$('#txtUcolor_'+n).val();
+					var t_parab=$('#txtSpec_'+n).val();
+					
+					for(var i=0;i<t_para.length;i++){
+						var value='';
+						if(t_para[i].key=="F"){
+							value=t_paraa;
+						}else if (t_para[i].key=="G"){
+							value=t_parab;
+						}
+						if(value.length!=0){
+							t_length += value;
+							ctx.font = t_para[i].fontsize+"px Arial";
+							ctx.fillStyle = 'black';
+							ctx.textAlign="center";
+							ctx.fillText(value+'',t_para[i].left,t_para[i].top);
+						}
+					}
+					//------------------------------
+					$('#imgPic_'+n).attr('src',c.toDataURL());
+					//條碼用圖形
+					xx_width = 355;
+					xx_height = 119;						
+					$('#canvas_'+n).width(xx_width).height(xx_height);
+					c.width = xx_width;
+					c.height = xx_height;
+					$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,xx_width,xx_height);
+					//報表用圖形 縮放為150*50
+					$('#canvas_'+n).width(150).height(50);
+					c.width = 150;
+					c.height = 50;
+					$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,150,50);
+				}
+			}
+			
 			var check_startdate=false;
 			var check_quat=false;
 			function btnOk() {
@@ -1143,8 +1246,19 @@
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-							if(q_cur==1 || q_cur==2)
+							if(q_cur==1 || q_cur==2){
 								$('#txtUcolor_'+b_seq).val($('#combUcolor_'+b_seq).find("option:selected").text());
+								chgimg(b_seq);
+							}
+						});
+						
+						$('#txtUcolor_' + i).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								chgimg(b_seq);
+							}
 						});
 						
 						$('#txtSize_' + i).change(function() {
@@ -1156,16 +1270,38 @@
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-							if(q_cur==1 || q_cur==2)
+							if(q_cur==1 || q_cur==2){
 								$('#txtSpec_'+b_seq).val($('#combSpec_'+b_seq).find("option:selected").text());
+								chgimg(b_seq);
+							}
+						});
+						
+						$('#txtSpec_' + i).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								chgimg(b_seq);
+							}
 						});
 						
 						$('#combClass_' + i).change(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-							if(q_cur==1 || q_cur==2)
+							if(q_cur==1 || q_cur==2){
 								$('#txtClass_'+b_seq).val($('#combClass_'+b_seq).find("option:selected").text());
+								chgimg(b_seq);
+							}
+						});
+						
+						$('#txtClass_' + i).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								chgimg(b_seq);
+							}
 						});
 						
 						$('#combProduct_' + i).change(function() {
@@ -1174,8 +1310,10 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
-								
-								totalreadonly();
+								chgcombSpec(b_seq);
+								chgcombUcolor(b_seq);
+								chgcombClass(b_seq);
+								chgimg(b_seq);
 							}
 						});
 						
@@ -1183,7 +1321,12 @@
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-							totalreadonly();
+							if(q_cur==1 || q_cur==2){
+								chgcombSpec(b_seq);
+								chgcombUcolor(b_seq);
+								chgcombClass(b_seq);
+								chgimg(b_seq);
+							}
 						});
 						
 						$('#btnMinus_' + i).click(function() {
@@ -1205,6 +1348,7 @@
 				$('#lblSize_s').text('號數');
 				$('#lblLengthb_s').text('米數');
 				$('#lblClass_s').text('廠牌');
+				$('#lblImg_s').text('形狀');
 				$('#lblUnit_s').text('單位');
 				$('#lblMount_s').text('數量(件)');
 				$('#lblWeight_s').text('重量(KG)');
@@ -1227,6 +1371,15 @@
                 		}
                 	}
 				});
+				
+				if(q_cur==1 || q_cur==2){
+					for (var j = 0; j < q_bbsCount; j++) {
+						chgcombSpec(j);
+						chgcombUcolor(j);
+						chgcombClass(j);
+						chgimg(j);
+					}
+				}
 			}
 			
 			function bbssum() {
@@ -1585,6 +1738,9 @@
 				HiddenTreat();
 				stype_chang();
 				refreshBbm();
+				for (var j = 0; j < q_bbsCount; j++) {
+					chgimg(j);
+				}
 			}
 
 			function HiddenTreat(){
@@ -1642,7 +1798,6 @@
 				else
 					$('#txtMon').attr('readonly', 'readonly');
 				refreshBbm();
-				totalreadonly();
 			}
 
 			function btnMinus(id) {
@@ -2035,19 +2190,20 @@
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' style="width: 100%;"><!--1900px-->
+		<div class='dbbs' style="width: 1590px;"><!--1900px-->
 			<table id="tbbs" class='tbbs'>
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:40px;"><input class="btn"  id="btnPlus" type="button" value='＋' style="font-weight: bold;width:" /></td>
 					<td align="center" style="width:55px;"><a id='lblNoq_s'> </a></td>
 					<!--<td align="center" style="width:200px;"><a id='lblUno_s'> </a></td>-->
 					<!--<td align="center" style="width:150px;"><a id='lblProductno_s'> </a></td>-->
-					<td align="center" style="width:150px;"><a id='lblProduct_s'> </a></td>
-					<td align="center" style="width:160px;"><a id='lblUcolor_s'> </a></td>
-					<td align="center" style="width:150px;"><a id='lblSpec_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblSize_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblLengthb_s'> </a></td>
+					<td align="center" style="width:110px;"><a id='lblProduct_s'> </a></td>
+					<td align="center" style="width:140px;"><a id='lblUcolor_s'> </a></td>
+					<td align="center" style="width:100px;"><a id='lblSpec_s'> </a></td>
+					<td align="center" style="width:70px;"><a id='lblSize_s'> </a></td>
+					<td align="center" style="width:70px;"><a id='lblLengthb_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblClass_s'> </a></td>
+					<td align="center" style="width:200px;"><a id='lblImg_s'> </a></td>
 					<!--<td align="center" style="width:55px;"><a id='lblUnit_s'> </a></td>-->
 					<td align="center" style="width:85px;">
 						<a id='lblMount_s'> </a>
@@ -2087,6 +2243,10 @@
 					<td>
 						<input id="txtClass.*" type="text" class="txt c1" style="width: 60%;"/>
 						<select id="combClass.*" class="txt" style="width: 20px;"> </select>
+					</td>
+					<td align="center">
+						<canvas id="canvas.*" width="150" height="50"> </canvas>
+						<img id="imgPic.*" src="" style="display:none;"/>
 					</td>
 					<!--<td><input id="txtUnit.*" type="text" class="txt c1"/></td>-->
 					<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
