@@ -72,7 +72,7 @@ update @tmp1 set tweight = case when tweight is null then 0 else tweight end,
 				 nweight = case when nweight is null then 0 else nweight end			  					 
 where gno = '0'
 
-update @tmp1 set product = REPLACE(product,' ','') + (case when LEN(isnull(size,'')) = 0 then '' else size end)+pmemo
+update @tmp1 set product = REPLACE(product,' ','') + (case when LEN(isnull(size,'')) = 0 then '' else size end)
 where gno = '0'
 
 declare @idno int
@@ -148,6 +148,7 @@ declare @tmp2 table(
 	product1 nvarchar(max),product2 nvarchar(max),product3 nvarchar(max),product4 nvarchar(max),product5 nvarchar(max),product6 nvarchar(max),
 	pmount1 float,pmount2 float,pmount3 float,pmount4 float,pmount5 float,pmount6 float,
 	pweight1 float,pweight2 float,pweight3 float,pweight4 float,pweight5 float,pweight6 float,
+	pmemo1 nvarchar(max),pmemo2 nvarchar(max),pmemo3 nvarchar(max),pmemo4 nvarchar(max),pmemo5 nvarchar(max),pmemo6 nvarchar(max),  
 	
 	trantype nvarchar(10),
 	taxname nvarchar(10),
@@ -178,8 +179,8 @@ begin
 	begin 
 		set @recno = 1
 		begin 
-			insert into @tmp2(gno,noa,datea,custno,cust,addr,conn,qno,memo,cartrips,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,taxname,intime,cardeal,store,carno) 
-			select gno,noa,datea,custno,cust,addr,conn,qno,memo,cartrips,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,taxname,intime,cardeal,store,carno
+			insert into @tmp2(gno,noa,datea,custno,cust,addr,conn,qno,memo,cartrips,tweight,eweight,nweight,price,total,class1,spec1,product1,pmemo1,pmount1,pweight1,trantype,taxname,intime,cardeal,store,carno) 
+			select gno,noa,datea,custno,cust,addr,conn,qno,memo,cartrips,tweight,eweight,nweight,price,total,class,spec,product,pmemo,pmount,pweight,trantype,taxname,intime,cardeal,store,carno
 			from @tmp1 where idno = @idno1
 		end
 		set @noa2 = @noa1 
@@ -192,7 +193,8 @@ begin
 						 spec2 = (select spec from @tmp1 where idno = @idno1), 
 						 product2 = (select product from @tmp1 where idno = @idno1), 
 						 pmount2 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight2 = (select pweight from @tmp1 where idno = @idno1)						 
+						 pweight2 = (select pweight from @tmp1 where idno = @idno1),
+						 pmemo2 = (select pmemo from @tmp1 where idno = @idno1)						 
 		where idno = @idno2 
 		
 		set @noa2 = @noa1 
@@ -204,7 +206,8 @@ begin
 						 spec3 = (select spec from @tmp1 where idno = @idno1), 
 						 product3 = (select product from @tmp1 where idno = @idno1), 
 						 pmount3 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight3 = (select pweight from @tmp1 where idno = @idno1)
+						 pweight3 = (select pweight from @tmp1 where idno = @idno1),
+						 pmemo3 = (select pmemo from @tmp1 where idno = @idno1)
 		where idno = @idno2 
 		
 		set @noa2 = @noa1 
@@ -216,7 +219,8 @@ begin
 						 spec4 = (select spec from @tmp1 where idno = @idno1), 
 						 product4 = (select product from @tmp1 where idno = @idno1), 
 						 pmount4 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight4 = (select pweight from @tmp1 where idno = @idno1)
+						 pweight4 = (select pweight from @tmp1 where idno = @idno1),
+						 pmemo4 = (select pmemo from @tmp1 where idno = @idno1)
 		where idno = @idno2 
 		
 		set @noa2 = @noa1 
@@ -228,7 +232,8 @@ begin
 						 spec5 = (select spec from @tmp1 where idno = @idno1), 
 						 product5 = (select product from @tmp1 where idno = @idno1), 
 						 pmount5 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight5 = (select pweight from @tmp1 where idno = @idno1)
+						 pweight5 = (select pweight from @tmp1 where idno = @idno1),
+						 pmemo5 = (select pmemo from @tmp1 where idno = @idno1)
 		where idno = @idno2 
 		
 		set @noa2 = @noa1 
@@ -240,7 +245,8 @@ begin
 						 spec6 = (select spec from @tmp1 where idno = @idno1), 
 						 product6 = (select product from @tmp1 where idno = @idno1), 
 						 pmount6 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight6 = (select pweight from @tmp1 where idno = @idno1)
+						 pweight6 = (select pweight from @tmp1 where idno = @idno1),
+						 pmemo6 = (select pmemo from @tmp1 where idno = @idno1)
 		where idno = @idno2 
 		
 		set @noa2 = @noa1 
