@@ -186,7 +186,7 @@ select ROW_NUMBER() over (partition by product,spec,size order by product,spec,c
 ,dbo.getComma(lengthc,-1)lengthc
 ,dbo.getComma(case when isnull(mount,0)=0 then 0 else round(isnull(weight,0)/isnull(mount,0),4) end,[3])avgweight
 ,*
-from #tmp order by product,spec,cast(dbo.get_num(size) as int),ucolor,lengthb,class,gno,rr
+from #tmp order by product,spec,cast(dbo.get_num(size) as int),size,ucolor,lengthb,class,gno,rr
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -689,7 +689,7 @@ select ROW_NUMBER() over (partition by storeno,product,spec,size,gno order by st
 from #tmp a
 order by storeno,page
 ,case when tablea='Paging' then 3 when tablea='title' then 1 else 2 end
-,product,cast(dbo.get_num(size) as int),spec,cast(gno as int),ucolor,lengthb,class,idno
+,product,cast(dbo.get_num(size) as int),size,spec,cast(gno as int),ucolor,lengthb,class,idno
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -1539,35 +1539,37 @@ CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 --盤
 insert #tmp
 select '0','ucce',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.weight,b.price,b.total,b.storeno,b.price,b.total,'ucce_vu?noa=$noa'
+,case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,b.price,b.total,b.storeno,b.price,b.total,'ucce_vu?noa=$noa'
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 
 --進
 insert #tmp
 select '1','rc2s',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*b.weight,b.price
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,'rc2_sf?noa=$noa'
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 
 --銷
 insert #tmp
 select '5','vccs',a.accy,a.noa,b.noq,a.datea,'',b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*b.weight,b.price
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,0,0,'vcc_sf?noa=$noa'
 from view_vcc a left join view_vccs b on a.noa=b.noa
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 
 insert #tmp
 select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*b.weight,c.price
-,case when a.typea='2' then -1 else 1 end*b.weight*c.price,'',0,0,'vcc_sf?noa=$noa'
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,c.price
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end*c.price
+,'',0,0,'vcc_sf?noa=$noa'
 from view_vcc a left join view_vcct b on a.noa=b.noa
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 
 update  a
 set storeno=isnull(b.storeno,'')
@@ -1893,6 +1895,7 @@ gno,product,spec,size,ucolor,dbo.getComma(lengthb,-1)lengthb,class
 ,dbo.getComma(tweight,2) tweight
 ,dbo.getComma(tmoney,2) tmoney
 ,case when isnull(tweight,0)=0 then dbo.getComma(0,2) else dbo.getComma(round(tmoney/tweight,2),2) end tprice
+,case when isnull(product,'') like '續接器%' or isnull(product,'') like '水泥方塊%' then '件數' else '重量' end utype
 from #tmpa a order by product,ucolor,spec,size,lengthb,class,storeno,datea,gno,typea,noa,noq
 
 IF OBJECT_ID('tempdb..#tmp')is not null
@@ -1989,7 +1992,8 @@ CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 --盤
 insert #tmp
 select '0','ucce',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.weight,b.price,b.total,b.storeno,b.price,b.total,'ucce_vu?noa=$noa'
+,case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,b.price,b.total,b.storeno,b.price,b.total,'ucce_vu?noa=$noa'
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
@@ -1997,30 +2001,31 @@ and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 --進
 insert #tmp
 select '1','rc2s',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*b.weight,b.price
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,'rc2_sf?noa=$noa'
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 
 --銷
 insert #tmp
 select '5','vccs',a.accy,a.noa,b.noq,a.datea,'',b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*b.weight,b.price
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,0,0,'vcc_sf?noa=$noa'
 from view_vcc a left join view_vccs b on a.noa=b.noa
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and (len(@x_uno)=0)
 
 insert #tmp
 select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*b.weight,c.price
-,case when a.typea='2' then -1 else 1 end*b.weight*c.price,'',0,0,'vcc_sf?noa=$noa'
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,c.price
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end*c.price
+,'',0,0,'vcc_sf?noa=$noa'
 from view_vcc a left join view_vcct b on a.noa=b.noa
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate 
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 
 update  a
@@ -2347,6 +2352,7 @@ gno,product,spec,size,ucolor,dbo.getComma(lengthb,-1)lengthb,class
 ,dbo.getComma(tweight,2) tweight
 ,dbo.getComma(tmoney,2) tmoney
 ,case when isnull(tweight,0)=0 then dbo.getComma(0,2) else dbo.getComma(round(tmoney/tweight,2),2) end tprice
+,case when isnull(product,'') like '續接器%' or isnull(product,'') like '水泥方塊%' then '件數' else '重量' end utype
 from #tmpa a order by product,ucolor,spec,size,lengthb,class,storeno,datea,gno,typea,noa,noq
 
 IF OBJECT_ID('tempdb..#tmp')is not null
