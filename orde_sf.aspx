@@ -296,6 +296,9 @@
 								para2=as[i].para
 							}
 						}
+						for (var j = 0; j < q_bbsCount; j++) {
+							chgimg(j);
+						}
 						break;
 					case 'cno_acomp':
 						var as = _q_appendData("acomp", "", true);
@@ -408,7 +411,11 @@
 					
 					for(var i=0;i<t_para.length;i++){
 						var value='';
-						if(t_para[i].key=="F"){
+						if(t_para[i].key=="A" && $('#txtClass_'+n).val()=='直'){
+							value=round(dec($('#txtLengthb_'+n).val())*100,0);
+						}else if(t_para[i].key=="B" && $('#txtClass_'+n).val()=='彎'){
+							value=round(dec($('#txtLengthb_'+n).val())*100,0);
+						}else if(t_para[i].key=="F"){
 							value=t_paraa;
 						}else if (t_para[i].key=="G"){
 							value=t_parab;
@@ -435,6 +442,24 @@
 					c.width = 150;
 					c.height = 50;
 					$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,150,50);
+				}
+				chgbbswidth();
+			}
+			
+			function chgbbswidth() {
+				var isCouplers=false;
+				for (var i = 0; i < q_bbsCount; i++) {
+					if($('#txtProduct_'+i).val().indexOf('續接器')>-1){
+						isCouplers=true;
+						break;
+					}
+				}
+				if(isCouplers){
+					$('#dbbs').css('width','1590px');
+					$('.img').show();
+				}else{
+					$('#dbbs').css('width','1390px');
+					$('.img').hide();
 				}
 			}
 			
@@ -543,7 +568,7 @@
 						});
 						
 						$('#txtSize_' + j).change(function() {
-							 if ($(this).val().substr(0, 1) != '#')
+							 if ($(this).val().substr(0, 1) != '#' && $(this).val().length>0)
                         		$(this).val('#' + $(this).val());
 						});
 						
@@ -1086,7 +1111,7 @@
 					<td align="center" style="width:70px;"><a id='lblSize_s'> </a></td>
 					<td align="center" style="width:70px;"><a id='lblLengthb_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblClass_s'> </a></td>
-					<td align="center" style="width:200px;"><a id='lblImg_s'> </a></td>
+					<td align="center" style="width:200px;" class="img"><a id='lblImg_s'> </a></td>
 					<!--<td align="center" style="width:55px;"><a id='lblUnit'> </a></td>-->
 					<td align="center" style="width:60px;"><a id='lblMount_s'> </a></td>
 					<td align="center" style="width:85px;"><a id='lblWeight_s'> </a></td>
@@ -1125,7 +1150,7 @@
 						<input id="txtClass.*" type="text" class="txt c1" style="width: 70%;"/>
 						<select id="combClass.*" class="txt" style="width: 20px;"> </select>
 					</td>
-					<td align="center">
+					<td align="center" class="img">
 						<canvas id="canvas.*" width="150" height="50"> </canvas>
 						<img id="imgPic.*" src="" style="display:none;"/>
 					</td>
