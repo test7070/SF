@@ -11,8 +11,10 @@ set @t_xaddr2 = case when '#non' = [5] then '' else [5] end
 ---------------------------------------------------------------------------------
 declare @tmp1 table(
 	gno nvarchar(1),
-	idno int identity(0,1), 
-	noa nvarchar(20),
+	page int,
+	idno int, 
+	noa nvarchar(30),
+	noq nvarchar(10),
 	datea nvarchar(20),
 	custno nvarchar(30),
 	cust nvarchar(100),
@@ -33,7 +35,7 @@ declare @tmp1 table(
 	pmemo nvarchar(max),
 	size nvarchar(max),
 	img nvarchar(MAX),
-	long float,
+	lengthb float,
 	pmount float,
 	pweight float,
 	
@@ -47,7 +49,7 @@ declare @tmp1 table(
 if (LEN(@t_xaddr2)!=0)
 begin
 	insert into @tmp1
-	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),a.memo,a.cartrips,
+	select '0',0,0,case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,'',a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),a.memo,a.cartrips,
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.store2,b.lengthb,sum(b.mount),sum(b.weight),
 		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,'','','',''
 	from view_vcc a
@@ -59,14 +61,13 @@ end
 else
 begin
 	insert into @tmp1
-	select '0',a.noa,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,a.memo,a.cartrips,
+	select '0',0,0,a.noa,b.noq,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,a.memo,a.cartrips,
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.store2,b.lengthb,b.mount,b.weight,
 		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,a.paydate,a.cardeal,b.store,a.carno
 	from view_vcc a
 	left join view_vccs b on a.noa = b. noa
 	where (a.noa between @t_bxnoa and @t_exnoa)
 end
-
 
 update @tmp1 set tweight = case when tweight is null then 0 else tweight end,
 				 eweight = case when eweight is null then 0 else eweight end,
@@ -76,209 +77,60 @@ where gno = '0'
 update @tmp1 set product = REPLACE(product,' ','') + (case when LEN(isnull(size,'')) = 0 then '' else size end)
 where gno = '0'
 
-declare @idno int
-declare @noa nvarchar(max)
-declare @qno nvarchar(max)
-declare @str nvarchar(max)
-declare @cnt int
-declare @i int
-
---declare cursor_table cursor for 
---select idno,noa,qno from @tmp1
---open cursor_table 
---fetch next from cursor_table 
---into @idno,@noa,@qno 
---while(@@FETCH_STATUS <> -1) 
---begin
---	set @cnt = 0
---	set @i = 1
---	while(@i <= LEN(@qno))
---	begin
---		if(SUBSTRING(@qno,@i,1) = 'Q')
---		begin
---			set @cnt = @cnt + 1
---		end
---		set @i = @i + 1
---	end
---	set @i = 0
---	set @str = ''
---	while (@i < @cnt)
---	begin 
---		if(@i = 0)
---		begin
---			set @str = @str + dbo.split(dbo.split(@qno,'##',@i),'@',0)
---			set @i = @i + 1
---		end
---		else if (@i > 0)
---		begin
---			set @str = @str + ',' + dbo.split(dbo.split(@qno,'##',@i),'@',0)
---			set @i = @i + 1
---		end
---	end
---	update @tmp1 set qno = @str where idno = @idno and noa =@noa
-	
---	fetch next from cursor_table 
---	into @idno,@noa,@qno
---end 
---close cursor_table 
---deallocate cursor_table
-
 --後面一張出貨單只會有一個合約號碼
 update @tmp1 set qno = dbo.split(dbo.split(qno,'##',0),'@',0)
 
-declare @tmp2 table(
-	gno nvarchar(1),
-	idno int identity(0,1), 
-	noa nvarchar(20),
-	datea nvarchar(20),
-	custno nvarchar(30),
-	cust nvarchar(100),
-	addr nvarchar(max),
-	conn nvarchar(50),
-	qno nvarchar(max),
-	tweight float,
-	eweight float,
-	nweight float,
-	price float,
-	total float,
-	memo nvarchar(MAX),
-	cartrips float,
- 	
-	class1 nvarchar(30),class2 nvarchar(30),class3 nvarchar(30),class4 nvarchar(30),class5 nvarchar(30),class6 nvarchar(30),
-	spec1 nvarchar(100),spec2 nvarchar(100),spec3 nvarchar(100),spec4 nvarchar(100),spec5 nvarchar(100),spec6 nvarchar(100),
-	product1 nvarchar(max),product2 nvarchar(max),product3 nvarchar(max),product4 nvarchar(max),product5 nvarchar(max),product6 nvarchar(max),
-	pmount1 float,pmount2 float,pmount3 float,pmount4 float,pmount5 float,pmount6 float,
-	pweight1 float,pweight2 float,pweight3 float,pweight4 float,pweight5 float,pweight6 float,
-	pmemo1 nvarchar(max),pmemo2 nvarchar(max),pmemo3 nvarchar(max),pmemo4 nvarchar(max),pmemo5 nvarchar(max),pmemo6 nvarchar(max),
-	img1 nvarchar(max),img2 nvarchar(max),img3 nvarchar(max),img4 nvarchar(max),img5 nvarchar(max),img6 nvarchar(max),
-	
-	trantype nvarchar(10),
-	taxname nvarchar(10),
-	intime nvarchar(10),
-	cardeal nvarchar(20),
-	store nvarchar(50),
-	carno nvarchar(20)
-)
+declare @t_pagelien int=6
 
-declare @noa1 nvarchar(20) 
-declare @noa2 nvarchar(20) 
-declare @idno1 int 
-declare @idno2 int 
-declare @recno int 
-declare @rno int 
+--變動頁數
+update a
+set idno=rr,page=ceiling((rr-1)/@t_pagelien)+1
+from (select page,idno,ROW_NUMBER()over (partition by noa order by noa,noq) rr from @tmp1)a
 
-set @noa2 = 'zzzzzzzzzz' 
-set @idno2 = -1 
+update a
+set idno=rr
+from (select idno,ROW_NUMBER()over (partition by noa,page order by noa,noq) rr from @tmp1)a
+
+--補空白行數
+declare @noa nvarchar(30)
+declare @page int
+declare @count int
 
 declare cursor_table cursor for 
-select noa,idno from @tmp1 order by noa,idno 
+select noa,page,count(*) from @tmp1 group by noa,page having count(*)!=@t_pagelien order by noa 
 open cursor_table 
 fetch next from cursor_table 
-into @noa1,@idno1 
+into @noa,@page,@count 
 while(@@FETCH_STATUS <> -1) 
 begin 
-	if(@noa2 != @noa1 or @recno%6 = 1) 
-	begin 
-		set @recno = 1
-		begin 
-			insert into @tmp2(gno,noa,datea,custno,cust,addr,conn,qno,memo,cartrips,tweight,eweight,nweight,price,total,class1,spec1,product1,pmemo1,pmount1,pweight1,img1,trantype,taxname,intime,cardeal,store,carno) 
-			select gno,noa,datea,custno,cust,addr,conn,qno,memo,cartrips,tweight,eweight,nweight,price,total,class,spec,product,pmemo,pmount,pweight,img,trantype,taxname,intime,cardeal,store,carno
-			from @tmp1 where idno = @idno1
-		end
-		set @noa2 = @noa1 
-		set @recno = @recno + 1 
-		set @idno2 = @idno2 + 1 
-	end 
-	else if(@recno = 2) 
-	begin 
-		update @tmp2 set class2 = (select class from @tmp1 where idno = @idno1), 
-						 spec2 = (select spec from @tmp1 where idno = @idno1), 
-						 product2 = (select product from @tmp1 where idno = @idno1), 
-						 pmount2 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight2 = (select pweight from @tmp1 where idno = @idno1),
-						 pmemo2 = (select pmemo from @tmp1 where idno = @idno1),
-						 img2 = (select img from @tmp1 where idno = @idno1)
-		where idno = @idno2 
+	while (@count<@t_pagelien)
+	begin
+		set @count=@count+1
 		
-		set @noa2 = @noa1 
-		set @recno = @recno + 1 
-	end 
-	else if(@recno = 3) 
-	begin 
-		update @tmp2 set class3 = (select class from @tmp1 where idno = @idno1), 
-						 spec3 = (select spec from @tmp1 where idno = @idno1), 
-						 product3 = (select product from @tmp1 where idno = @idno1), 
-						 pmount3 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight3 = (select pweight from @tmp1 where idno = @idno1),
-						 pmemo3 = (select pmemo from @tmp1 where idno = @idno1),
-						 img3 = (select img from @tmp1 where idno = @idno1)
-		where idno = @idno2 
+		insert @tmp1
 		
-		set @noa2 = @noa1 
-		set @recno = @recno + 1 
-	end 
-	else if(@recno = 4) 
-	begin 
-		update @tmp2 set class4 = (select class from @tmp1 where idno = @idno1), 
-						 spec4 = (select spec from @tmp1 where idno = @idno1), 
-						 product4 = (select product from @tmp1 where idno = @idno1), 
-						 pmount4 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight4 = (select pweight from @tmp1 where idno = @idno1),
-						 pmemo4 = (select pmemo from @tmp1 where idno = @idno1),
-						 img4 = (select img from @tmp1 where idno = @idno1)
-		where idno = @idno2 
+		select top 1 '0',page,@count,@noa,CHAR(255),datea,custno,cust,addr,conn,qno
+		,tweight,eweight,nweight,price,total,memo,cartrips
+		,'','','','','','',null,null,null,trantype,taxname,intime,cardeal,store,carno
+		from @tmp1 where noa=@noa and page=@page
 		
-		set @noa2 = @noa1 
-		set @recno = @recno + 1 
-	end 
-	else if(@recno = 5) 
-	begin 
-		update @tmp2 set class5 = (select class from @tmp1 where idno = @idno1), 
-						 spec5 = (select spec from @tmp1 where idno = @idno1), 
-						 product5 = (select product from @tmp1 where idno = @idno1), 
-						 pmount5 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight5 = (select pweight from @tmp1 where idno = @idno1),
-						 pmemo5 = (select pmemo from @tmp1 where idno = @idno1),
-						 img5 = (select img from @tmp1 where idno = @idno1)
-		where idno = @idno2 
-		
-		set @noa2 = @noa1 
-		set @recno = @recno + 1 
-	end 
-	else if(@recno = 6) 
-	begin 
-		update @tmp2 set class6 = (select class from @tmp1 where idno = @idno1), 
-						 spec6 = (select spec from @tmp1 where idno = @idno1), 
-						 product6 = (select product from @tmp1 where idno = @idno1), 
-						 pmount6 = (select pmount from @tmp1 where idno = @idno1),
-						 pweight6 = (select pweight from @tmp1 where idno = @idno1),
-						 pmemo6 = (select pmemo from @tmp1 where idno = @idno1),
-						 img6 = (select img from @tmp1 where idno = @idno1)
-		where idno = @idno2 
-		
-		set @noa2 = @noa1 
-		set @recno = @recno + 1 	
 	end
-
 	fetch next from cursor_table 
-	into @noa1,@idno1	
+	into @noa,@page,@count 
 end 
 close cursor_table 
 deallocate cursor_table 
 
+update @tmp1
+set gno=case when product like '續接器%' then '2' else '1' end
+
+insert @tmp1(gno,noa,page,idno)
+select '3',noa,page,7 from @tmp1 group by noa,page
+
 select 
 case when isnull(cartrips,0)!=0 then '應收運費:'+dbo.getComma(cartrips,0)+'　　' else '' end+'備註:'+memo  memo
 	,*,tweight twei,eweight ewei,nweight nwei
-	,case when product1 like '續接器%' or product1 like '水泥方塊%' then pmount1 else pweight1 end pwei1
-	,case when product2 like '續接器%' or product2 like '水泥方塊%' then pmount2 else pweight2 end pwei2
-	,case when product3 like '續接器%' or product3 like '水泥方塊%' then pmount3 else pweight3 end pwei3
-	,case when product4 like '續接器%' or product4 like '水泥方塊%' then pmount4 else pweight4 end pwei4
-	,case when product5 like '續接器%' or product5 like '水泥方塊%' then pmount5 else pweight5 end pwei5
-	,case when product6 like '續接器%' or product6 like '水泥方塊%' then pmount6 else pweight6 end pwei6
-	,case when len(isnull(img1,''))>0 then '<img src="'+img1+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs1
-	,case when len(isnull(img2,''))>0 then '<img src="'+img2+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs2
-	,case when len(isnull(img3,''))>0 then '<img src="'+img3+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs3
-	,case when len(isnull(img4,''))>0 then '<img src="'+img4+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs4
-	,case when len(isnull(img5,''))>0 then '<img src="'+img5+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs5
-	,case when len(isnull(img6,''))>0 then '<img src="'+img6+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs6
-from @tmp2 order by noa,gno;
+	,case when product like '續接器%' or product like '水泥方塊%' then pmount else pweight end pwei
+	,case when lengthb=0 then null else cast(lengthb as nvarchar(50))+'M' end lena
+	,case when len(isnull(img,''))>0 then '<img src="'+img+'" style="width:60px'+char(59)+'height:20px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs
+from @tmp1 order by noa,page,idno,gno;
