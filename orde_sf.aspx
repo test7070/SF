@@ -57,7 +57,7 @@
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
 				q_gt('adspec', '1=1 ', 0, 0, 0, "bbsspec2");
 				q_gt('adpro', '1=1 ', 0, 0, 0, "bbspro");
-				q_gt('img', "where=^^ noa='A01' or noa='B01' ^^ ", 0, 0, 0, "bbsimg");
+				q_gt('img', "where=^^ noa like 'Z%' ^^ ", 0, 0, 0, "bbsimg");
 				$('#txtOdate').focus();
 			});
 
@@ -232,7 +232,7 @@
 			var focus_addr = '';
 			var z_cno = r_cno, z_acomp = r_comp, z_nick = r_comp.substr(0, 2);
 			var a_spec='@',a_spec2='@',a_color='@',a_pro='@',a_class='@'; //106/01/04 續接器 類別 材質改抓續接參數 廠牌 =直彎
-			var oimg1='',para1='',oimg2='',para2='';//直,彎
+			var a_img,a_class2='@';//106/01/06改抓img編號名稱
 			function q_gtPost(t_name) {
 				switch (t_name) {
 					case 'bbsucc':
@@ -285,16 +285,10 @@
 						}
 						break;
 					case 'bbsimg':
-						var as = _q_appendData("img", "", true);
-						for (var i = 0; i < as.length; i++) {
-							if(as[i].noa=='A01'){
-								oimg1=as[i].org;
-								para1=as[i].para
-							}
-							if(as[i].noa=='B01'){
-								oimg2=as[i].org;
-								para2=as[i].para
-							}
+						a_img = _q_appendData("img", "", true);
+						a_class2='@'
+						for (var i = 0; i < a_img.length; i++) {
+							a_class2+=","+a_img[i].noa+'@'+a_img[i].noa+' '+a_img[i].namea;
 						}
 						for (var j = 0; j < q_bbsCount; j++) {
 							chgimg(j);
@@ -371,30 +365,25 @@
 			function chgcombClass(n) {
 				$('#combClass_'+n).text('');
 				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
-					q_cmbParse("combClass_"+n, ',直,彎');
+					q_cmbParse("combClass_"+n, a_class2);
 				else
 					q_cmbParse("combClass_"+n, a_class);
 			}
 			
-			function chgimg(n) {
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1
-				&& ($('#txtClass_'+n).val()=='直' || $('#txtClass_'+n).val()=='彎' )){
-					var t_para='';
+			function chgimg(n) { //a_img
+				if($('#txtProduct_'+n).val().indexOf('續接器')>-1 && $('#txtClass_'+n).val()!=''){
 					var t_imgorg='';
-					if($('#txtClass_'+n).val()=='直'){
-						if(oimg1.length==0){
-							return;
-						}
-						t_para = JSON.parse(para1);
-						t_imgorg = oimg1;
-					}else{
-						if(oimg2.length==0){
-							return;
-						}
-						t_para = JSON.parse(para2);
-						t_imgorg = oimg2;
-					}
 					
+					for (var i=0;i<a_img.length;i++){
+						if($('#txtClass_'+n).val()==a_img[i].noa){
+							t_imgorg=a_img[i].org;
+							break;
+						}
+					}
+					if(t_imgorg.length==0){
+						return;
+					}
+										
 					$('#imgPic_'+n).attr('src',t_imgorg);
 					var imgwidth = 300;
 					var imgheight = 100;
@@ -404,30 +393,7 @@
 					c.width = imgwidth;
 					c.height = imgheight;
 					ctx.drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight);
-					var t_length = 0;
 					
-					var t_paraa=$('#txtUcolor_'+n).val();
-					var t_parab=$('#txtSpec_'+n).val();
-					
-					for(var i=0;i<t_para.length;i++){
-						var value='';
-						if(t_para[i].key=="A" && $('#txtClass_'+n).val()=='直'){
-							value=round(dec($('#txtLengthb_'+n).val())*100,0);
-						}else if(t_para[i].key=="B" && $('#txtClass_'+n).val()=='彎'){
-							value=round(dec($('#txtLengthb_'+n).val())*100,0);
-						}else if(t_para[i].key=="F"){
-							value=t_paraa;
-						}else if (t_para[i].key=="G"){
-							value=t_parab;
-						}
-						if(value.length!=0){
-							t_length += value;
-							ctx.font = t_para[i].fontsize+"px Arial";
-							ctx.fillStyle = 'black';
-							ctx.textAlign="center";
-							ctx.fillText(value+'',t_para[i].left,t_para[i].top);
-						}
-					}
 					//------------------------------
 					$('#imgPic_'+n).attr('src',c.toDataURL());
 					//條碼用圖形
@@ -595,7 +561,7 @@
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
-								$('#txtClass_'+b_seq).val($('#combClass_'+b_seq).find("option:selected").text());
+								$('#txtClass_'+b_seq).val($('#combClass_'+b_seq).find("option:selected").val());
 								chgimg(b_seq);
 							}
 						});
