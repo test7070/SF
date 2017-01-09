@@ -447,7 +447,7 @@
 			var thisCarSpecno = '';
 			var q1_weight=0,q2_weight=0;
 			var a_spec='@',a_color='@',a_pro='@',a_class='@'; //106/01/04 續接器 類別 材質改抓續接參數 廠牌 =直彎
-			var a_img,a_class2='@';//106/01/06改抓img編號名稱
+			var a_img=[],a_class2='@';//106/01/06改抓img編號名稱
 			function q_gtPost(t_name) {
 				var as;
 				switch (t_name) {

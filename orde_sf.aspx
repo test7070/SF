@@ -232,7 +232,7 @@
 			var focus_addr = '';
 			var z_cno = r_cno, z_acomp = r_comp, z_nick = r_comp.substr(0, 2);
 			var a_spec='@',a_spec2='@',a_color='@',a_pro='@',a_class='@'; //106/01/04 續接器 類別 材質改抓續接參數 廠牌 =直彎
-			var a_img,a_class2='@';//106/01/06改抓img編號名稱
+			var a_img=[],a_class2='@';//106/01/06改抓img編號名稱
 			function q_gtPost(t_name) {
 				switch (t_name) {
 					case 'bbsucc':
