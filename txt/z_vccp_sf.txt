@@ -17,7 +17,7 @@ declare @tmp1 table(
 	noq nvarchar(10),
 	datea nvarchar(20),
 	custno nvarchar(30),
-	cust nvarchar(100),
+	comp nvarchar(100),
 	addr nvarchar(max),
 	conn nvarchar(50),
 	qno nvarchar(max),
@@ -80,7 +80,7 @@ where gno = '0'
 --後面一張出貨單只會有一個合約號碼
 update @tmp1 set qno = dbo.split(dbo.split(qno,'##',0),'@',0)
 
-declare @t_pagelien int=6
+declare @t_pagelien int=9
 
 --變動頁數
 update a
@@ -109,7 +109,7 @@ begin
 		
 		insert @tmp1
 		
-		select top 1 '0',page,@count,@noa,CHAR(255),datea,custno,cust,addr,conn,qno
+		select top 1 '0',page,@count,@noa,CHAR(255),datea,custno,comp,addr,conn,qno
 		,tweight,eweight,nweight,price,total,memo,cartrips
 		,'','','','','','',null,null,null,trantype,taxname,intime,cardeal,store,carno
 		from @tmp1 where noa=@noa and page=@page
@@ -125,7 +125,7 @@ update @tmp1
 set gno=case when product like '續接器%' then '2' else '1' end
 
 insert @tmp1(gno,noa,page,idno)
-select '3',noa,page,7 from @tmp1 group by noa,page
+select '3',noa,page,@t_pagelien+1 from @tmp1 group by noa,page
 
 select 
 case when isnull(cartrips,0)!=0 then '應收運費:'+dbo.getComma(cartrips,0)+'　　' else '' end+'備註:'+memo  memo
