@@ -123,7 +123,7 @@ close cursor_table
 deallocate cursor_table 
 
 update @tmp1
-set gno=case when product like '續接器%' then '2' else '1' end
+set gno=case when product like '續接%' or product like '組接%' then '2' else '1' end
 
 insert @tmp1(gno,noa,page,idno,datea,custno,comp,addr,conn,qno,trantype,taxname,intime,cardeal,store,carno,memo,worker)
 select '3',noa,page,@t_pagelien+1,MAX(datea),MAX(custno),MAX(comp),MAX(addr),MAX(conn),MAX(qno),MAX(trantype),MAX(taxname),MAX(intime),MAX(cardeal),MAX(store),MAX(carno),MAX(memo),MAX(worker)
@@ -132,7 +132,7 @@ from @tmp1 group by noa,page
 select 
 case when isnull(cartrips,0)!=0 then '應收運費:'+dbo.getComma(cartrips,0)+'　　' else '' end+'備註:'+memo  memo
 	,*,tweight twei,eweight ewei,nweight nwei
-	,case when product like '續接器%' or product like '水泥方塊%' then pmount else pweight end pwei
+	,case when product like '續接%' or product like '組接%' or product like '費%' or product like '水泥方塊%' then pmount else pweight end pwei
 	,case when lengthb=0 then null else cast(lengthb as nvarchar(50))+'M' end lena
 	,case when len(isnull(img,''))>0 then '<img src="'+img+'" style="width:60px'+char(59)+'height:20px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs
 from @tmp1 order by noa,page,idno,gno;
