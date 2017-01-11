@@ -44,14 +44,15 @@ declare @tmp1 table(
 	intime nvarchar(10),
 	cardeal nvarchar(20),
 	store nvarchar(50),
-	carno nvarchar(20)
+	carno nvarchar(20),
+	worker nvarchar(50)
 )
 if (LEN(@t_xaddr2)!=0)
 begin
 	insert into @tmp1
 	select '0',0,0,case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,'',a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),a.memo,a.cartrips,
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.store2,b.lengthb,sum(b.mount),sum(b.weight),
-		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,'','','',''
+		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,'','','','',''
 	from view_vcc a
 	left join view_vccs b on a.noa = b. noa
 	where (a.noa between @t_bxnoa and @t_exnoa)
@@ -63,7 +64,7 @@ begin
 	insert into @tmp1
 	select '0',0,0,a.noa,b.noq,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,a.memo,a.cartrips,
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.store2,b.lengthb,b.mount,b.weight,
-		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,a.paydate,a.cardeal,b.store,a.carno
+		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,a.paydate,a.cardeal,b.store,a.carno,a.worker
 	from view_vcc a
 	left join view_vccs b on a.noa = b. noa
 	where (a.noa between @t_bxnoa and @t_exnoa)
@@ -111,7 +112,7 @@ begin
 		
 		select top 1 '0',page,@count,@noa,CHAR(255),datea,custno,comp,addr,conn,qno
 		,tweight,eweight,nweight,price,total,memo,cartrips
-		,'','','','','','',null,null,null,trantype,taxname,intime,cardeal,store,carno
+		,'','','','','','',null,null,null,trantype,taxname,intime,cardeal,store,carno,worker
 		from @tmp1 where noa=@noa and page=@page
 		
 	end
@@ -124,8 +125,9 @@ deallocate cursor_table
 update @tmp1
 set gno=case when product like '續接器%' then '2' else '1' end
 
-insert @tmp1(gno,noa,page,idno)
-select '3',noa,page,@t_pagelien+1 from @tmp1 group by noa,page
+insert @tmp1(gno,noa,page,idno,datea,custno,comp,addr,conn,qno,trantype,taxname,intime,cardeal,store,carno,memo,worker)
+select '3',noa,page,@t_pagelien+1,MAX(datea),MAX(custno),MAX(comp),MAX(addr),MAX(conn),MAX(qno),MAX(trantype),MAX(taxname),MAX(intime),MAX(cardeal),MAX(store),MAX(carno),MAX(memo),MAX(worker)
+from @tmp1 group by noa,page
 
 select 
 case when isnull(cartrips,0)!=0 then '應收運費:'+dbo.getComma(cartrips,0)+'　　' else '' end+'備註:'+memo  memo

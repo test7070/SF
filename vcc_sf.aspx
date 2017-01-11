@@ -117,7 +117,7 @@
 				var t_where = "where=^^ 1=1 ^^";
 				q_gt('ucc', t_where, 0, 0, 0, "");
 				
-				$('#lblPaydate').text('入廠時間');
+				$('#lblPaydate').text('出廠時間');
 				$('#lblAddr2').text('工地名稱');
 				$('#lblTranadd').text('車空重');
 				$('#lblBenifit').text('車總重');
@@ -951,7 +951,7 @@
 			
 			function chgcombSpec(n) {
 				$('#combSpec_'+n).text('');
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+				if($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1)
 					q_cmbParse("combSpec_"+n, a_pro);
 				else
 					q_cmbParse("combSpec_"+n, a_spec);
@@ -959,7 +959,7 @@
 			
 			function chgcombUcolor(n) {
 				$('#combUcolor_'+n).text('');
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+				if($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1)
 					q_cmbParse("combUcolor_"+n, a_pro);
 				else
 					q_cmbParse("combUcolor_"+n, a_color);
@@ -967,14 +967,14 @@
 			
 			function chgcombClass(n) {
 				$('#combClass_'+n).text('');
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+				if($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1)
 					q_cmbParse("combClass_"+n, a_class2);
 				else
 					q_cmbParse("combClass_"+n, a_class);
 			}
 			
 			function chgimg(n) { //a_img
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1 && $('#txtClass_'+n).val()!=''){
+				if(($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1) && $('#txtClass_'+n).val()!=''){
 					var t_imgorg='';
 					
 					for (var i=0;i<a_img.length;i++){
@@ -1019,7 +1019,7 @@
 			function chgbbswidth() {
 				var isCouplers=false;
 				for (var i = 0; i < q_bbsCount; i++) {
-					if($('#txtProduct_'+i).val().indexOf('續接器')>-1){
+					if($('#txtProduct_'+i).val().indexOf('續接')>-1 || $('#txtProduct_'+i).val().indexOf('組接')>-1){
 						isCouplers=true;
 						break;
 					}
@@ -1065,7 +1065,7 @@
 				
 				for (var j = 0; j < q_bbsCount; j++) {
 					var tproduct=$('#txtProduct_'+j).val();
-					if(tproduct.indexOf('續接器')>-1){
+					if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1){
 						var t_para1=$('#txtUcolor_'+j).val().replace(/[^0-9]/g,"");
 						var t_para2=$('#txtSpec_'+j).val().replace(/[^0-9]/g,"");
 						var tmp='';
@@ -1194,7 +1194,7 @@
 								
 								var tproduct=$('#txtProduct_'+b_seq).val();
 								
-								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接器')>-1 || tproduct.indexOf('水泥方塊')>-1)
+								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1)
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
 								else
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
@@ -1215,7 +1215,7 @@
 								b_seq = t_IdSeq;
 								var tproduct=$('#txtProduct_'+b_seq).val();
 								
-								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接器')>-1 || tproduct.indexOf('水泥方塊')>-1)
+								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1)
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
 								else
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
@@ -1232,7 +1232,7 @@
 								b_seq = t_IdSeq;
 								var tproduct=$('#txtProduct_'+b_seq).val();
 								
-								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接器')>-1 || tproduct.indexOf('水泥方塊')>-1)
+								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1)
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
 								else
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));

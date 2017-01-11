@@ -73,7 +73,7 @@
 				var t1 = 0, t_unit, t_mount=0, t_weight = 0;
 				for (var j = 0; j < q_bbsCount; j++) {
 					var tproduct=$('#txtProduct_'+j).val();
-					if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接器')>-1 || tproduct.indexOf('水泥方塊')>-1){
+					if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
 						t_mount = $('#txtMount_' + j).val();
 					}else{
 						t_mount = $('#txtWeight_' + j).val();
@@ -348,7 +348,7 @@
 			
 			function chgcombSpec(n) {
 				$('#combSpec_'+n).text('');
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+				if($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1)
 					q_cmbParse("combSpec_"+n, a_pro);
 				else
 					q_cmbParse("combSpec_"+n, a_spec);
@@ -356,7 +356,7 @@
 			
 			function chgcombUcolor(n) {
 				$('#combUcolor_'+n).text('');
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+				if($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1)
 					q_cmbParse("combUcolor_"+n, a_pro);
 				else
 					q_cmbParse("combUcolor_"+n, a_color);
@@ -364,14 +364,14 @@
 			
 			function chgcombClass(n) {
 				$('#combClass_'+n).text('');
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1)
+				if($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1)
 					q_cmbParse("combClass_"+n, a_class2);
 				else
 					q_cmbParse("combClass_"+n, a_class);
 			}
 			
 			function chgimg(n) { //a_img
-				if($('#txtProduct_'+n).val().indexOf('續接器')>-1 && $('#txtClass_'+n).val()!=''){
+				if(($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1) && $('#txtClass_'+n).val()!=''){
 					var t_imgorg='';
 					
 					for (var i=0;i<a_img.length;i++){
@@ -415,7 +415,7 @@
 			function chgbbswidth() {
 				var isCouplers=false;
 				for (var i = 0; i < q_bbsCount; i++) {
-					if($('#txtProduct_'+i).val().indexOf('續接器')>-1){
+					if($('#txtProduct_'+i).val().indexOf('續接')>-1 || $('#txtProduct_'+i).val().indexOf('組接')>-1){
 						isCouplers=true;
 						break;
 					}
@@ -456,7 +456,7 @@
 				
 				for (var j = 0; j < q_bbsCount; j++) {
 					var tproduct=$('#txtProduct_'+j).val();
-					if(tproduct.indexOf('續接器')>-1){
+					if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1){
 						var t_para1=$('#txtUcolor_'+j).val().replace(/[^0-9]/g,"");
 						var t_para2=$('#txtSpec_'+j).val().replace(/[^0-9]/g,"");
 						var tmp='';
