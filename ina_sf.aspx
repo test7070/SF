@@ -360,7 +360,7 @@
 				}
 				
 				//取得UNO
-				/*var needuno=false;
+				var needuno=false;
 				for (var i = 0; i < q_bbsCount; i++) {
 					if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
 						needuno=true;
@@ -369,7 +369,7 @@
 				if(!getnewuno && needuno){
 					q_func('qtxt.query.getnewuno', 'cuc_sf.txt,getnewuno,ina;'+$('#txtNoa').val()+';'+q_getPara('sys.key_ina')+';'+$('#txtDatea').val());
 					return;
-				}*/
+				}
 				
 				getnewuno=false;
                 check_uno=false;
@@ -582,7 +582,8 @@
 								$('#txtTranstartno').val(as[0].transtartno);
 							}
 						}
-						q_func('rc2_post.post.ina2rc220', r_accy + ',' + t_rc2no + ',0');
+						if(t_rc2no.length>0)
+							q_func('rc2_post.post.ina2rc220', r_accy + ',' + t_rc2no + ',0');
 					}
 				}
 			}
@@ -717,6 +718,18 @@
 							var whilenum=0;
 							if(t_noa!='' && ($('#txtNoa').val().length==0 || $('#txtNoa').val()=='AUTO'))
 								$('#txtNoa').val(t_noa);
+							
+							//定尺
+							for (var i = 0; i < q_bbsCount; i++) {
+								if(!emp($('#txtProduct_' + i).val()) && $('#txtUcolor_'+i).val().indexOf('定尺')>-1
+								&& emp($('#txtUno_'+i).val())){
+									if(t_noa!='' && ($('#txtNoa').val().length==0 || $('#txtNoa').val()=='AUTO'))
+										$('#txtUno_'+i).val(t_noa);
+									else
+										$('#txtUno_'+i).val($('#txtNoa').val());
+								}
+							}
+							
 							if(t_uno!=''){
 								//檢查是否與表身重覆
 								while(1==1 && whilenum<q_bbsCount*q_bbsCount) //避免無窮迴圈
