@@ -52,120 +52,7 @@ dbo.getComma(weight,0) weight
 ,* from @tmp order by noa,spec,dbo.get_num(size),gno
 ,color,picno,lengthb,lengthc;
 --******************************************************************************************************
-z_cucp_sf01bk:--z_cucp_sf01bk
-SET QUOTED_IDENTIFIER OFF	
 
-declare @t_path nvarchar(max) = '[1]'
-declare @t_xnoa nvarchar(100) = case when '#non'= [2] then '' else [2] end
-declare @t_spec nvarchar(100) = case when '#non'= [8] then '' else [8] end
-declare @t_size nvarchar(100) = case when '#non'= [9] then '' else [9] end
-declare @t_memo nvarchar(100) = case when '#non'= [10] then '' else [10] end
-declare @t_bpicno nvarchar(100) = case when '#non'= [11] then '' else [11] end
-declare @t_epicno nvarchar(100) = case when '#non'= [12] then char(255) else [12] end
-declare @t_order nvarchar(100) = case when '#non'= [13] then '' else [13] end
-----------------------------------------------------------------------------------------------------------------------------
-
-declare @tmp table(
-	gno nvarchar(1),
-	idno int,
-	noa nvarchar(100),
-	datea nvarchar(10),
-	mech nvarchar(100),
-	cust nvarchar(200),
-	bdate nvarchar(20),
-	amemo nvarchar(MAX),
-	tmemo nvarchar(MAX),
-	smemo nvarchar(MAX),
-	
-	noq nvarchar(100),
-	productno nvarchar(100),
-	product nvarchar(200),
-	ucolor nvarchar(100),
-	spec nvarchar(100),
-	size nvarchar(100),
-	picno nvarchar(100),
-	picno2 nvarchar(100),--加工排序用
-	picname nvarchar(100),
-	imgdata nvarchar(max),
-	paraf nvarchar(50),
-	parag nvarchar(50),
-	lengthb float,
-	lengthc float,
-	mount float,
-	weight float,
-	class nvarchar(50),
-	memo nvarchar(MAX),
-	bsize nvarchar(100)
-)
-
-insert @tmp
-select '0',0,a.noa,a.datea,a.mech,a.cust,a.bdate,a.memo,'',''
-		,b.noq,b.productno,b.product,b.ucolor,b.spec,b.size,b.picno,b.picno,b.picname
-		,b.imgdata,b.paraf,b.parag,b.lengthb,b.mount1,b.mount,b.weight,b.class,b.memo,b.size2
-from  view_cuc a left join view_cucs b on a.noa=b.noa
-where a.noa=@t_xnoa 
-and (len(@t_spec)=0 or b.spec=@t_spec)
-and (len(@t_size)=0 or b.size=@t_size)
-and (len(@t_memo)=0 or b.memo=@t_memo)
-and (b.picno between @t_bpicno and @t_epicno)
-
-update a
-set tmemo=stuff((select CHAR(59)+size+'-'+spec+'='+dbo.getComma(SUM(weight),0)+'KG' from @tmp where noa=a.noa group by size,spec order by cast(dbo.get_num(size) as int),spec FOR XML PATH('')),1,1,'')
-from @tmp a
-
-update a
-set smemo=stuff((select CHAR(59)+para+'-'+dbo.getComma(SUM(lengthc),0)+'個' from (
-select paraf para,SUM(lengthc) lengthc from @tmp where ISNULL(paraf,'')!='' and isnull(lengthb,0)!=0 group by paraf
-union all
-select parag para,SUM(lengthc) lengthc from @tmp where ISNULL(parag,'')!='' and isnull(lengthb,0)!=0 group by parag
-)tmp group by para order by cast(dbo.get_num(para) as int) FOR XML PATH('')),1,1,'')
-from @tmp a
-
-if(@t_order='memo')
-begin
-	update a
-	set idno=rr
-	from (select idno,ROW_NUMBER() over (order by memo,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
-	
-	insert @tmp(gno,noa,idno,weight)
-	select '1',noa,MAX(idno)+1,sum(weight) from @tmp group by noa
-end
-else if(@t_order='pic')
-begin
-	--分兩頁
-	update @tmp
-	set picno2=case when picname='直料' then '1' else '2' end
-	
-	insert @tmp(gno,noa,picno2,weight)
-	select '1',noa,picno2,sum(weight) from @tmp group by noa,picno2
-	
-	update a
-	set idno=rr
-	from (select idno,ROW_NUMBER() over (order by picno2,gno,picno,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
-end
-else
-begin
-	update a
-	set idno=rr
-	from (select idno,ROW_NUMBER() over (order by cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
-	
-	insert @tmp(gno,noa,idno,weight)
-	select '1',noa,MAX(idno)+1,sum(weight) from @tmp group by noa
-end
-
-select
-dbo.getComma(lengthb,2) lengthb,
-dbo.getComma(lengthc,0) lengthc,
-dbo.getComma(mount,0) mount,
-dbo.getComma(weight,0) weight
-,case when len(isnull(imgdata,''))>0 then 
-			'<img src="'+imgdata+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' 
-			else '<span style="display:block'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end image1
-,*
-from @tmp
-order by idno
-;
---******************************************************************************************************
 z_cucp_sf02:--z_cucp_sf02
 SET QUOTED_IDENTIFIER OFF	
 
@@ -355,3 +242,167 @@ dbo.getComma(vh,0) vh,
 dbo.getComma(vw,0) vw,
 * from @result order by noa,gno,no2
 ;
+-----------------------------------------------------------------------------------------------------
+z_cucp_sf04:--z_cucp_sf04
+SET QUOTED_IDENTIFIER OFF	
+
+declare @t_path nvarchar(max) = '[1]'
+declare @t_xnoa nvarchar(100) = case when '#non'= [2] then '' else [2] end
+declare @t_spec nvarchar(100) = case when '#non'= [8] then '' else [8] end
+declare @t_size nvarchar(100) = case when '#non'= [9] then '' else [9] end
+declare @t_memo nvarchar(100) = case when '#non'= [10] then '' else [10] end
+declare @t_bpicno nvarchar(100) = case when '#non'= [11] then '' else [11] end
+declare @t_epicno nvarchar(100) = case when '#non'= [12] then char(255) else [12] end
+declare @t_order nvarchar(100) = case when '#non'= [13] then '' else [13] end
+----------------------------------------------------------------------------------------------------------------------------
+
+declare @tmp table(
+	gno nvarchar(1),
+	idno int,
+	noa nvarchar(100),
+	datea nvarchar(10),
+	mech nvarchar(100),
+	cust nvarchar(200),
+	bdate nvarchar(20),
+	amemo nvarchar(MAX),
+	tmemo nvarchar(MAX),
+	smemo nvarchar(MAX),
+	
+	noq nvarchar(100),
+	productno nvarchar(100),
+	product nvarchar(200),
+	ucolor nvarchar(100),
+	spec nvarchar(100),
+	size nvarchar(100),
+	picno nvarchar(100),
+	picno2 nvarchar(100),--加工排序用
+	picname nvarchar(100),
+	imgdata nvarchar(max),
+	paraf nvarchar(50),
+	parag nvarchar(50),
+	lengthb float,
+	lengthc float,
+	mount float,
+	weight float,
+	class nvarchar(50),
+	memo nvarchar(MAX),
+	bsize nvarchar(100)
+)
+
+insert @tmp
+select '0',0,a.noa,a.datea,a.mech,a.cust,a.bdate,a.memo,'',''
+		,b.noq,b.productno,b.product,b.ucolor,b.spec,b.size,b.picno,b.picno,b.picname
+		,b.imgdata,b.paraf,b.parag,b.lengthb,b.mount1,b.mount,b.weight,b.class,b.memo,b.size2
+from  view_cuc a left join view_cucs b on a.noa=b.noa
+where a.noa=@t_xnoa 
+and (len(@t_spec)=0 or b.spec=@t_spec)
+and (len(@t_size)=0 or b.size=@t_size)
+and (len(@t_memo)=0 or b.memo=@t_memo)
+and (b.picno between @t_bpicno and @t_epicno)
+
+update a
+set tmemo=stuff((select CHAR(59)+size+'-'+spec+'='+dbo.getComma(SUM(weight),0)+'KG' from @tmp where noa=a.noa group by size,spec order by cast(dbo.get_num(size) as int),spec FOR XML PATH('')),1,1,'')
+from @tmp a
+
+update a
+set smemo=stuff((select CHAR(59)+para+'-'+dbo.getComma(SUM(lengthc),0)+'個' from (
+select paraf para,SUM(lengthc) lengthc from @tmp where ISNULL(paraf,'')!='' and isnull(lengthb,0)!=0 group by paraf
+union all
+select parag para,SUM(lengthc) lengthc from @tmp where ISNULL(parag,'')!='' and isnull(lengthb,0)!=0 group by parag
+)tmp group by para order by cast(dbo.get_num(para) as int) FOR XML PATH('')),1,1,'')
+from @tmp a
+
+if(@t_order='memo')
+begin
+	update a
+	set idno=rr
+	from (select idno,ROW_NUMBER() over (order by memo,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
+	
+	insert @tmp(gno,noa,idno,weight)
+	select '1',noa,MAX(idno)+1,sum(weight) from @tmp group by noa
+end
+else if(@t_order='pic')
+begin
+	--分兩頁
+	update @tmp
+	set picno2=case when picname='直料' then '1' else '2' end
+	
+	insert @tmp(gno,noa,picno2,weight)
+	select '1',noa,picno2,sum(weight) from @tmp group by noa,picno2
+	
+	update a
+	set idno=rr
+	from (select idno,ROW_NUMBER() over (order by picno2,gno,picno,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
+end
+else
+begin
+	update a
+	set idno=rr
+	from (select idno,ROW_NUMBER() over (order by cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
+	
+	insert @tmp(gno,noa,idno,weight)
+	select '1',noa,MAX(idno)+1,sum(weight) from @tmp group by noa
+end
+
+select
+dbo.getComma(lengthb,2) lengthb,
+dbo.getComma(lengthc,0) lengthc,
+dbo.getComma(mount,0) mount,
+dbo.getComma(weight,0) weight
+,case when len(isnull(imgdata,''))>0 then 
+			'<img src="'+imgdata+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' 
+			else '<span style="display:block'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end image1
+,*
+from @tmp
+order by idno
+;
+--******************************************************************************************************
+z_cucp_sf04old:--z_cucp_sf04old
+SET QUOTED_IDENTIFIER OFF	
+declare @t_path nvarchar(max) = '[1]'
+declare @t_xnoa nvarchar(100) = case when '#non'= [2] then '' else [2] end
+----------------------------------------------------------------------------------------------------------------------------
+declare @tmp table(
+	gno nvarchar(1),
+	noa nvarchar(100),
+	ordeno nvarchar(50),
+	mech nvarchar(100),
+	cust nvarchar(200),
+	product nvarchar(50),
+	spec nvarchar(100),
+	size nvarchar(100),
+	
+	noq nvarchar(100),
+	color nvarchar(50),
+	picno nvarchar(100),
+	imgdata nvarchar(max),
+	lengthb float,
+	lengthc float,
+	mount float,
+	weight float,
+	class nvarchar(100),
+	memo nvarchar(max)
+)
+insert @tmp
+select '0',a.noa,b.ordeno,a.mech,a.cust,b.product,b.spec,b.size
+		,'',isnull(b.btime,'')+isnull(b.etime,''),b.picno
+		,b.imgorg,b.lengthb,sum(b.mount1),sum(b.mount),sum(b.weight),b.class,b.memo
+from  view_cuc a left join view_cucs b on a.noa=b.noa
+where a.noa=@t_xnoa 
+group by a.noa,a.mech,a.cust,b.spec,b.size,b.ordeno,b.product,b.class,b.memo
+,isnull(b.btime,'')+isnull(b.etime,''),b.picno,b.imgorg,b.lengthb 
+
+insert @tmp(gno,noa,mech,cust,spec,size,lengthc,mount,weight)
+select '1',noa,mech,cust,spec,size,SUM(lengthc),SUM(mount),SUM(weight) from @tmp
+group by noa,mech,cust,spec,size
+
+select 
+dbo.getComma(lengthb,2) lengthb,
+dbo.getComma(lengthc,0) lengthc,
+dbo.getComma(mount,0) mount,
+dbo.getComma(weight,0) weight
+,case when len(isnull(imgdata,''))>0 then 
+			'<img src="'+imgdata+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' 
+			else '<span style="display:block'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end image1
+,* from @tmp order by noa,spec,dbo.get_num(size),gno
+,color,picno,lengthb,lengthc;
