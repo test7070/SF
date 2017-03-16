@@ -393,6 +393,13 @@
                     alert(t_err);
                     return;
                 }
+                
+                for(var i=0;i<q_bbsCount;i++){
+                	//106/03/16 長度=0 刪除
+                	if(emp($('#txtLengthb_'+i).val()) || dec($('#txtLengthb_'+i).val())==0){
+                		$('#btnMinus_'+i).click();
+                	}
+                }
 				
 				$('#txtNoa').val(trim($('#txtNoa').val()));
 				var t_noa = trim($('#txtNoa').val());
@@ -827,6 +834,30 @@
                 	}
 				});
 				
+				$('#btnBtimeCopy').click(function() {
+                	if(q_cur==1 || q_cur==2){
+                		if(!emp($('#cmbBtime_0').val())){
+	                		for (var i = 1; i < q_bbsCount; i++) {
+	                			if(emp($('#cmbBtime_'+i).val())){
+	                				$('#cmbBtime_'+i).val($('#cmbBtime_0').val());
+	                			}
+	                		}
+                		}
+                	}
+				});
+				
+				$('#btnEtimeCopy').click(function() {
+                	if(q_cur==1 || q_cur==2){
+                		if(!emp($('#cmbEtime_0').val())){
+	                		for (var i = 1; i < q_bbsCount; i++) {
+	                			if(emp($('#cmbEtime_'+i).val())){
+	                				$('#cmbEtime_'+i).val($('#cmbEtime_0').val());
+	                			}
+	                		}
+                		}
+                	}
+				});
+				
 				$('#btnOrdeCopy').click(function() {
 					if(q_cur==1 || q_cur==2){
                 		if(!emp($('#txtOrdeno_0').val())){
@@ -1182,7 +1213,7 @@
                 font-size: medium;
             }
             .dbbs {
-                width: 1750px;
+                width: 1850px;
             }
             .dbbs .tbbs {
                 margin: 0;
@@ -1333,8 +1364,14 @@
 						</td>
 						<!--<td style="width:150px;"><a id='lblMech_s'>剪裁機台</a></td>
 						<td style="width:150px;"><a id='lblMech2_s'>成型機台</a></td>-->
-						<td style="width:50px;"><a id='lblBtime_s'> </a></td>
-						<td style="width:50px;"><a id='lblEtime_s'> </a></td>
+						<td style="width:90px;">
+							<a id='lblBtime_s'> </a>
+							<input class="btn" id="btnBtimeCopy" type="button" value='≡' style="font-weight: bold;"  />
+						</td>
+						<td style="width:90px;">
+							<a id='lblEtime_s'> </a>
+							<input class="btn" id="btnEtimeCopy" type="button" value='≡' style="font-weight: bold;"  />
+						</td>
 						<td style="width:40px;"><a id='lblRadius_s'> </a></td>
 						<td style="width:40px;"><a id='lblWidth_s'> </a></td>
 						<td style="width:40px;"><a id='lblDime_s'> </a></td>
