@@ -545,7 +545,7 @@
 							weighttotal();
 						});
 						
-						/*$('#checkWaste_'+j).click(function() {
+						$('#checkWaste_'+j).click(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
@@ -608,7 +608,7 @@
 									$('#txtDime_'+b_seq).val(0);
 							}
 							weighttotal();
-						});*/
+						});
 						
 						$('#txtPicno_' + j).bind('contextmenu', function(e) {
                             /*滑鼠右鍵*/
@@ -1061,27 +1061,27 @@
 				for (var i = 0; i < q_bbsCount; i++) {
 					if(q_cur==1 || q_cur==2){
 						$('#checkMins_'+i).removeAttr('disabled');
-						/*$('#checkHours_'+i).removeAttr('disabled');
+						$('#checkHours_'+i).removeAttr('disabled');
 						$('#checkWaste_'+i).removeAttr('disabled');
 						
 						$('#checkRadius_'+i).removeAttr('disabled');
 						$('#checkWidth_'+i).removeAttr('disabled');
-						$('#checkDime_'+i).removeAttr('disabled');*/
+						$('#checkDime_'+i).removeAttr('disabled');
 					}else{
 						$('#checkMins_'+i).attr('disabled', 'disabled');
-						/*$('#checkHours_'+i).attr('disabled', 'disabled');
+						$('#checkHours_'+i).attr('disabled', 'disabled');
 						$('#checkWaste_'+i).attr('disabled', 'disabled');
 						
 						$('#checkRadius_'+i).attr('disabled', 'disabled');
 						$('#checkWidth_'+i).attr('disabled', 'disabled');
-						$('#checkDime_'+i).attr('disabled', 'disabled');*/
+						$('#checkDime_'+i).attr('disabled', 'disabled');
 					}
 					if($('#txtMins_'+i).val()==0){
 						$('#checkMins_'+i).prop('checked',false);
 					}else{
 						$('#checkMins_'+i).prop('checked',true);
 					}
-					/*if($('#txtWaste_'+i).val()==0){
+					if($('#txtWaste_'+i).val()==0){
 						$('#checkWaste_'+i).prop('checked',false);
 					}else{
 						$('#checkWaste_'+i).prop('checked',true);
@@ -1106,7 +1106,7 @@
 						$('#checkDime_'+i).prop('checked',false);
 					}else{
 						$('#checkDime_'+i).prop('checked',true);
-					}*/
+					}
 				}
 			}
 			
@@ -1213,7 +1213,7 @@
                 font-size: medium;
             }
             .dbbs {
-                width: 1750px;
+                width: 1850px;
             }
             .dbbs .tbbs {
                 margin: 0;
@@ -1372,12 +1372,12 @@
 							<a id='lblEtime_s'> </a>
 							<input class="btn" id="btnEtimeCopy" type="button" value='≡' style="font-weight: bold;"  />
 						</td>
-						<!--<td style="width:40px;"><a id='lblRadius_s'> </a></td>
+						<td style="width:40px;"><a id='lblRadius_s'> </a></td>
 						<td style="width:40px;"><a id='lblWidth_s'> </a></td>
-						<td style="width:40px;"><a id='lblDime_s'> </a></td>-->
+						<td style="width:40px;"><a id='lblDime_s'> </a></td>
 						<td style="width:40px;"><a id='lblMins_s'> </a></td>
-						<!--<td style="width:40px;"><a id='lblHours_s'> </a></td>
-						<td style="width:40px;"><a id='lblWaste_s'> </a></td>-->
+						<td style="width:40px;"><a id='lblHours_s'> </a></td>
+						<td style="width:40px;"><a id='lblWaste_s'> </a></td>
 					</tr>
 					<tr  style='background:#cad3ff;'>
 						<td align="center"><input class="btn" id="btnMinus.*" type="button" value='-' style=" font-weight: bold;" /></td>
@@ -1448,7 +1448,7 @@
 						</td>-->
 						<td><select id="cmbBtime.*" class="txt c1"> </select></td>
 						<td><select id="cmbEtime.*" class="txt c1"> </select></td>
-						<!--<td>
+						<td>
 							<input id="checkRadius.*" type="checkbox"/>
 							<input id="txtRadius.*" type="hidden"/>
 						</td>
@@ -1459,19 +1459,19 @@
 						<td>
 							<input id="checkDime.*" type="checkbox"/>
 							<input id="txtDime.*" type="hidden"/>
-						</td>-->
+						</td>
 						<td>
 							<input id="checkMins.*" type="checkbox"/>
 							<input id="txtMins.*" type="hidden"/>
 						</td>
-						<!--<td>
+						<td>
 							<input id="checkHours.*" type="checkbox"/>
 							<input id="txtHours.*" type="hidden"/>
 						</td>
 						<td>
 							<input id="checkWaste.*" type="checkbox"/>
 							<input id="txtWaste.*" type="hidden"/>
-						</td>-->
+						</td>
 					</tr>
 				</table>
 			</div>

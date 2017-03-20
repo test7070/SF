@@ -84,22 +84,14 @@
 				//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
 				var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
                 var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
-				q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
+				
+				//106/03/20 不使用
+				//q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
 				
 				//q_cmbParse("combSize", ',#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16');
 				//q_cmbParse("combOrder",' @ ,memo@備註(標籤)');
-				q_cmbParse("combMechno2",'1@1剪,2@2剪,3@3剪,7@7辦公室');
+				q_cmbParse("combMechno2",'成型組');
 				$('#combOrder').val('memo');//1124預設
-				
-				if(r_userno.toUpperCase()=='B01'){
-					$('#combMechno2').val('1');
-				}else if(r_userno.toUpperCase()=='B02'){
-					$('#combMechno2').val('2');
-				}else if(r_userno.toUpperCase()=='B03'){
-					$('#combMechno2').val('3');
-				}else{
-					$('#combMechno2').val('7');
-				}
 				
 				//關閉彈出視窗
 				$('#btnDialog_close').click(function() {
@@ -1305,12 +1297,16 @@
                     	break;
 					case 'mech':
 						var as = _q_appendData("mech", "", true);
-						t_mech='@';
+						t_mech='@',t_select='';
 						for ( i = 0; i < as.length; i++) {
 							t_mech+=","+as[i].noa+"@"+as[i].mech;
+							if(t_select.length==0 && as[i].mech.indexOf('成型')>-1){
+								t_select=as[i].noa;
+							}
 						}
-						$('#combMechno').text();
+						$('#combMechno').text('');
 						q_cmbParse("combMechno", t_mech);
+						$('#combMechno').val(t_select);
 						break;
 					/*case 'nouno_getuno':
 						var as = _q_appendData("view_cubs", "", true);
@@ -2133,6 +2129,7 @@
 		<a class="lbl">人員組別</a>&nbsp;
 			<select id="combMechno2" class="txt" style="font-size: medium;"> </select>
 		<a class="lbl">生產記錄備註</a>&nbsp;<input id="textMemo"  type="text" class="txt" style="width: 300px;"/>
+		<!--106/03/20 不使用
 		<input type='button' id='btnCub' style='font-size:16px;' value="入庫"/>
 		<input type='button' id='btnCancels' style='font-size:16px;' value="取消鎖定"/>
 		<input type='button' id='btnClear' style='font-size:16px;' value="畫面刷新"/>
@@ -2146,12 +2143,11 @@
 		&nbsp;<a class="lbl">工　地</a>&nbsp;
 		<input id="textMech"  type="text" class="txt" style="width: 150px;" disabled="disabled"/>
 		&nbsp;<a class="lbl">備註(標籤)</a>&nbsp;
-		<!--<input id="textMemos"  type="text" class="txt" style="width: 150px;"/>-->
 		<select id="combMemos" class="txt" style="font-size: medium;"> </select>
 		<input type='button' id='btnImport' style='font-size:16px;' value="選擇加工品項"/>
 		<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<a style="color: red;">※機台鎖定時間超過15分鐘將自動解除鎖定</a>
-		<div id="cucs" style="float:left;width:100%;height:500px;overflow:auto;position: relative;"> </div> 
+		<div id="cucs" style="float:left;width:100%;height:500px;overflow:auto;position: relative;"> </div> -->
 		<!--<div id="cucs_control" style="width:100%;"> </div>--> 
 		<div id="cuct" style="float:left;width:100%;height:80px;overflow:auto;position: relative;"> </div>
 		<div id="cucu" style="float:left;width:100%;height:80px;overflow:auto;position: relative;"> </div>

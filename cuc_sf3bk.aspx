@@ -49,12 +49,12 @@
 						if(!emp($('#cucs_noa'+i).text()) && new_where.indexOf($('#cucs_noa'+i).text()+$('#cucs_noq'+i).text())==-1)
 							new_where=new_where+" or (a.noa+'-'+b.noq='"+$('#cucs_noa'+i).text()+"-"+$('#cucs_noq'+i).text()+"' )";
 					}
-					//var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+					//var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) )  order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 					//105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-					//105/12/16 依加工單判斷是否要續接
-					//var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-					var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-					var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
+					//105/12/16 依加工單判斷是否要成型
+					//var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+					var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+					var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
 					q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'importcucs', r_accy);
 					Lock();
 				}
@@ -75,21 +75,20 @@
                 $('#textDatea').mask(r_picd);
                 $('#textDatea').val(q_date());
                 q_cur=2;
-                document.title='現場續接作業';
+                document.title='現場成型作業';
 				
 				//載入案號 資料 --先用 加工名稱排除 板料 和 直料 //編號目前不知道
-                //var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+                //var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) )  order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
                 //105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-                //105/12/16 依加工單判斷是否要續接
-                //var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-                var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-                var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
-				//106/03/20 不使用
-				//q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
+                //105/12/16 依加工單判斷是否要成型
+				//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+				var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+                var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
+				q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
 				
 				//q_cmbParse("combSize", ',#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16');
 				//q_cmbParse("combOrder",' @ ,memo@備註(標籤)');
-				q_cmbParse("combMechno2",'續接組');
+				q_cmbParse("combMechno2",'1@1剪,2@2剪,3@3剪,7@7辦公室');
 				$('#combOrder').val('memo');//1124預設
 				
 				if(r_userno.toUpperCase()=='B01'){
@@ -124,9 +123,9 @@
 				});*/
 				
 				$('#lblCucnoa').click(function() {
-					//105/12/16 依加工單判斷是否要續接
-					//q_box("cuc_vu_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(waste,0)=0 and isnull(hours,0)=0 and (isnull(paraf,'')!='' or isnull(parag,'')!='') and isnull(picname,'')!='板料' and isnull(picname,'')!='' ) ;" + r_accy, 'cuc_vu_b', "95%", "95%", '加工單');
-					q_box("cuc_vu_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(waste,0)=0 and isnull(hours,0)=0 and isnull(width,0)=1 ) ;" + r_accy, 'cuc_vu_b', "95%", "95%", '加工單');
+					//105/12/16 依加工單判斷是否要成型
+					//q_box("cuc_vu_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(waste,0)=0 and isnull(picname,'')!='直料' and isnull(picname,'')!='板料' and isnull(picname,'')!='' ) ;" + r_accy, 'cuc_vu_b', "95%", "95%", '加工單');
+					q_box("cuc_vu_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(waste,0)=0 and isnull(dime,0)=1 ) ;" + r_accy, 'cuc_vu_b', "95%", "95%", '加工單');
 				});
 				
 				$('#combCucno').change(function() {
@@ -152,12 +151,11 @@
 							return;
 						}
                 		
-	                    //var t_where = " 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ";
+	                    //var t_where = " 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) ) ";
 	                    //105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-	                    //105/12/16 依加工單判斷是否要續接
-	                    //var t_where = " 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ";
-	                    var t_where = " 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 ";
-	                    
+	                    //105/12/16 依加工單判斷是否要成型
+	                    //var t_where = " 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ";
+	                    var t_where = " 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 ";
 	                    t_where += q_sqlPara2("a.noa", t_cucno);
 	                    if(t_memos!='#non'){
 	                    	if(t_memos==''){
@@ -168,7 +166,7 @@
 	                    }
 	                    
 	                    t_where="swhere"+t_where+" order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-	                    var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
+	                    var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
 	                    q_box("cucs_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";"+t_where+t_where1+" ;" + r_accy, 'cucs_sf_b', "95%", "95%", '加工單');
 	                    
 	                    /*Lock();
@@ -207,12 +205,12 @@
 						$(this).click();
                     });*/
                 	//初始化cucs
-                	//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='')  and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+                	//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0  and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) )  order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
                 	//105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-                	//105/12/16 依加工單判斷是否要續接
-                	//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='')  and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
-                	var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
-                	var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
+                	//105/12/16 依加工單判斷是否要成型
+					//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+					var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+                	var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
 					q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
                 });
                 
@@ -243,23 +241,23 @@
 						
 						if(t_err.length>0){
 							if(confirm(t_err)){
-								//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+								//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) )  order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 								//105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-								//105/12/16 依加工單判斷是否要續接
-								//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
+								//105/12/16 依加工單判斷是否要成型
+								//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'tocub', r_accy);
 								Lock();
 							}
 						}else{
 							if(confirm("確定是否要入庫?")){//確定轉至加工單
-								//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+								//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) )  order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 								//105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-								//105/12/16 依加工單判斷是否要續接
-								//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
+								//105/12/16 依加工單判斷是否要成型
+								//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'tocub', r_accy);
 								Lock();
 							}
@@ -632,7 +630,7 @@
 	                   	if(confirm("確認要入庫?")){
 	                   		Lock();
 		                   	q_func('qtxt.query.cucutocubs', 'cuc_sf.txt,cucutocubs,'
-							+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno+';'+r_name+';'+ts_bbu+';3');
+							+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno+';'+r_name+';'+ts_bbu+';2');
 						}
 					}
 				});
@@ -692,22 +690,20 @@
 				switch (t_name) {
 					case 'init':
 						//載入bbs表頭
-						var string = "<table id='cucs_table' style='width:1500px;word-break:break-all;'>";
+						var string = "<table id='cucs_table' style='width:1450px;word-break:break-all;'>";
 						string+='<tr id="cucs_header">';
 						string+='<td id="cucs_chk" align="center" style="width:30px; color:black;">鎖定</td>';
 						string+='<td id="cucs_cubno" align="center" style="width:20px; color:black;display:none;">鎖定人</td>'
-						string+='<td id="cucs_noa" align="center" style="width:70px; color:black;">案號</td>'
+						string+='<td id="cucs_noa" align="center" style="width:110px; color:black;">案號</td>'
 						string+='<td id="cucs_noq" align="center" style="width:40px; color:black;">案序</td>'
 						string+='<td id="cucs_ucolor" title="類別" align="center" style="width:120px; color:black;display:none;">類別</td>';
 						string+='<td id="cucs_product" title="品名" align="center" style="width:70px; color:black;display:none;">品名</td>';
-						string+='<td id="cucs_picno" title="型狀" align="center" style="width:50px; color:black;display:none;">型狀</td>';
-						string+='<td id="cucs_picname" title="型狀名稱" align="center" style="width:80px; color:black;">型狀名稱</td>';
-						string+='<td id="cucs_paraf" title="續接材料1" align="center" style="width:50px; color:black;">續接<BR>材料1</td>';
-						string+='<td id="cucs_parag" title="續接材料2" align="center" style="width:50px; color:black;">續接<BR>材料2</td>';
-						string+='<td id="cucs_pic" title="續接工作圖" align="center" style="width:170px; color:black;">續接工作圖</td>';
-						string+='<td id="cucs_spec" title="材質" align="center" style="width:80px; color:black;">材質</td>';
-						string+='<td id="cucs_size" title="號數" align="center" style="width:50px; color:black;">號數</td>';
-						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:50px; color:black;">米數</td>';
+						string+='<td id="cucs_picno" title="加工型式" align="center" style="width:50px; color:black;display:none;">加工型式</td>';
+						string+='<td id="cucs_picname" title="加工名稱" align="center" style="width:80px; color:black;">加工名稱</td>';
+						string+='<td id="cucs_pic" title="型狀" align="center" style="width:170px; color:black;">型狀</td>';
+						string+='<td id="cucs_spec" title="材質" align="center" style="width:90px; color:black;">材質</td>';
+						string+='<td id="cucs_size" title="號數" align="center" style="width:60px; color:black;">號數</td>';
+						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:60px; color:black;">米數</td>';
 						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:50px; color:black;" class="co1">訂單件數</td>';
 						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:50px; color:black;" class="co1">訂單支數</td>';
 						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:50px; color:black;" class="co1">訂單重量</td>';
@@ -721,37 +717,34 @@
 						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;" class="co3">支數<BR><input id="btnAutoxcount" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
 						string+='<td id="cucs_xweight" title="重量" align="center" style="width:60px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
 						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;display:none;">廠牌</td>';
-						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:100px; color:black;">備註(標籤)</td>';
+						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:110px; color:black;">備註(標籤)</td>';
 						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;">工令</td>';
 						string+='<td id="cucs_custno" title="客戶編號" align="center" style="width:75px; color:black;display:none;">客戶編號</td>';
 						string+='<td id="cucs_cust" title="客戶名稱" align="center" style="width:75px; color:black;">客戶名稱</td>';
 						string+='<td id="cucs_ordeno" title="訂單號碼" align="center" style="width:90px; color:black;display:none;">訂單號碼</td>';
 						string+='<td id="cucs_no2" title="訂單序號" align="center" style="width:90px; color:black;display:none;">訂單序號</td>';
 						//string+='<td id="cucs_waste" align="center" style="width:30px; color:black;">完工</td>';
-						string+="<td id='cucs_hours' align='center' style='width:35px; color:black;'><input type='button' id='btnHours' style='font-size:16px;width: 30px;height: 45px;white-space: inherit;' value='完工'/></td>";
-						string+='<td id="cucs_waste" title="待成型" align="center" style="width:30px; color:black;">待成型</td>';
+						string+="<td id='cucs_waste' align='center' style='width:35px; color:black;'><input type='button' id='btnWaste' style='font-size:16px;width: 30px;height: 45px;white-space: inherit;' value='完工'/></td>";
 						string+='</tr>';
 						string+='</table>';
 						$('#cucs').html(string);
 						
 						//浮動表頭
 						var string = "<div id='cucs_float' style='position:absolute;display:block;left:0px; top:0px;'>";
-						string+="<table id='cucs_table2' style='width:1500px;border-bottom: none;'>";
+						string+="<table id='cucs_table2' style='width:1450px;border-bottom: none;'>";
 						string+='<tr id="cucs_header">';
 						string+='<td id="cucs_chk" align="center" style="width:30px; color:black;">鎖定</td>';
 						string+='<td id="cucs_cubno" align="center" style="width:20px; color:black;display:none;">鎖定人</td>'
-						string+='<td id="cucs_noa" align="center" style="width:70px; color:black;">案號</td>'
+						string+='<td id="cucs_noa" align="center" style="width:110px; color:black;">案號</td>'
 						string+='<td id="cucs_noq" align="center" style="width:40px; color:black;">案序</td>'
 						string+='<td id="cucs_ucolor" title="類別" align="center" style="width:120px; color:black;display:none;">類別</td>';
 						string+='<td id="cucs_product" title="品名" align="center" style="width:70px; color:black;display:none;">品名</td>';
-						string+='<td id="cucs_picno" title="型狀" align="center" style="width:50px; color:black;display:none;">型狀</td>';
-						string+='<td id="cucs_picname" title="型狀名稱" align="center" style="width:80px; color:black;">型狀名稱</td>';
-						string+='<td id="cucs_paraf" title="續接材料1" align="center" style="width:50px; color:black;">續接<BR>材料1</td>';
-						string+='<td id="cucs_parag" title="續接材料2" align="center" style="width:50px; color:black;">續接<BR>材料2</td>';
-						string+='<td id="cucs_pic" title="續接工作圖" align="center" style="width:170px; color:black;">續接工作圖</td>';
-						string+='<td id="cucs_spec" title="材質" align="center" style="width:80px; color:black;">材質</td>';
-						string+='<td id="cucs_size" title="號數" align="center" style="width:50px; color:black;">號數</td>';
-						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:50px; color:black;">米數</td>';
+						string+='<td id="cucs_picno" title="加工型式" align="center" style="width:50px; color:black;display:none;">加工型式</td>';
+						string+='<td id="cucs_picname" title="加工名稱" align="center" style="width:80px; color:black;">加工名稱</td>';
+						string+='<td id="cucs_pic" title="型狀" align="center" style="width:170px; color:black;">型狀</td>';
+						string+='<td id="cucs_spec" title="材質" align="center" style="width:90px; color:black;">材質</td>';
+						string+='<td id="cucs_size" title="號數" align="center" style="width:60px; color:black;">號數</td>';
+						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:60px; color:black;">米數</td>';
 						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:50px; color:black;" class="co1">訂單件數</td>';
 						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:50px; color:black;" class="co1">訂單支數</td>';
 						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:50px; color:black;" class="co1">訂單重量</td>';
@@ -765,15 +758,14 @@
 						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;" class="co3">支數<BR><input id="btnAutoxcount2" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
 						string+='<td id="cucs_xweight" title="重量" align="center" style="width:60px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
 						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;display:none;">廠牌</td>';
-						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:100px; color:black;">備註(標籤)</td>';
+						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:110px; color:black;">備註(標籤)</td>';
 						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;">工令</td>';
 						string+='<td id="cucs_custno" title="客戶編號" align="center" style="width:75px; color:black;display:none;">客戶編號</td>';
 						string+='<td id="cucs_cust" title="客戶名稱" align="center" style="width:75px; color:black;">客戶名稱</td>';
 						string+='<td id="cucs_ordeno" title="訂單號碼" align="center" style="width:90px; color:black;display:none;">訂單號碼</td>';
 						string+='<td id="cucs_no2" title="訂單序號" align="center" style="width:90px; color:black;display:none;">訂單序號</td>';
 						//string+='<td id="cucs_waste" align="center" style="width:30px; color:black;">完工</td>';
-						string+="<td id='cucs_hours' align='center' style='width:35px; color:black;'><input type='button' id='btnHours2' style='font-size:16px;width: 30px;height: 45px;white-space: inherit;' value='完工'/></td>";
-						string+='<td id="cucs_waste" title="待成型" align="center" style="width:30px; color:black;">待成型</td>';
+						string+="<td id='cucs_waste' align='center' style='width:35px; color:black;'><input type='button' id='btnWaste2' style='font-size:16px;width: 30px;height: 45px;white-space: inherit;' value='完工'/></td>";
 						string+='</tr>';
 						string+='</table>';
 						$('#cucs_float').remove();
@@ -818,9 +810,9 @@
 						});
 						
 						//完工
-		                $('#btnHours').click(function() {
+		                $('#btnWaste').click(function() {
 		                	t_mins_count=0;
-		                	$('#cucs .cucs_hours').each(function(index) {
+		                	$('#cucs .cucs_waste').each(function(index) {
 								if($(this).prop('checked')){
 									t_mins_count++;
 								}
@@ -828,12 +820,12 @@
 							
 							if(t_mins_count>0){
 								if(confirm("確認要完工?")){
-									$('#cucs .cucs_hours').each(function(index) {
+									$('#cucs .cucs_waste').each(function(index) {
 										if($(this).prop('checked')){
-											var n=$(this).attr('id').replace('cucs_hours','')
+											var n=$(this).attr('id').replace('cucs_waste','')
 											t_endanoa=$('#cucs_noa'+n).text();
 											t_endanoq=$('#cucs_noq'+n).text();
-											q_func('qtxt.query.enda', 'cuc_sf.txt,hours,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name);
+											q_func('qtxt.query.enda', 'cuc_sf.txt,waste,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name);
 										}
 									});
 								}else{
@@ -844,8 +836,8 @@
 							}
 						});
 						
-						$('#btnHours2').click(function() {
-                        	$('#btnHours').click();
+						$('#btnWaste2').click(function() {
+                        	$('#btnWaste').click();
 						});
                         break;
 					case 'importcucs':
@@ -927,8 +919,6 @@
 										$('#cucs_size'+j).text(as[i].size);
 										$('#cucs_picno'+j).text(as[i].picno);
 										$('#cucs_picname'+j).text(as[i].picname);
-										$('#cucs_paraf'+j).text(as[i].paraf);
-										$('#cucs_parag'+j).text(as[i].parag);
 										$('#cucs_pic'+j).html('<img src="'+as[i].imgdata+'" style="width:100%;">');
 										$('#cucs_lengthb'+j).text(as[i].lengthb);
 										$('#cucs_mount'+j).text(as[i].mount);
@@ -947,7 +937,6 @@
 										$('#cucs_cust'+j).text(as[i].acust.substr(0,4));
 										$('#cucs_ordeno'+j).text(as[i].ordeno);
 										$('#cucs_no2'+j).text(as[i].no2);
-										$('#cucs_waste'+j).text((as[i].picname!='直料' && as[i].picname!='板料' && as[i].picname!='')?'Y':'');
 										
 										//移除已存在的資料
 										as.splice(i, 1);
@@ -976,8 +965,6 @@
 									$('#cucs_size'+j).text('');
 									$('#cucs_picno'+j).text('');
 									$('#cucs_picname'+j).text('');
-									$('#cucs_paraf'+j).text('');
-									$('#cucs_parag'+j).text('');
 									$('#cucs_pic'+j).html('');
 									$('#cucs_lengthb'+j).text('');
 									$('#cucs_mount'+j).text('');
@@ -997,8 +984,7 @@
 									$('#cucs_cust'+j).text('');
 									$('#cucs_ordeno'+j).text('');
 									$('#cucs_no2'+j).text('');
-									$('#cucs_hours'+j).remove();
-									$('#cucs_waste'+j).text('');
+									$('#cucs_waste'+j).remove();
 								}
 							}
 							table_noa=$('#cucs_noa'+(bbsrow-1)).text();
@@ -1017,8 +1003,6 @@
 								string+='<td id="cucs_product'+(i+bbsrow)+'" style="display:none;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_picno'+(i+bbsrow)+'" style="display:none;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_picname'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
-								string+='<td id="cucs_paraf'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
-								string+='<td id="cucs_parag'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_pic'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_spec'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_size'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
@@ -1043,7 +1027,6 @@
 								string+='<td id="cucs_ordeno'+(i+bbsrow)+'" style="display:none;font-size: 12px;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_no2'+(i+bbsrow)+'" style="display:none;font-size: 12px;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td style="text-align: center;"></td>';
-								string+='<td id="cucs_waste'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='</tr>';
 								bbsrow++;
 							}
@@ -1057,8 +1040,6 @@
 							string+='<td id="cucs_product'+(i+bbsrow)+'" style="display:none;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].product+'</td>';
 							string+='<td id="cucs_picno'+(i+bbsrow)+'" style="display:none;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].picno+'</td>';
 							string+='<td id="cucs_picname'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].picname+'</td>';
-							string+='<td id="cucs_paraf'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].paraf+'</td>';
-							string+='<td id="cucs_parag'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].parag+'</td>';
 							string+='<td id="cucs_pic'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"><img src="'+as[i].imgdata+'" style="width:100%;"></td>';
 							string+='<td id="cucs_spec'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].spec+'</td>';
 							string+='<td id="cucs_size'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].size+'</td>';
@@ -1082,8 +1063,7 @@
 							string+='<td id="cucs_cust'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].acust.substr(0,4)+'</td>';
 							string+='<td id="cucs_ordeno'+(i+bbsrow)+'" style="display:none;font-size: 12px;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].ordeno+'</td>';
 							string+='<td id="cucs_no2'+(i+bbsrow)+'" style="display:none;font-size: 12px;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].no2+'</td>';
-							string+='<td style="text-align: center;"><input id="cucs_hours'+(i+bbsrow)+'" class="cucs_hours" type="checkbox"/></td>';
-							string+='<td id="cucs_waste'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+((as[i].picname!='直料' && as[i].picname!='板料' && as[i].picname!='')?'Y':'')+'</td>';
+							string+='<td style="text-align: center;"><input id="cucs_waste'+(i+bbsrow)+'" class="cucs_waste" type="checkbox"/></td>';
 							string+='</tr>';
 							
 							table_noa=as[i].noa;
@@ -1120,16 +1100,9 @@
 						//事件更新
 						$('#cucs .cucs_chk').unbind('click');
 						$('#cucs .cucs_chk').click(function(e) {
-							//106/08/11 不同案號不能選取
 							var n=$(this).attr('id').replace('cucs_chk','')
 							if($(this).prop('checked')){
 								var t_err = q_chkEmpField([['combMechno', '機　台']]);
-								if(chk_cucs.length>0){
-									if(chk_cucs[0].noa!=$('#cucs_noa' + n).text()){
-										t_err="只能鎖定相同的案號!!";
-									}
-								}
-								
 				                if (t_err.length > 0 || chk_cucs.length>=8) {
 				                	if(t_err.length>0)
 				                    	alert(t_err);
@@ -1151,12 +1124,12 @@
 				                }
 							}
 							//Lock();
-							//var t_where="where=^^  1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ^^";
+							//var t_where="where=^^  1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) )  ^^";
 							//105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-							//105/12/16 依加工單判斷是否要續接
-							//var t_where="where=^^  1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ^^";
-							var t_where="where=^^  1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 ^^";
-							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
+							//105/12/16 依加工單判斷是否要成型
+							//var t_where = "where=^^ 1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ^^";
+							var t_where = "where=^^ 1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 ^^";
+							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
 							//判斷是否能被鎖定或解除
 							if($(this).prop('checked')){
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'getcanlock_'+n, r_accy);
@@ -1238,12 +1211,12 @@
 								if($('#cucs_noa'+i).text()==imp_cucno && !$('#cucs_chk'+i).prop('checked')
 								&& !$('#cucs_chk'+i).prop('disabled')){ //沒有被核取過的資料 且目前沒被鎖定過
 									$('#cucs_chk'+i).prop('checked',true).parent().parent().find('td').css('background', 'darkturquoise');
-									//var t_where="where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ^^";
+									//var t_where="where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) )  ^^";
 									//105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-									//105/12/16 依加工單判斷是否要續接
-									//var t_where="where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ^^";
-									var t_where="where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 ^^";
-									var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
+									//105/12/16 依加工單判斷是否要成型
+									//var t_where = "where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' ^^";
+									var t_where = "where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 ^^";
+									var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
 									q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'getcanlock_'+i, r_accy);
 									//$('#cucs_chk'+i).click();
 									//$('#cucs_chk'+i).prop('checked',true).parent().parent().find('td').css('background', 'darkturquoise');
@@ -1321,7 +1294,7 @@
 	                    		}
 	                    		q_func('qtxt.query.cucstocub', 'cuc_sf.txt,cucstocub,'
 	                    		+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'
-	                    		+r_userno+';'+r_name+';'+t_noa+';'+t_noq+';'+t_xmount+';'+t_xcount+';'+t_xweight+';3');
+	                    		+r_userno+';'+r_name+';'+t_noa+';'+t_noq+';'+t_xmount+';'+t_xcount+';'+t_xweight+';2');
 	                    		//取消刷新
 	                    		//clearInterval(intervalupdate);
 							}
@@ -1332,16 +1305,12 @@
                     	break;
 					case 'mech':
 						var as = _q_appendData("mech", "", true);
-						t_mech='@',t_select='';
+						t_mech='@';
 						for ( i = 0; i < as.length; i++) {
 							t_mech+=","+as[i].noa+"@"+as[i].mech;
-							if(t_select.length==0 && as[i].mech.indexOf('續接')>-1){
-								t_select=as[i].noa;
-							}
 						}
-						$('#combMechno').text('');
+						$('#combMechno').text();
 						q_cmbParse("combMechno", t_mech);
-						$('#combMechno').val(t_select);
 						break;
 					/*case 'nouno_getuno':
 						var as = _q_appendData("view_cubs", "", true);
@@ -1738,7 +1707,7 @@
 								}
 							}
 							if(t_nouno.length>0){
-								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_nouno)+ ';' + encodeURI(t_mechno)+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+';3');
+								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_nouno)+ ';' + encodeURI(t_mechno)+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+';2');
 								Lock();
 							}
                 		}
@@ -1785,12 +1754,12 @@
 								if(!emp(b_ret[i].noa) && !emp(b_ret[i].noq))
 									im_where=im_where+" or (a.noa+'-'+b.noq='"+b_ret[i].noa+"-"+b_ret[i].noq+"' )";
 							}
-							//var t_where = "where=^^ 1=1 and ("+im_where+") and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+							//var t_where = "where=^^ 1=1 and ("+im_where+") and isnull(a.gen,0)=0 and isnull(b.mins,0)=1 and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' and ((isnull(b.paraf,'')='' and isnull(b.parag,'')='') or (isnull(b.paraf,'')!='' and isnull(b.parag,'')!='' and isnull(b.hours,0)=1) )  order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 							//105/08/15 因為可能會直接使用庫存或外調半成品 所以不需確定前置階段完工
-							//105/12/16 依加工單判斷是否要續接
-							//var t_where = "where=^^ 1=1 and ("+im_where+") and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and (isnull(b.paraf,'')!='' or isnull(b.parag,'')!='') and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-							var t_where = "where=^^ 1=1 and ("+im_where+") and isnull(a.gen,0)=0 and isnull(b.waste,0)=0 and isnull(b.hours,0)=0 and isnull(b.width,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
-							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='3' ^^";
+							//105/12/16 依加工單判斷是否要成型
+							//var t_where = "where=^^ 1=1 and ("+im_where+") and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.picname,'')!='直料' and isnull(b.picname,'')!='板料' and isnull(b.picname,'')!='' order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+							var t_where = "where=^^ 1=1 and ("+im_where+") and isnull(a.gen,0)=0  and isnull(b.waste,0)=0 and isnull(b.dime,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='2' ^^";
 							q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'importcucs', r_accy);
 							if(chk_cucs.length==0){
 								intervalupdate = setInterval(";");
@@ -1867,13 +1836,13 @@
                             $('#cucs_tr'+i+' .co1').css('background-color', 'antiquewhite');
                             $('#cucs_tr'+i+' .co2').css('background-color', 'lightpink');
                             $('#cucs_tr'+i+' .co3').css('background-color', 'lightsalmon');
-                            $('#cucs_hours' + i).attr('disabled', 'disabled');
+                            $('#cucs_waste' + i).attr('disabled', 'disabled');
 						}else if (islock && cubno.split('##')[0]==r_userno){//自己鎖定
 							$('#cucs_lbla'+i).text('');
 							$('#cucs_chk' + i).removeAttr('disabled');
                             $('#cucs_chk'+i).prop('checked',true).parent().parent().find('td').css('background', 'darkturquoise');
                             $('#combMechno').val(cubno.split('##')[2]!=undefined?cubno.split('##')[2]:'');
-                            $('#cucs_hours' + i).removeAttr('disabled');
+                            $('#cucs_waste' + i).removeAttr('disabled');
                             //text寫入
                             for(var j =0 ;j<chk_cucs.length;j++){
                             	if(chk_cucs[j].noa==$('#cucs_noa'+i).text() && chk_cucs[j].noq==$('#cucs_noq'+i).text()){
@@ -1888,7 +1857,7 @@
 							$('#cucs_lbla'+i).text('');
 							$('#cucs_chk' + i).removeAttr('disabled');
 							$('#cucs_chk'+i).prop('checked',false).parent().parent().find('td').css('background', 'lavender');
-							$('#cucs_hours' + i).removeAttr('disabled');
+							$('#cucs_waste' + i).removeAttr('disabled');
 							$('#cucs_tr'+i+' .co1').css('background-color', 'antiquewhite');
                             $('#cucs_tr'+i+' .co2').css('background-color', 'lightpink');
                             $('#cucs_tr'+i+' .co3').css('background-color', 'lightsalmon');
@@ -1897,7 +1866,7 @@
 						$('#cucs_lbla'+i).text('');
 						$('#cucs_chk' + i).removeAttr('disabled');
 						$('#cucs_chk'+i).prop('checked',false).parent().parent().find('td').css('background', 'lavender');
-						$('#cucs_hours' + i).removeAttr('disabled');
+						$('#cucs_waste' + i).removeAttr('disabled');
 						$('#cucs_tr'+i+' .co1').css('background-color', 'antiquewhite');
 						$('#cucs_tr'+i+' .co2').css('background-color', 'lightpink');
 						$('#cucs_tr'+i+' .co3').css('background-color', 'lightsalmon');
@@ -2153,7 +2122,7 @@
 		<div id='q_acDiv'> </div>
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<input type='button' id='btnAuthority' name='btnAuthority' style='font-size:16px;' value='權限'/>
-		<a style="color: red;font-size: 20px;font-weight: bolder;">現場續接器作業</a>
+		<a style="color: red;font-size: 20px;font-weight: bolder;">現場成型作業</a>
 		<a id='logout' class="lbl" style="color: coral;cursor: pointer;font-weight: bolder;float: right;">登出</a>
 		<BR>
 		<a class="lbl">加工日</a>&nbsp;<input id="textDatea"  type="text" class="txt" style="width: 100px;"/>&nbsp;
@@ -2164,7 +2133,6 @@
 		<a class="lbl">人員組別</a>&nbsp;
 			<select id="combMechno2" class="txt" style="font-size: medium;"> </select>
 		<a class="lbl">生產記錄備註</a>&nbsp;<input id="textMemo"  type="text" class="txt" style="width: 300px;"/>
-		<!--106/03/20 不使用
 		<input type='button' id='btnCub' style='font-size:16px;' value="入庫"/>
 		<input type='button' id='btnCancels' style='font-size:16px;' value="取消鎖定"/>
 		<input type='button' id='btnClear' style='font-size:16px;' value="畫面刷新"/>
@@ -2178,11 +2146,12 @@
 		&nbsp;<a class="lbl">工　地</a>&nbsp;
 		<input id="textMech"  type="text" class="txt" style="width: 150px;" disabled="disabled"/>
 		&nbsp;<a class="lbl">備註(標籤)</a>&nbsp;
+		<!--<input id="textMemos"  type="text" class="txt" style="width: 150px;"/>-->
 		<select id="combMemos" class="txt" style="font-size: medium;"> </select>
 		<input type='button' id='btnImport' style='font-size:16px;' value="選擇加工品項"/>
 		<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		<a style="color: red;">※機台鎖定時間超過15分鐘將自動解除鎖定</a>
-		<div id="cucs" style="float:left;width:100%;height:500px;overflow:auto;position: relative;"> </div>--> 
+		<div id="cucs" style="float:left;width:100%;height:500px;overflow:auto;position: relative;"> </div> 
 		<!--<div id="cucs_control" style="width:100%;"> </div>--> 
 		<div id="cuct" style="float:left;width:100%;height:80px;overflow:auto;position: relative;"> </div>
 		<div id="cucu" style="float:left;width:100%;height:80px;overflow:auto;position: relative;"> </div>

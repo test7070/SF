@@ -198,26 +198,36 @@ declare @result table(
 	done float,
 	stand float,
 	undone float,
+	unfinal float,
 	memo nvarchar(MAX),
-	qhrefa nvarchar(MAX)
+	gen float,
+	qhrefa nvarchar(MAX),
+	qhrefb nvarchar(MAX)
 )
+
 insert @result
 select '0',left(a.cust,4),a.noa,a.bdate
-		,isnull(sum(b.weight),0)
-		,isnull(sum(c.bweight),0)
-		,isnull(sum(c.bweight),0)-isnull(sum(e.vweight),0) 
-		,sum(case when isnull(b.weight,0)-isnull(c.bweight,0)<0 or b.mins=1 then 0 else isnull(b.weight,0)-isnull(c.bweight,0) end)
-		,a.memo
+		,isnull(SUM(b.weight),0)
+		,isnull(SUM(c.bweight),0)+isnull(SUM(d.bweight),0)
+		,isnull(SUM(c.bweight),0)+isnull(SUM(d.bweight),0)-isnull(SUM(e.vweight),0) 
+		,case when isnull(sum(b.weight),0)-isnull(sum(c.bweight),0)-isnull(SUM(d.bweight),0)<0 then 0 else isnull(sum(b.weight),0)-isnull(sum(c.bweight),0)-isnull(SUM(d.bweight),0) end
+		,(isnull(SUM(c.bweight),0)+isnull(SUM(d.bweight),0) -isnull(SUM(e.vweight),0))
+		+(case when isnull(sum(b.weight),0)-isnull(sum(c.bweight),0)-isnull(SUM(d.bweight),0)<0 then 0 else isnull(sum(b.weight),0)-isnull(sum(c.bweight),0)-isnull(SUM(d.bweight),0) end)
+		,a.memo,a.gen
 		,"z_cucp_sf?report=\'z_cucp_sf02\' and noa=\'"+a.noa+"\' and "+a.noa+"=$noa"
+		,''
 from view_cuc a left join view_cucs b on a.noa=b.noa
-outer apply (select cb.uno,cb.weight bweight from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='1' and cb.productno2=a.noa and cb.product2=b.noq )c --只需裁剪
-outer apply (select SUM(gweight) vweight from view_cubt where uno=c.uno)e
+outer apply (select SUM(cb.weight) bweight from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='1' and cb.productno2=a.noa and cb.product2=b.noq and (b.picname='' or b.picname='直料' or b.picname='板料'))c --只需裁剪
+outer apply (select SUM(cb.weight) bweight from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='2' and cb.productno2=a.noa and cb.product2=b.noq and (b.picname!='' and b.picname!='直料' and b.picname!='板料'))d --加工
+outer apply (select SUM(weight) vweight from view_vcct where ordeno=b.ordeno and no2=b.no2)e
 where left(a.datea,7) between @t_bmon and @t_emon
-group by a.cust,a.noa,a.bdate,a.memo
+group by a.cust,a.noa,a.bdate,a.memo,a.gen
 
+update @result
+set qhrefb="z_cucp_sf?report=\'z_cucp_sf03\' and noa=\'"+noa+"\' and "+cast(unfinal as nvarchar(50))+"=$unfinal"
 
 update a
-set undone=0
+set undone=0,unfinal=stand
 from @result a 
 outer apply(select sum(case when mins=0 then 1 else 0 end) mins from view_cucs where noa=a.noa) b 
 where b.mins=0
@@ -225,10 +235,15 @@ where b.mins=0
 --依cuc的gen
 --delete @result where len(@t_type)>0 and isnull(gen,0)!=cast(@t_type as float)
 
+if(@t_type='0')--未結案
+	delete @result where unfinal<=0
+if(@t_type='1')--已結案
+	delete @result where unfinal>0
+
 if((select count(*) from @result)>0)
 begin
-	insert @result(gno,comp,ordeno,done,stand,undone)
-	select '1',char(255),sum(ordeno),sum(done),sum(stand),sum(undone)
+	insert @result(gno,comp,ordeno,done,stand,undone,unfinal)
+	select '1',char(255),sum(ordeno),sum(done),sum(stand),sum(undone),sum(unfinal)
 	from @result
 end
 
@@ -237,6 +252,7 @@ dbo.getComma(ordeno,0) ordeno,
 dbo.getComma(done,0) done,
 dbo.getComma(stand,0) stand,
 dbo.getComma(undone,0) undone,
+dbo.getComma(unfinal,0) unfinal,
 ROW_NUMBER() over (order by gno,noa) recno,
 dbo.charbr(memo,20) memo,
 *
