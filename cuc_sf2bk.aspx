@@ -49,7 +49,7 @@
 						if(!emp($('#cucs_noa'+i).text()) && new_where.indexOf($('#cucs_noa'+i).text()+$('#cucs_noq'+i).text())==-1)
 							new_where=new_where+" or (a.noa+'-'+b.noq='"+$('#cucs_noa'+i).text()+"-"+$('#cucs_noq'+i).text()+"' )";
 					}
-					var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+					var t_where = "where=^^ 1=1 and ("+new_where+") and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(b.radius,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 					var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 					q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'importcucs', r_accy);
 					Lock();
@@ -74,7 +74,7 @@
                 document.title='現場裁剪作業';
 				
 				//載入案號 資料
-                var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+                var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(b.radius,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
                 var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 				q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
 				
@@ -115,7 +115,7 @@
 				});*/
 				
 				$('#lblCucnoa').click(function() {
-					q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
+					q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0 and isnull(radius,0)=1) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
 				});
 				
 				//匯入
@@ -130,7 +130,7 @@
 							return;
 						}
                 		
-	                    var t_where = " 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 ";
+	                    var t_where = " 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(b.radius,0)=1 ";
 	                    t_where += q_sqlPara2("a.noa", t_cucno);
 	                    t_where += q_sqlPara2("b.size", t_size);
 	                    t_where += q_sqlPara2("b.spec", tx_spec);
@@ -176,7 +176,7 @@
 						$(this).click();
                     });*/
                 	//初始化cucs
-                	var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+                	var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(b.radius,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
                 	var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 					q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
                 });
@@ -208,14 +208,14 @@
 						
 						if(t_err.length>0){
 							if(confirm(t_err)){
-								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(b.radius,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'tocub', r_accy);
 								Lock();
 							}
 						}else{
 							if(confirm("確定是否要入庫?")){//確定轉至加工單
-								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(b.radius,0)=1 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'tocub', r_accy);
 								Lock();
@@ -1101,7 +1101,7 @@
 				                }
 							}
 							//Lock();
-							var t_where="where=^^  1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 ^^";
+							var t_where="where=^^  1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(b.radius,0)=1 ^^";
 							var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 							//判斷是否能被鎖定或解除
 							if($(this).prop('checked')){
@@ -1184,7 +1184,7 @@
 								if($('#cucs_noa'+i).text()==imp_cucno && !$('#cucs_chk'+i).prop('checked')
 								&& !$('#cucs_chk'+i).prop('disabled')){ //沒有被核取過的資料 且目前沒被鎖定過
 									$('#cucs_chk'+i).prop('checked',true).parent().parent().find('td').css('background', 'darkturquoise');
-									var t_where="where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 ^^";
+									var t_where="where=^^ 1=1 and a.noa='"+$('#cucs_noa'+i).text()+"' and b.noq='"+$('#cucs_noq'+i).text()+"' and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(b.radius,0)=1 ^^";
 									var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 									q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'getcanlock_'+i, r_accy);
 									//$('#cucs_chk'+i).click();

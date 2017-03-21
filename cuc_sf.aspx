@@ -17,7 +17,7 @@
 			q_desc=1;
             q_tables = 's';
             var q_name = "cuc";
-            var q_readonly = ['txtNoa','txtWorker', 'txtWorker2','textWeight'];
+            var q_readonly = ['txtNoa','txtWorker', 'txtWorker2','textWeight','txtCust'];
             var q_readonlys = ['txtPicname','txtMech','txtMech2'];
             var bbmNum = [];
             var bbsNum = [];
@@ -413,8 +413,19 @@
                     //wrServer(t_noa);
 				}
 				
+				
+				t_bbsordegen=false;
+                var t_ordeno='';
+                
 				for(var i=0;i<q_bbsCount;i++){
                 	createImg(i);
+                	if(t_ordeno.length==0 && !emp($('#txtOrdeno_'+i).val())){
+                		t_ordeno=$('#txtOrdeno_'+i).val();
+                	}
+                }
+                
+                if(t_ordeno.length==0){
+                	t_bbsordegen=true;
                 }
 				
                 var s1 = $('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val();
@@ -951,7 +962,8 @@
                 $('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val(key_value);
                 _btnOk(key_value, bbmKey[0], bbsKey[1], '', 2);
             }
-
+			
+			var t_bbsordegen=false;
             function bbsSave(as) {
                 if (!as['ordeno'] && !as['product']) {
                     as[bbsKey[1]] = '';
@@ -959,6 +971,10 @@
                 }
 
                 q_nowf();
+                if(emp(as['ordeno']) && t_bbsordegen)
+                	as['ordeno'] = abbm2['noa'];
+                if(emp(as['no2']) && t_bbsordegen)
+                	as['no2'] = as['noq'];
 
                 return true;
             }

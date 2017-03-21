@@ -697,7 +697,7 @@ BEGIN
 END
 ;
 ----------------------------------------------------------------------------------------------------------------------------------
-z_ucc_sf04:--z_ucc_sf04 成本表
+z_ucc_sf04:--z_ucc_sf04 三泰庫存表
 SET QUOTED_IDENTIFIER OFF
 declare @t_pno nvarchar(50)
 declare @t_ucolor nvarchar(50)
@@ -800,6 +800,24 @@ select '5','vcct',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,case when a.typea='2' then -1 else 1 end*b.weight*c.price,0,0
 from view_vcc a left join view_vcct b on a.noa=b.noa
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+
+--互換
+--入
+insert #tmp
+select '2','inas',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,0
+,b.weight,b.mweight
+,b.weight*b.mweight,b.mweight,b.weight*b.mweight
+from view_ina a left join view_inas b on a.noa=b.noa
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+--進
+insert #tmp
+select '6','gets',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,0
+,b.weight,b.mweight
+,b.weight*b.mweight,b.mweight,b.weight*b.mweight
+from view_get a left join view_gets b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
 and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
 
@@ -908,7 +926,7 @@ begin
 	end
 	
 	--進貨
-	if(@tablea='rc2s')
+	if(@tablea='rc2s' or @tablea='inas')
 	begin
 		if(@ttotal<=0 or @tweight<=0) --處理超領導致金額不正確 以最近進貨的單價作為目前超領的單價
 			set @ttotal=@tweight*case when @weight=0 then 0 else round(@total/@weight,4) end
@@ -919,7 +937,7 @@ begin
 	end
 	
 	--出貨
-	if(@tablea='vccs' or @tablea='vcct')
+	if(@tablea='vccs' or @tablea='vcct' or @tablea='gets')
 	begin
 		set @tweight=@tweight-@weight
 		set @ttotal=@ttotal-round(@weight*@aprice,4)
@@ -961,7 +979,7 @@ begin
 	where mon>=@t_mon and product=@tproduct and spec=@tspec and size=@tsize and ucolor=@tucolor and lengthb=@tlengthb and class=@tclass
 end
 
-update a set cost=total from #tmp a where a.tablea='rc2s' or a.tablea='ucce'
+update a set cost=total from #tmp a where a.tablea='rc2s' or a.tablea='ucce' or a.tablea='inas'
 ----------------------------------------------------------------
 declare @uweight float=0
 declare @utotal float=0
@@ -1032,14 +1050,14 @@ begin
 		set @ttotal=@total
 	end
 	--進貨--入庫
-	if(@tablea='rc2s')
+	if(@tablea='rc2s' or @tablea='inas')
 	begin
 		set @tweight=@tweight+@weight
 		set @ttotal=@ttotal+@total
 	end
 	
 	--領料--出貨
-	if(@tablea='vccs' or @tablea='vcct')
+	if(@tablea='vccs' or @tablea='vcct' or @tablea='gets')
 	begin
 		if(@total=0)
 			set @total=@weight*case when @tweight=0 then 0 else @ttotal/@tweight end
@@ -1091,8 +1109,8 @@ set rw=isnull(b.weight,0),rm=isnull(b.cost,0),
 	vw=isnull(c.weight,0),vc=isnull(c.cost,0),
 	vm=isnull(c.total,0),profit=case when isnull(c.cost,0)=0 then 0 else round((isnull(c.total,0)-isnull(c.cost,0))/c.cost*100,2) end
 from #tmpa a
-outer apply (select SUM(weight)weight,SUM(cost)cost from #tmp where product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and tablea='rc2s' and datea between @t_bdate and @t_edate)b
-outer apply (select SUM(weight)weight,SUM(cost)cost,SUM(total)total from #tmp where product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class  and (tablea='vccs' or tablea='vcct') and datea between @t_bdate and @t_edate )c
+outer apply (select SUM(weight)weight,SUM(cost)cost from #tmp where product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and (tablea='rc2s' or tablea='inas') and datea between @t_bdate and @t_edate)b
+outer apply (select SUM(weight)weight,SUM(cost)cost,SUM(total)total from #tmp where product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class  and (tablea='vccs' or tablea='vcct' or tablea='gets') and datea between @t_bdate and @t_edate )c
 
 update #tmpa
 set dw=round(lw-(bw+rw-vw),4)
@@ -1100,21 +1118,21 @@ set dw=round(lw-(bw+rw-vw),4)
 
 delete #tmpa where bw=0 and rw=0 and vw=0 and dw=0 and lw=0
 
-insert #tmpa (gno,product,spec,bw,bm,rw,rm,vw,vc,vm,profit,dw,dm,lw,lp,lm)
-select '2'gno,product,spec
+insert #tmpa (gno,product,spec,size,bw,bm,rw,rm,vw,vc,vm,profit,dw,dm,lw,lp,lm)
+select '2'gno,product,spec,size
 ,sum(bw),sum(bm),sum(rw),sum(rm)
 ,sum(vw),sum(vc),sum(vm)
 ,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
 ,sum(dw),sum(dm),sum(lw),case when sum(lw)=0 then 0 else round(sum(lm)/sum(lw),4) end,sum(lm)
-from #tmpa where gno='9' group by product,spec
+from #tmpa where gno='9' group by product,spec,size
 
 if((select count(*) from #tmpa where gno='2')>0)
 begin
 	insert #tmpa (gno)
 	select '1'gno
 	
-	insert #tmpa (gno,product,spec,bw,bm,rw,rm,vw,vc,vm,profit,dw,dm,lw,lp,lm)
-	select '3'gno,CHAR(255),CHAR(255)
+	insert #tmpa (gno,product,spec,size,bw,bm,rw,rm,vw,vc,vm,profit,dw,dm,lw,lp,lm)
+	select '3'gno,CHAR(255),CHAR(255),CHAR(255)
 	,sum(bw),sum(bm),sum(rw),sum(rm)
 	,sum(vw),sum(vc),sum(vm)
 	,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
@@ -1160,6 +1178,22 @@ select '5','vcct',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,case when a.typea='2' then -1 else 1 end*b.mount*c.price,0,0
 from view_vcc a left join view_vcct b on a.noa=b.noa
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
+and (isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+
+--互換
+--入
+insert #tmp
+select '2','inas',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,0,b.mweight,b.mount*b.mweight,b.mweight,b.mount*b.mweight
+from view_ina a left join view_inas b on a.noa=b.noa
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
+and (isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+--進
+insert #tmp
+select '6','gets',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,0,b.mweight,b.mount*b.mweight,b.mweight,b.mount*b.mweight
+from view_get a left join view_gets b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 and (isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
 
@@ -1223,7 +1257,7 @@ begin
 	end
 	
 	--進貨
-	if(@tablea='rc2s')
+	if(@tablea='rc2s' or @tablea='inas')
 	begin
 		if(@ttotal<=0 or @tmount<=0) --處理超領導致金額不正確 以最近進貨的單價作為目前超領的單價
 			set @ttotal=@tmount*case when @mount=0 then 0 else round(@total/@mount,4) end
@@ -1234,7 +1268,7 @@ begin
 	end
 	
 	--出貨
-	if(@tablea='vccs' or @tablea='vcct')
+	if(@tablea='vccs' or @tablea='vcct' or @tablea='gets')
 	begin
 		set @tmount=@tmount-@mount
 		set @ttotal=@ttotal-round(@mount*@aprice,4)
@@ -1276,7 +1310,7 @@ begin
 	where mon>=@t_mon and product=@tproduct and spec=@tspec and size=@tsize and ucolor=@tucolor and lengthb=@tlengthb and class=@tclass
 end
 
-update a set cost=total from #tmp a where a.tablea='rc2s' or a.tablea='ucce'
+update a set cost=total from #tmp a where a.tablea='rc2s' or a.tablea='ucce' or a.tablea='inas'
 ----------------------------------------------------------------
 declare @umount float=0
 
@@ -1328,14 +1362,14 @@ begin
 		set @ttotal=@total
 	end
 	--進貨--入庫
-	if(@tablea='rc2s')
+	if(@tablea='rc2s' or @tablea='inas')
 	begin
 		set @tmount=@tmount+@mount
 		set @ttotal=@ttotal+@total
 	end
 	
 	--領料--出貨
-	if(@tablea='vccs' or @tablea='vcct')
+	if(@tablea='vccs' or @tablea='vcct' or @tablea='gets')
 	begin
 		if(@total=0)
 			set @total=@mount*case when @tmount=0 then 0 else @ttotal/@tmount end
@@ -1387,8 +1421,8 @@ set ro=isnull(b.mount,0),rm=isnull(b.cost,0),
 	vo=isnull(c.mount,0),vc=isnull(c.cost,0),
 	vm=isnull(c.total,0),profit=case when isnull(c.cost,0)=0 then 0 else round((isnull(c.total,0)-isnull(c.cost,0))/c.cost*100,2) end
 from #tmpa a
-outer apply (select SUM(mount)mount,SUM(cost)cost from #tmp where product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and tablea='rc2s' and datea between @t_bdate and @t_edate)b
-outer apply (select SUM(mount)mount,SUM(cost)cost,SUM(total)total from #tmp where product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class  and (tablea='vccs' or tablea='vcct') and datea between @t_bdate and @t_edate )c
+outer apply (select SUM(mount)mount,SUM(cost)cost from #tmp where product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and (tablea='rc2s' or tablea='inas') and datea between @t_bdate and @t_edate)b
+outer apply (select SUM(mount)mount,SUM(cost)cost,SUM(total)total from #tmp where product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class  and (tablea='vccs' or tablea='vcct' or tablea='gets') and datea between @t_bdate and @t_edate )c
 
 update #tmpa
 set do=round(lo-(bo+ro-vo),4)
@@ -1396,21 +1430,21 @@ set do=round(lo-(bo+ro-vo),4)
 
 delete #tmpa where bo=0 and ro=0 and vo=0 and do=0 and lo=0 and gno='9'
 
-insert #tmpa (gno,product,size,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
-select '5'gno,product,size
+insert #tmpa (gno,product,spec,size,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
+select '5'gno,product,spec,size
 ,sum(bo),sum(bm),sum(ro),sum(rm)
 ,sum(vo),sum(vc),sum(vm)
 ,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
 ,sum(do),sum(dm),sum(lo),case when sum(lo)=0 then 0 else round(sum(lm)/sum(lo),4) end,sum(lm)
-from #tmpa where gno='9' group by product,size
+from #tmpa where gno='9' group by product,spec,size
 
 if((select count(*) from #tmpa where gno='5')>0)
 begin
 	insert #tmpa (gno)
 	select '4'gno
 	
-	insert #tmpa (gno,product,size,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
-	select '6'gno,CHAR(255),CHAR(255)
+	insert #tmpa (gno,product,spec,size,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
+	select '6'gno,CHAR(255),CHAR(255),CHAR(255)
 	,sum(bo),sum(bm),sum(ro),sum(rm)
 	,sum(vo),sum(vc),sum(vm)
 	,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
@@ -1576,6 +1610,29 @@ set storeno=isnull(b.storeno,'')
 from #tmp a outer apply (select top 1 storeno from #tmp where tablea not like 'vcc%' and uno=a.uno order by datea) b
 where tablea='vcct'
 
+--互換
+--入
+insert #tmp
+select '2','inas',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.mweight
+,b.mweight*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,b.storeno,b.mweight
+,b.mweight*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,'ina_sf?noa=$noa'
+from view_ina a left join view_inas b on a.noa=b.noa
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+
+--出
+insert #tmp
+select '6','gets',a.accy,a.noa,b.noq,a.datea,'',b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.mweight
+,b.mweight*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,b.storeno,0,0,'get_sf?noa=$noa'
+from view_get a left join view_gets b on a.noa=b.noa
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
+
+
 --------------------------------------------------------------------
 --月成本
 create table #tmpb(
@@ -1682,7 +1739,7 @@ begin
 	end
 	
 	--進貨
-	if(@tablea='rc2s')
+	if(@tablea='rc2s' or @tablea='inas')
 	begin
 		if(@ttotal<=0 or @tweight<=0) --處理超領導致金額不正確 以最近進貨的單價作為目前超領的單價
 			set @ttotal=@tweight*case when @weight=0 then 0 else round(@total/@weight,4) end
@@ -1693,7 +1750,7 @@ begin
 	end
 	
 	--出貨
-	if(@tablea='vccs' or @tablea='vcct')
+	if(@tablea='vccs' or @tablea='vcct' or @tablea='gets')
 	begin
 		set @tweight=@tweight-@weight
 		set @ttotal=@ttotal-round(@weight*@aprice,4)
@@ -1736,7 +1793,7 @@ begin
 	where mon>=@t_mon and product=@tproduct and spec=@tspec and size=@tsize and ucolor=@tucolor and lengthb=@tlengthb and class=@tclass and storeno=@tstoreno
 end
 
-update a set cost=total from #tmp a where a.tablea='rc2s' or a.tablea='ucce'
+update a set cost=total from #tmp a where a.tablea='rc2s' or a.tablea='ucce' or a.tablea='inas'
 ----------------------------------------------------------------
 delete #tmp where not((len(@t_pno)=0 or isnull(product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(ucolor,'')=@t_ucolor)
 and (len(@t_spec)=0 or isnull(spec,'')=@t_spec) and (len(@t_size)=0 or isnull(size,'')=@t_size)
@@ -1816,14 +1873,14 @@ begin
 		set @ttotal=@total
 	end
 	--進貨--入庫
-	if(@tablea='rc2s' or @tablea='cubs')
+	if(@tablea='rc2s' or @tablea='inas')
 	begin
 		set @tweight=@tweight+@weight
 		set @ttotal=@ttotal+@total
 	end
 	
 	--領料--出貨
-	if(@tablea='vccs' or @tablea='vcct')
+	if(@tablea='vccs' or @tablea='vcct' or @tablea='gets')
 	begin
 		if(@total=0)
 			set @total=@weight*case when @tweight=0 then 0 else @ttotal/@tweight end
@@ -1884,6 +1941,8 @@ when tablea='ucce' then '盤點'
 when tablea='rc2s' then '進貨' 
 when tablea='vccs' then '出貨'
 when tablea='vcct' then '出貨'
+when tablea='inas' then '互進'
+when tablea='gets' then '互出'
 else tablea end
 
 select 

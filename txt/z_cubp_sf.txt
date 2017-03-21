@@ -205,13 +205,14 @@ insert @result
 select '0',left(a.cust,4),a.noa,a.bdate
 		,isnull(sum(b.weight),0)
 		,isnull(sum(c.bweight),0)
-		,isnull(sum(c.bweight),0)-isnull(sum(e.vweight),0) 
+		,isnull(sum(c.bweight),0)-isnull(sum(e.gweight),0)-isnull(sum(f.vweight),0) 
 		,sum(case when isnull(b.weight,0)-isnull(c.bweight,0)<0 or b.mins=1 then 0 else isnull(b.weight,0)-isnull(c.bweight,0) end)
 		,a.memo
 		,"z_cucp_sf?report=\'z_cucp_sf02\' and noa=\'"+a.noa+"\' and "+a.noa+"=$noa"
 from view_cuc a left join view_cucs b on a.noa=b.noa
 outer apply (select cb.uno,cb.weight bweight from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='1' and cb.productno2=a.noa and cb.product2=b.noq )c --只需裁剪
-outer apply (select SUM(gweight) vweight from view_cubt where uno=c.uno)e
+outer apply (select SUM(gweight) gweight from view_cubt where uno=c.uno)e
+outer apply (select SUM(weight) vweight from view_vcct where uno=c.uno)f
 where left(a.datea,7) between @t_bmon and @t_emon
 group by a.cust,a.noa,a.bdate,a.memo
 
