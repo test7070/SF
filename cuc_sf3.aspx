@@ -1716,6 +1716,7 @@
                 		if(dec(as[0].mount)<=0 || dec(as[0].weight)<=0 || dec(as[0].lengthc)<0){
                 			alert('批號已被領用!!');
                 			$('#btnMinut_'+n).click();
+                			$('#textUno_'+n).focus();
                 		}else{
 	                		$('#cuct_product'+n).text(as[0].product);
 							$('#cuct_ucolor'+n).text(as[0].ucolor);
@@ -1729,10 +1730,12 @@
 							$('#textGmount_'+n).val(as[0].mount);
 							$('#textGlengthc_'+n).val(as[0].lengthc);
 							$('#textGweight_'+n).val(as[0].weight);
+							$('#textUno_'+(dec(n)+1)).focus();
 						}
                 	}else{
                 		alert('無此批號!!');
                 		$('#btnMinut_'+n).click();
+                		$('#textUno_'+n).focus();
                 	}
                 }
 			}
@@ -2149,8 +2152,8 @@
 		<a style="color: red;">※機台鎖定時間超過15分鐘將自動解除鎖定</a>
 		<div id="cucs" style="float:left;width:100%;height:500px;overflow:auto;position: relative;"> </div> -->
 		<!--<div id="cucs_control" style="width:100%;"> </div>--> 
-		<div id="cuct" style="float:left;width:100%;height:80px;overflow:auto;position: relative;"> </div>
-		<div id="cucu" style="float:left;width:100%;height:80px;overflow:auto;position: relative;"> </div>
+		<div id="cuct" style="float:left;width:100%;height:400px;overflow:auto;position: relative;"> </div>
+		<div id="cucu" style="float:left;width:100%;height:400px;overflow:auto;position: relative;"> </div>
 		<div id="div_nouno" style="position:absolute; top:70px; left:840px; display:none; width:400px; background-color: #CDFFCE; border: 1px solid gray;">
 			<table id="table_nouno" style="width:100%;" border="1" cellpadding='2'  cellspacing='0'>
 				<tr>
