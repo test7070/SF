@@ -852,7 +852,7 @@
 				//取得UNO
 				var needuno=false;
 				for (var i = 0; i < q_bbsCount; i++) {
-					if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
+					if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && ($('#txtProduct_'+i).val().indexOf('鐵線')>-1 || $('#txtProduct_'+i).val().indexOf('鋼筋')>-1)){
 						needuno=true;
 					}
 				}
@@ -1338,7 +1338,7 @@
 												isnoexists=false;
 											}
 										}
-										if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
+										if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && ($('#txtProduct_'+i).val().indexOf('鐵線')>-1 || $('#txtProduct_'+i).val().indexOf('鋼筋')>-1)){
 											needuno=true;
 										}
 									}
@@ -1347,7 +1347,7 @@
 									}
 									if(isnoexists){
 										for (var i = 0; i < q_bbsCount; i++) {
-											if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
+											if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && ($('#txtProduct_'+i).val().indexOf('鐵線')>-1 || $('#txtProduct_'+i).val().indexOf('鋼筋')>-1)){
 												$('#txtUno_'+i).val(t_uno);
 												break;
 											}
