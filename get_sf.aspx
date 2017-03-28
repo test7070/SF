@@ -53,11 +53,13 @@
 			
 			function sum() {
 				var t1 = 0, t_price = 0, t_mount, t_weight = 0,t_money=0, t_tax = 0, t_total = 0;
+				var tt_weight=0;
 				for (var j = 0; j < q_bbsCount; j++) {
 					t_weight=$('#txtWeight_' + j).val();
 					t_price=$('#txtMweight_' + j).val();
 					t_money = q_mul(dec(t_weight), dec(t_price));
 					t1=q_add(t1,t_money);
+					tt_weight=q_add(tt_weight,dec(t_weight));
 				}
 				if($('#chkAtax').prop('checked')){
 					var t_taxrate = q_div(parseFloat(q_getPara('sys.taxrate')), 100);
@@ -73,6 +75,7 @@
 				$('#txtMoney').val(FormatNumber(t1));
 				$('#txtTax').val(FormatNumber(t_tax));
 				$('#txtTotal').val(FormatNumber(t_total));
+				$('#txtWeight').val(tt_weight);
 			}
 
 			function mainPost() {
@@ -242,6 +245,13 @@
 								alert('互換合約廠商與互換出貨廠商不同!!');
 							}else{
 								$('#txtAddr').val(as[0].addr);
+								if(as[0].atax=="true"){
+									$('#chkAtax').prop('checked',true);
+								}else{
+									$('#chkAtax').prop('checked',false);
+								}
+								sum();
+								refreshBbm();
 							}
 						}else{
 							alert($('#txtIdno').val()+'合約不存在!!!');
@@ -971,7 +981,7 @@
 					<td style="width:75px; text-align: center;">號數</td>
 					<td style="width:75px; text-align: center;">米數</td>
 					<td style="width:90px; text-align: center;">廠牌</td>
-					<td style="width:70px; text-align: center;">數量</td>
+					<td style="width:70px; text-align: center;">數量(件)</td>
 					<td style="width:80px; text-align: center;">重量kg</td>
 					<td style="width:80px; text-align: center;">單價</td>
 					<td style=" text-align: center;">單項備註</td>

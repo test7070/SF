@@ -303,15 +303,26 @@
 						}
 						
 						//變動事件
-						if(objname=='textUno')
-						$(this).change(function() {
-							if($(this).val()!=''){
-								//找批號
-								q_func('qtxt.query.cuctgetuno_'+n, 'cuc_sf.txt,getuno,'+$(this).val()+';#non');
-							}else{
-								$('#btnMinut_'+n).click();
-							}
-						});
+						if(objname=='textUno'){
+							$(this).change(function() {
+								if($(this).val()!=''){
+									//找批號
+									q_func('qtxt.query.cuctgetuno_'+n, 'cuc_sf.txt,getuno,'+$(this).val()+';#non');
+								}else{
+									$('#btnMinut_'+n).click();
+								}
+							});
+						}
+						if(objname=='textGmount'){
+							$(this).change(function() {
+								if($(this).val()!=''){
+									//找批號
+									q_func('qtxt.query.cuctgetunom_'+n, 'cuc_sf.txt,getuno,'+$('#textUno_'+n).val()+';#non');
+								}else{
+									$('#btnMinut_'+n).click();
+								}
+							});
+						}
 					});
 					
 					//移動下一格
@@ -1741,9 +1752,36 @@
 							//$('#cuct_lengthc'+n).text(as[0].lengthc);
 							//$('#cuct_mount'+n).text(as[0].mount);
 							//$('#cuct_weight'+n).text(as[0].weight);
-							$('#textGmount_'+n).val(as[0].mount);
-							$('#textGlengthc_'+n).val(as[0].lengthc);
-							$('#textGweight_'+n).val(as[0].weight);
+							//106/03/27 預設領料件數=1
+							$('#textGmount_'+n).val(1);
+							//$('#textGmount_'+n).val(as[0].mount);
+							$('#textGlengthc_'+n).val(round(as[0].lengthc/as[0].mount,0));
+							$('#textGweight_'+n).val(round(as[0].weight/as[0].mount,0));
+						}
+                	}else{
+                		alert('無此批號!!');
+                		$('#btnMinut_'+n).click();
+                	}
+                }
+                if(t_func.indexOf('qtxt.query.cuctgetunom_')>-1){
+                	var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		if(dec(as[0].mount)<=0 || dec(as[0].weight)<=0 ){
+                			alert('批號已被領用!!');
+                			$('#btnMinut_'+n).click();
+                		}else{
+	                		$('#cuct_product'+n).text(as[0].product);
+							$('#cuct_ucolor'+n).text(as[0].ucolor);
+							$('#cuct_spec'+n).text(as[0].spec);
+							$('#cuct_size'+n).text(as[0].size);
+							$('#cuct_lengthb'+n).text(as[0].lengthb);
+							$('#cuct_class'+n).text(as[0].class);
+							//$('#cuct_lengthc'+n).text(as[0].lengthc);
+							//$('#cuct_mount'+n).text(as[0].mount);
+							//$('#cuct_weight'+n).text(as[0].weight);
+							$('#textGlengthc_'+n).val(round(q_mul(q_div(as[0].lengthc,as[0].mount),dec($('#textGmount_'+n).val())),0));
+							$('#textGweight_'+n).val(round(q_mul(q_div(as[0].weight,as[0].mount),dec($('#textGmount_'+n).val())),0));
 						}
                 	}else{
                 		alert('無此批號!!');

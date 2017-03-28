@@ -1036,7 +1036,7 @@
 				$('#lblSize_s').text('號數');
 				$('#lblLengthb_s').text('米數');
 				$('#lblClass_s').text('廠牌');
-				$('#lblMount_s').text('件數');
+				$('#lblMount_s').text('數量(件)');
 				$('#lblLengthc_s').text('支數');
 				$('#lblWeight_s').text('重量(KG)');
 				
