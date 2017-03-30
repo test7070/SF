@@ -310,7 +310,8 @@
                     $('#cuct_table .minut').each(function(index) {
 						$(this).click(function() {
 							var ns=$(this).attr('id').split('_')[1];
-							$('#cuct_tr'+ns+' input[type="text"]').val('');
+							var t_uno=$('#textUno_'+ns).val();
+							$('#cuct_tr'+ns+' input[type="text"]').val('').removeAttr('disabled');
 							$('#cuct_product'+ns).text('');
 							$('#cuct_ucolor'+ns).text('');
 							$('#cuct_spec'+ns).text('');
@@ -322,6 +323,25 @@
 							$('#cuct_weight'+ns).text('');
 							$('#cuct_xnoa'+ns).text('');
 							$('#cuct_xnoq'+ns).text('');
+							
+							//刪除同批號的資料
+							var cuct_count=document.getElementById("cuct_table").rows.length-1;	
+							for(var i=0;i<cuct_count;i++){
+								if($('#textUno_'+i).val()==t_uno){
+									$('#cuct_tr'+i+' input[type="text"]').val('').removeAttr('disabled');
+									$('#cuct_product'+i).text('');
+									$('#cuct_ucolor'+i).text('');
+									$('#cuct_spec'+i).text('');
+									$('#cuct_size'+i).text('');
+									$('#cuct_lengthb'+i).text('');
+									$('#cuct_class'+i).text('');
+									$('#cuct_lengthc'+i).text('');
+									$('#cuct_mount'+i).text('');
+									$('#cuct_weight'+i).text('');
+									$('#cuct_xnoa'+i).text('');
+									$('#cuct_xnoq'+i).text('');
+								}
+							}
 						});
                     });
                     				
@@ -1757,7 +1777,7 @@
 								//$('#cuct_weight'+(dec(n)+i)).text(as[i].weight);
 								$('#textUno_'+(dec(n)+1)).focus();
 								//106/03/27 預設領料件數=1 //106/03/29 板料才領一個，其他全領
-								if(as[0].ucolor=='板料'){
+								if(as[0].ucolor=='板料' && as.length==1){
 									$('#textGmount_'+(dec(n)+i)).val(1);
 									$('#textGlengthc_'+(dec(n)+i)).val(round(as[i].lengthc/as[i].mount,0));
 									$('#textGweight_'+(dec(n)+i)).val(round(as[i].weight/as[i].mount,0));
@@ -1765,6 +1785,13 @@
 									$('#textGmount_'+(dec(n)+i)).val(as[i].mount);
 		 							$('#textGlengthc_'+(dec(n)+i)).val(as[i].lengthc);
 		 							$('#textGweight_'+(dec(n)+i)).val(as[i].weight);
+	 							}
+	 							//多鋼筋綁在一起不能單領，要全部領料
+	 							if(as.length>1){
+	 								$('#textUno_'+(dec(n)+i)).attr('disabled', 'disabled');
+	 								$('#textGmount_'+(dec(n)+i)).attr('disabled', 'disabled');
+	 								$('#textGlengthc_'+(dec(n)+i)).attr('disabled', 'disabled');
+	 								$('#textGweight_'+(dec(n)+i)).attr('disabled', 'disabled');
 	 							}
 	 						}
 						}
