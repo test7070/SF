@@ -111,7 +111,7 @@
 						for (var i=0;i<t_nouno.length;i++){
 							if(t_nouno[i].length>0){
 								getunocount=getunocount+1;
-								q_func('qtxt.query.cuctcheckuno_'+n, 'cuc_sf.txt,getuno,'+t_nouno[i]+';#non');
+								q_func('qtxt.query.cuctcheckuno_'+n, 'cuc_sf.txt,getuno,'+t_nouno[i]+';#non'+';#non'+';#non');
 							}
 						}
 					}
@@ -405,8 +405,8 @@
                 			$('#btnMinut__'+n).click();
                 		}else{
                 			$('#btnMinut__'+n).click();
-							q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtGmount,txtGweight,txtUno'
-								, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno', 'txtUno');
+							q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtGmount,txtGweight,txtUno,txtMemo'
+								, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno,memo', 'txtUno');
 							
 							if(dec(n)+as.length>=q_bbtCount){
 								$('#btnPlut').click();
@@ -668,7 +668,7 @@
 							if(t_noa.length==0)
 								t_noa='#non';
 							if(!emp($('#txtUno_'+b_seq).val())){
-								q_func('qtxt.query.cubsuno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno_'+b_seq).val()+';'+t_noa);
+								q_func('qtxt.query.cubsuno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno_'+b_seq).val()+';'+t_noa+';#non'+';#non');
 							}
 						});
                     }
@@ -770,7 +770,7 @@
 							if(t_noa.length==0)
 								t_noa='#non';
 							if(!emp($('#txtUno__'+b_seq).val())){
-								q_func('qtxt.query.cubtuno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno__'+b_seq).val()+';'+t_noa);
+								q_func('qtxt.query.cubtuno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno__'+b_seq).val()+';'+t_noa+';#non'+';#non');
 							}
 						});
                     }
@@ -1227,7 +1227,7 @@
 						<input class="btn"  id="btnStoreno..*" type="button" value='.' style=" font-weight: bold;float: left;" />
 						<input id="txtStore..*" type="text" class="txt c1" style="width: 50%"/>
 					</td>-->
-					<td><input id="txtMemo2..*" type="text" class="txt c1"/></td>
+					<td><input id="txtMemo..*" type="text" class="txt c1"/></td>
 				</tr>
 			</table>
 		</div>

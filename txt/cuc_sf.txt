@@ -115,13 +115,15 @@ SET QUOTED_IDENTIFIER OFF
 declare @cmd nvarchar(max) = ''
 declare @uno nvarchar(max) = [1] --uno
 declare @noa nvarchar(max) = [2] --排除的領料單號
+declare @xnoa nvarchar(max) = case when '#non'=[3] then '' else [3] end --原入庫單號
+declare @xnoq nvarchar(max) = case when '#non'=[4] then '' else [4] end --原入庫單序
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
 	set @cmd = 'drop table #tmp'
 	EXECUTE sp_executesql @cmd
 END
-
+--106/03/29 多產品單一批號也要全部顯示出來，但會全部領料
 create table #tmp( 
 	accy nvarchar(50),
 	tablea nvarchar(50), 
@@ -169,7 +171,7 @@ where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
 --互換進
 insert #tmp
 select a.accy,'inas' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,0,a.storeno,a.store,a.memo,'','','6'
+,a.mount,a.weight,0,b.storeno,b.store,a.memo,'','','6'
 from view_inas a left join view_ina b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
 
@@ -197,7 +199,7 @@ where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
 --互換出
 insert #tmp
 select a.accy,'gets' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,-1*a.mount,-1*a.weight,0,a.storeno,a.store,a.memo,'','','7'
+,-1*a.mount,-1*a.weight,0,b.storeno,b.store,a.memo,'','','7'
 from view_gets a left join view_get b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
 
@@ -225,14 +227,16 @@ update #tmp
 set mount=ISNULL(mount,0),weight=ISNULL(weight,0),lengthc=ISNULL(lengthc,0)
 ,storeno=ISNULL(storeno,''),store=ISNULL(store,'')
 
-insert #tmp(uno,typea)
-select uno,'0' from #tmp group by uno
+insert #tmp(uno,typea,product,spec,size,ucolor,lengthb,class,memo)
+select uno,'0',product,spec,size,ucolor,lengthb,class,memo from #tmp group by uno,product,spec,size,ucolor,lengthb,class,memo
 
 update a
 set accy=b.accy,tablea=b.tablea,noa=b.noa,noq=b.noq,datea=b.datea
-,product=b.product,ucolor=b.ucolor,spec=b.spec,size=b.size,lengthb=b.lengthb,class=b.class
-,storeno=b.storeno,store=b.store,memo=b.memo,ordeno=b.ordeno,no2=b.no2
-from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and typea!='0' order by datea,typea,noa,noq) b
+,storeno=b.storeno,store=b.store,ordeno=b.ordeno,no2=b.no2
+from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and typea!='0' 
+and product=a.product and spec=a.spec and size=a.size 
+and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and memo=a.memo
+order by datea,typea,noa,noq) b
 where a.typea='0'
 
 delete a
@@ -241,7 +245,9 @@ where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.typea+'-'+a
 
 update a
 set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)
-from #tmp a outer apply (select SUM(mount)mount,SUM(weight)weight,sum(lengthc)lengthc from #tmp where uno=a.uno and typea!='0' ) b
+from #tmp a outer apply (select SUM(mount)mount,SUM(weight)weight,sum(lengthc)lengthc from #tmp 
+where uno=a.uno and typea!='0' and product=a.product and spec=a.spec and size=a.size 
+and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and memo=a.memo) b
 where a.typea='0'
 
 delete #tmp where typea!='0'
@@ -250,7 +256,7 @@ delete #tmp where typea!='0'
 --if(len(@noa)=0)
 --	delete #tmp where mount=0 and weight=0 and lengthc=0
 
-select * from #tmp
+select * from #tmp where (len(@xnoa)=0 or noa=@xnoa) and (len(@xnoq)=0 or noq=@xnoq)
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -595,69 +601,70 @@ create table #unotable(
 	lengthc float,
 	storeno nvarchar(50),
 	store nvarchar(50),
-	typea nvarchar(10)
+	typea nvarchar(10),
+	memo nvarchar(MAX)
 ) 
 
 --盤點
 insert #unotable
 select a.accy,'ucces' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store,'5'
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,'5',a.memo
 from view_ucces a left join view_ucce b on a.noa=b.noa
 where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
 --進貨
 insert #unotable
 select a.accy,'rc2s' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store,'6'
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,'6',a.memo
 from view_rc2s a left join view_rc2 b on a.noa = b.noa 
 where b.typea='1' and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
 --入庫
 insert #unotable
 select a.accy,'cubs' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,a.lengthc,a.storeno,a.store,'6'
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,'6',a.memo
 from view_cubs a left join view_cub b on a.noa=b.noa
 where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
 --互換進
 insert #unotable
 select a.accy,'inas' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,a.mount,a.weight,0,a.storeno,a.store,'6'
+,a.mount,a.weight,0,b.storeno,b.store,'6',a.memo
 from view_inas a left join view_ina b on a.noa=b.noa
 where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
 --出貨退回
 insert #unotable
 select a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,'','','6'
+,b.mount,b.weight,b.lengthc,'','','6',b.memo
 from view_vcc a left join view_vcct b on a.noa = b.noa 
 where a.typea='2' and exists (select * from dbo.fnSplit(@uno) where n=b.uno)
 
 --出貨
 insert #unotable
 select a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,-1*b.mount,-1*b.weight,-1*b.lengthc,'','','7'
+,-1*b.mount,-1*b.weight,-1*b.lengthc,'','','7',b.memo
 from view_vcc a left join view_vcct b on a.noa = b.noa 
 where a.typea='1' and exists (select * from dbo.fnSplit(@uno) where n=b.uno)
 
 --領料
 insert #unotable
 select a.accy,'cubt' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,-1*a.gmount,-1*a.gweight,-1*a.lengthc,'','','7'
+,-1*a.gmount,-1*a.gweight,-1*a.lengthc,'','','7',a.memo
 from view_cubt a left join view_cub b on a.noa=b.noa
 where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
 --互換出
 insert #unotable
 select a.accy,'gets' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,-1*a.mount,-1*a.weight,0,a.storeno,a.store,'7'
+,-1*a.mount,-1*a.weight,0,b.storeno,b.store,'7',a.memo
 from view_gets a left join view_get b on a.noa=b.noa
 where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
 --退貨
 insert #unotable
 select a.accy,'rc2t' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
-,-1*a.mount,-1*a.weight,-1*a.lengthc,a.storeno,a.store,'7'
+,-1*a.mount,-1*a.weight,-1*a.lengthc,a.storeno,a.store,'7',a.memo
 from view_rc2s a left join view_rc2 b on a.noa = b.noa 
 where b.typea='2' and len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
@@ -665,14 +672,17 @@ update #unotable
 set mount=ISNULL(mount,0),weight=ISNULL(weight,0),lengthc=ISNULL(lengthc,0)
 ,storeno=ISNULL(storeno,''),store=ISNULL(store,'')
 
-insert #unotable(uno,typea)
-select uno,'0' from #unotable group by uno
+insert #unotable(uno,typea,product,spec,size,ucolor,lengthb,class,memo)
+select uno,'0',product,spec,size,ucolor,lengthb,class,memo 
+from #unotable group by uno,product,spec,size,ucolor,lengthb,class,memo
 
 update a
 set accy=b.accy,tablea=b.tablea,noa=b.noa,noq=b.noq,datea=b.datea
-,product=b.product,ucolor=b.ucolor,spec=b.spec,size=b.size,lengthb=b.lengthb,class=b.class
 ,storeno=b.storeno,store=b.store
-from #unotable a outer apply (select top 1 * from #unotable where uno=a.uno and typea!='0' order by datea,typea,noa,noq) b
+from #unotable a outer apply (select top 1 * from #unotable 
+where uno=a.uno and typea!='0' and product=a.product and spec=a.spec and size=a.size 
+and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and memo=a.memo
+order by datea,typea,noa,noq) b
 where a.typea='0'
 
 delete #unotable where typea!='0'
@@ -694,6 +704,7 @@ set mount=dbo.split(b.item,'@',0)
 ,weight=dbo.split(b.item,'@',2)
 ,lengthc=dbo.split(b.item,'@',1)
 from #unotable a left join dbo.fnSplit(@uno) b on a.uno=b.n
+and a.noa=dbo.split(b.item,'@',3) and a.noq=dbo.split(b.item,'@',4)
 
 --刪除已領料完畢的批號 --1041210顯示已出貨或領料單號
 --delete #unotable where mount<=0 and weight<=0 
@@ -724,10 +735,10 @@ begin
 		
 	--bbt
 	exec("
-		insert cubt"+@accy+" (noa,noq,uno,product,ucolor,spec,size,lengthb,class,lengthc,gmount,gweight,storeno,store)
+		insert cubt"+@accy+" (noa,noq,uno,product,ucolor,spec,size,lengthb,class,lengthc,gmount,gweight,storeno,store,memo)
 		select '"+@cubno+"',right('000'+cast(ROW_NUMBER()over (order by uno) as nvarchar(10)),3)
 		,uno,product,ucolor,spec,size,lengthb,class
-		,lengthc,mount,weight,storeno,store
+		,lengthc,mount,weight,storeno,store,memo
 		from #unotable 
 	")
 	

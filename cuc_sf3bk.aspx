@@ -348,7 +348,7 @@
 						$(this).change(function() {
 							if($(this).val()!=''){
 								//找批號
-								q_func('qtxt.query.cuctgetuno_'+n, 'cuc_sf.txt,getuno,'+$(this).val()+';#non');
+								q_func('qtxt.query.cuctgetuno_'+n, 'cuc_sf.txt,getuno,'+$(this).val()+';#non'+';#non'+';#non');
 							}else{
 								$('#btnMinut_'+n).click();
 							}
@@ -409,7 +409,7 @@
 					for(var j=0;j<bbtrow;j++){
 						if($('#textUno_'+j).val().length>0){
 							getunocount=getunocount+1;
-							q_func('qtxt.query.cuctcheckuno_'+n, 'cuc_sf.txt,getuno,'+$('#textUno_'+j).val()+';#non');
+							q_func('qtxt.query.cuctcheckuno_'+n, 'cuc_sf.txt,getuno,'+$('#textUno_'+j).val()+';#non'+';#non'+';#non');
 						}
 					}
 					

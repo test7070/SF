@@ -838,7 +838,7 @@
 					check_uno_count=0;check_uno_err='';
 					for (var i = 0; i < q_bbsCount; i++) {
 						if(!emp($('#txtUno_'+i).val())){
-							q_func('qtxt.query.rc2checkuno_'+i, 'cuc_sf.txt,getuno,'+$('#txtUno_'+i).val()+';'+$('#txtNoa').val());
+							q_func('qtxt.query.rc2checkuno_'+i, 'cuc_sf.txt,getuno,'+$('#txtUno_'+i).val()+';'+$('#txtNoa').val()+';#non'+';#non');
 							check_uno_count++;
 						}	
 					}
@@ -1018,7 +1018,7 @@
 							if(t_noa.length==0)
 								t_noa='#non';
 							if(!emp($('#txtUno_'+b_seq).val())){
-								q_func('qtxt.query.rc2suno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno_'+b_seq).val()+';'+t_noa);
+								q_func('qtxt.query.rc2suno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno_'+b_seq).val()+';'+t_noa+';#non'+';#non');
 							}
 						});
 					}

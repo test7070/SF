@@ -359,7 +359,7 @@
 					check_uno_count=0;check_uno_err='';
 					for (var i = 0; i < q_bbsCount; i++) {
 						if(!emp($('#txtUno_'+i).val())){
-							q_func('qtxt.query.inacheckuno_'+i, 'cuc_sf.txt,getuno,'+$('#txtUno_'+i).val()+';'+$('#txtNoa').val());
+							q_func('qtxt.query.inacheckuno_'+i, 'cuc_sf.txt,getuno,'+$('#txtUno_'+i).val()+';'+$('#txtNoa').val()+';#non'+';#non');
 							check_uno_count++;
 						}	
 					}
@@ -607,6 +607,8 @@
 
                 q_nowf();
                 as['datea'] = abbm2['datea'];
+                as['storeno'] = abbm2['storeno'];
+                as['store'] = abbm2['store'];
                 
                 return true;
             }

@@ -95,6 +95,7 @@ insert #tmp
 select '6',a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
 ,b.mount,b.weight,b.lengthc,'','',b.memo,a.custno,a.nick,''
 from view_vcc a left join view_vcct b on a.noa = b.noa 
+where len(b.uno)>0 and a.datea<=@t_edate  and a.typea='2'
 
 --出貨
 insert #tmp
@@ -128,14 +129,16 @@ update #tmp
 set mount=ISNULL(mount,0),weight=ISNULL(weight,0),lengthc=ISNULL(lengthc,0)
 ,storeno=ISNULL(storeno,''),store=ISNULL(store,''),custno=ISNULL(custno,''),comp=ISNULL(comp,''),ordeno=ISNULL(ordeno,'')
 
-insert #tmp(uno,gno)
-select uno,'0' from #tmp group by uno
+insert #tmp(uno,gno,product,spec,size,ucolor,lengthb,class,memo)
+select uno,'0',product,spec,size,ucolor,lengthb,class,memo from #tmp group by uno,product,spec,size,ucolor,lengthb,class,memo
 
 update a
 set accy=b.accy,tablea=b.tablea,noa=b.noa,noq=b.noq,datea=b.datea
-,product=b.product,ucolor=b.ucolor,spec=b.spec,size=b.size,lengthb=b.lengthb,class=b.class
-,storeno=b.storeno,store=b.store,memo=b.memo,custno=b.custno,comp=b.comp,ordeno=b.ordeno
-from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and gno!='0' order by datea,gno,noa,noq) b
+,storeno=b.storeno,store=b.store,custno=b.custno,comp=b.comp,ordeno=b.ordeno
+from #tmp a outer apply (select top 1 * from #tmp 
+where uno=a.uno and gno!='0' and product=a.product and spec=a.spec and size=a.size 
+and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and memo=a.memo
+order by datea,gno,noa,noq) b
 where a.gno='0'
 
 --刪除多次批號的資料 只保留最後一次批號(同一天依gno,noa順序)
@@ -145,7 +148,8 @@ where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.gno+'-'+a.n
 
 update a
 set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)
-from #tmp a outer apply (select SUM(mount)mount,SUM(weight)weight,sum(lengthc)lengthc from #tmp where uno=a.uno and gno!='0' ) b
+from #tmp a outer apply (select SUM(mount)mount,SUM(weight)weight,sum(lengthc)lengthc 
+from #tmp where uno=a.uno and product=a.product and spec=a.spec and size=a.size and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and memo=a.memo and gno!='0' ) b
 where a.gno='0'
 
 delete #tmp where gno!='0'
@@ -460,6 +464,7 @@ and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
 and isnull(b.productno,'')=''
+and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
 
 --刪除多次盤點的資料 只保留最後一次盤點
 delete a
@@ -480,6 +485,7 @@ and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
 and isnull(b.productno,'')=''
+and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
 	
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '13','cubs',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno,b.mount,b.weight,0,b.uno
@@ -493,6 +499,7 @@ and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 and isnull(b.productno,'')=''
+and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
 
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '14','inas',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,a.storeno,b.mount,b.weight,0,b.uno
@@ -504,8 +511,9 @@ and a.datea>=isnull(c.datea,'')
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
 and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+and (isnull(a.storeno,'') between @t_bstoreno and @t_estoreno)
 and isnull(b.productno,'')=''
+and isnull(a.storeno,'')!='A' --106/03/29不顯示三泰本倉
 
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '15','vcct',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno,b.mount,b.weight,0,b.uno
@@ -519,6 +527,7 @@ and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
 and isnull(b.productno,'')=''
+and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
 		
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '15','vccs',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno,b.mount,b.weight,0,''
@@ -533,6 +542,7 @@ and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
 and isnull(b.productno,'')=''
+and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
 	
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '16','cubt',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,d.storeno,b.gmount,b.gweight,0,b.uno
@@ -547,6 +557,7 @@ and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 and isnull(b.productno,'')=''
+and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
 
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '17','gets',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,a.storeno,b.mount,b.weight,0,b.uno
@@ -560,6 +571,7 @@ and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(a.storeno,'') between @t_bstoreno and @t_estoreno)
 and isnull(b.productno,'')=''
+and isnull(a.storeno,'')!='A' --106/03/29不顯示三泰本倉
 
 declare @tablea nvarchar(100)
 declare @storeno nvarchar(100)

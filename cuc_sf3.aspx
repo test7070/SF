@@ -271,6 +271,8 @@
 				string+='<td id="cuct_gmount" align="center" style="width:90px; color:black;">領料件數</td>';
 				string+='<td id="cuct_lengthc" align="center" style="width:90px; color:black;">領料支數</td>';
 				string+='<td id="cuct_gweight" align="center" style="width:110px; color:black;">領料重量</td>';
+				string+='<td id="cuct_xnoa" align="center" style="color:black;display:none;">入庫單號</td>';
+				string+='<td id="cuct_xnoq" align="center" style="color:black;display:none;">入庫單序</td>';
 				string+='</tr>';
 				string+='</table>';
 				$('#cuct').html(string);
@@ -293,6 +295,8 @@
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textGmount_'+i+'" type="text" class="txt num c1" value="" /></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textGlengthc_'+i+'" type="text" class="txt num c1" value="" /></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textGweight_'+i+'" type="text" class="txt num c1" value="" /></td>';
+	    				string+='<td id=cuct_xnoa'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+';display:none;"></td>';
+	    				string+='<td id=cuct_xnoq'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+';display:none;"></td>';
 	    				//string+='<td id=cuct_mount'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
 	    				//string+='<td id=cuct_lengthc'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
 	    				//string+='<td id=cuct_weight'+i+' style="text-align: center;color:'+t_color[i%t_color.length]+'"></td>';
@@ -316,6 +320,8 @@
 							$('#cuct_lengthc'+ns).text('');
 							$('#cuct_mount'+ns).text('');
 							$('#cuct_weight'+ns).text('');
+							$('#cuct_xnoa'+ns).text('');
+							$('#cuct_xnoq'+ns).text('');
 						});
                     });
                     				
@@ -336,15 +342,26 @@
 						}
 						
 						//變動事件
-						if(objname=='textUno')
-						$(this).change(function() {
-							if($(this).val()!=''){
-								//找批號
-								q_func('qtxt.query.cuctgetuno_'+n, 'cuc_sf.txt,getuno,'+$(this).val()+';#non');
-							}else{
-								$('#btnMinut_'+n).click();
-							}
-						});
+						if(objname=='textUno'){
+							$(this).change(function() {
+								if($(this).val()!=''){
+									//找批號
+									q_func('qtxt.query.cuctgetuno_'+n, 'cuc_sf.txt,getuno,'+$(this).val()+';#non'+';#non'+';#non');
+								}else{
+									$('#btnMinut_'+n).click();
+								}
+							});
+						}
+						if(objname=='textGmount'){
+							$(this).change(function() {
+								if($(this).val()!=''){
+									//找批號
+									q_func('qtxt.query.cuctgetunom_'+n, 'cuc_sf.txt,getuno,'+$('#textUno_'+n).val()+';#non'+';'+$('#cuct_xnoa'+n).text()+';'+$('#cuct_xnoq'+n).text());
+								}else{
+									$('#btnMinut_'+n).click();
+								}
+							});
+						}
 					});
 					
 					//移動下一格
@@ -380,6 +397,8 @@
 				string+='<td id="cuct_gmount" align="center" style="width:90px; color:black;">領料件數</td>';
 				string+='<td id="cuct_lengthc" align="center" style="width:90px; color:black;">領料支數</td>';
 				string+='<td id="cuct_gweight" align="center" style="width:110px; color:black;">領料重量</td>';
+				string+='<td id="cuct_xnoa" align="center" style="color:black;display:none;">入庫單號</td>';
+				string+='<td id="cuct_xnoq" align="center" style="color:black;display:none;">入庫單序</td>';
 				string+='</tr>';
 				string+='</table>';
 				$('#cuct').append(string);
@@ -401,7 +420,7 @@
 					for(var j=0;j<bbtrow;j++){
 						if($('#textUno_'+j).val().length>0){
 							getunocount=getunocount+1;
-							q_func('qtxt.query.cuctcheckuno_'+n, 'cuc_sf.txt,getuno,'+$('#textUno_'+j).val()+';#non');
+							q_func('qtxt.query.cuctcheckuno_'+n, 'cuc_sf.txt,getuno,'+$('#textUno_'+j).val()+';#non'+';'+$('#cuct_xnoa'+j).text()+';'+$('#cuct_xnoq'+j).text());
 						}
 					}
 					
@@ -1699,7 +1718,7 @@
 							var bbtrow=document.getElementById("cuct_table").rows.length-1;
 							for(var j=0;j<bbtrow;j++){
 								if($('#textUno_'+j).val().length>0){
-									t_nouno=t_nouno+$('#textUno_'+j).val()+'@'+$('#textGmount_'+j).val()+'@'+$('#textGlengthc_'+j).val()+'@'+$('#textGweight_'+j).val()+'#';
+									t_nouno=t_nouno+$('#textUno_'+j).val()+'@'+$('#textGmount_'+j).val()+'@'+$('#textGlengthc_'+j).val()+'@'+$('#textGweight_'+j).val()+'@'+$('#cuct_xnoa'+j).text()+'@'+$('#cuct_xnoq'+j).text()+'#';
 								}
 							}
 							if(t_nouno.length>0){
@@ -1713,10 +1732,55 @@
                 	var n=t_func.split('_')[1];
                 	var as = _q_appendData("tmp0", "", true, true);
                 	if (as[0] != undefined) {
-                		if(dec(as[0].mount)<=0 || dec(as[0].weight)<=0 || dec(as[0].lengthc)<0){
+                		if(dec(as[0].mount)<=0 || dec(as[0].weight)<=0 ){
                 			alert('批號已被領用!!');
                 			$('#btnMinut_'+n).click();
                 			$('#textUno_'+n).focus();
+                		}else{
+                			var tablerow=$('#cuct_table tr').length-1;
+                			while(as.length>1 && dec(n)+as.length>tablerow){
+                				$('#btnPlut2').click();
+                				tablerow=$('#cuct_table tr').length-1;
+                			}
+                			for(var i=0;i<as.length;i++){
+		                		$('#cuct_product'+(dec(n)+i)).text(as[i].product);
+								$('#cuct_ucolor'+(dec(n)+i)).text(as[i].ucolor);
+								$('#cuct_spec'+(dec(n)+i)).text(as[i].spec);
+								$('#cuct_size'+(dec(n)+i)).text(as[i].size);
+								$('#cuct_lengthb'+(dec(n)+i)).text(as[i].lengthb);
+								$('#cuct_class'+(dec(n)+i)).text(as[i].class);
+								$('#cuct_xnoa'+(dec(n)+i)).text(as[i].noa);
+								$('#cuct_xnoq'+(dec(n)+i)).text(as[i].noq);
+								$('#textUno_'+(dec(n)+i)).val(as[i].uno);
+								//$('#cuct_lengthc'+(dec(n)+i)).text(as[i].lengthc);
+								//$('#cuct_mount'+(dec(n)+i)).text(as[i].mount);
+								//$('#cuct_weight'+(dec(n)+i)).text(as[i].weight);
+								$('#textUno_'+(dec(n)+1)).focus();
+								//106/03/27 預設領料件數=1 //106/03/29 板料才領一個，其他全領
+								if(as[0].ucolor=='板料'){
+									$('#textGmount_'+(dec(n)+i)).val(1);
+									$('#textGlengthc_'+(dec(n)+i)).val(round(as[i].lengthc/as[i].mount,0));
+									$('#textGweight_'+(dec(n)+i)).val(round(as[i].weight/as[i].mount,0));
+								}else{
+									$('#textGmount_'+(dec(n)+i)).val(as[i].mount);
+		 							$('#textGlengthc_'+(dec(n)+i)).val(as[i].lengthc);
+		 							$('#textGweight_'+(dec(n)+i)).val(as[i].weight);
+	 							}
+	 						}
+						}
+                	}else{
+                		alert('無此批號!!');
+                		$('#btnMinut_'+n).click();
+                		$('#textUno_'+n).focus();
+                	}
+                }
+                if(t_func.indexOf('qtxt.query.cuctgetunom_')>-1){
+                	var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		if(dec(as[0].mount)<=0 || dec(as[0].weight)<=0 ){
+                			alert('批號已被領用!!');
+                			$('#btnMinut_'+n).click();
                 		}else{
 	                		$('#cuct_product'+n).text(as[0].product);
 							$('#cuct_ucolor'+n).text(as[0].ucolor);
@@ -1724,18 +1788,17 @@
 							$('#cuct_size'+n).text(as[0].size);
 							$('#cuct_lengthb'+n).text(as[0].lengthb);
 							$('#cuct_class'+n).text(as[0].class);
+							$('#cuct_xnoa'+n).text(as[0].noa);
+							$('#cuct_xnoq'+n).text(as[0].noq);
 							//$('#cuct_lengthc'+n).text(as[0].lengthc);
 							//$('#cuct_mount'+n).text(as[0].mount);
 							//$('#cuct_weight'+n).text(as[0].weight);
-							$('#textGmount_'+n).val(as[0].mount);
-							$('#textGlengthc_'+n).val(as[0].lengthc);
-							$('#textGweight_'+n).val(as[0].weight);
-							$('#textUno_'+(dec(n)+1)).focus();
+							$('#textGlengthc_'+n).val(round(q_mul(q_div(as[0].lengthc,as[0].mount),dec($('#textGmount_'+n).val())),0));
+							$('#textGweight_'+n).val(round(q_mul(q_div(as[0].weight,as[0].mount),dec($('#textGmount_'+n).val())),0));
 						}
                 	}else{
                 		alert('無此批號!!');
                 		$('#btnMinut_'+n).click();
-                		$('#textUno_'+n).focus();
                 	}
                 }
 			}

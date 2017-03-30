@@ -561,6 +561,8 @@
 
 				q_nowf();
 				as['datea'] = abbm2['datea'];
+				as['storeno'] = abbm2['storeno'];
+                as['store'] = abbm2['store'];
 				return true;
 			}
 
