@@ -77,35 +77,26 @@ create table #tmpa(
 CREATE INDEX tmpa_index ON #tmpa (noa,typea)
 
 insert #tmpa
-select noa,'vcc',apvmemo,(case when typea='1' then 1 else -1 end)*total,(case when typea='1' then 1 else -1 end)*payed
-,left(apvmemo,charindex('@',apvmemo)-1)
-,(case when typea='1' then 1 else -1 end)*cast(SUBSTRING(apvmemo,charindex('@',apvmemo)+1,charindex('##',apvmemo)-charindex('@',apvmemo)-1) as float)
-,left(SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo)),CHARINDEX('@',SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo)))-1)
-,(case when typea='1' then 1 else -1 end)*cast(SUBSTRING(SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo)),charindex('@',SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo)))+1,len(SUBSTRING(apvmemo,charindex('##',apvmemo)+2,len(apvmemo))))as float)
-from view_vcc where len(apvmemo)>0
+select noa,'get',idno,weight
+from view_get where len(idno)>0
 and (custno between @t_btggno and @t_etggno ) --出貨與合約客戶會一樣
 and datea>= @tt_bdate --會先有合約才會出貨 --避免提早出貨多抓取前1個月的出貨
 
 insert #tmpa
-select noa,'rc2',transtart,(case when typea='1' then 1 else -1 end)*total,(case when typea='1' then 1 else -1 end)*payed
-,left(transtart,charindex('@',transtart)-1)
-,(case when typea='1' then 1 else -1 end)*cast(SUBSTRING(transtart,charindex('@',transtart)+1,charindex('##',transtart)-charindex('@',transtart)-1) as float)
-,left(SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart)),CHARINDEX('@',SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart)))-1)
-,(case when typea='1' then 1 else -1 end)*cast(SUBSTRING(SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart)),charindex('@',SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart)))+1,len(SUBSTRING(transtart,charindex('##',transtart)+2,len(transtart))))as float)
-from view_rc2 where len(transtart)>0
+select noa,'ina'
+,ordeno,weight
+from view_ina where len(ordeno)>0
 and (tggno between @t_btggno and @t_etggno ) --出貨與合約客戶會一樣
 and datea>= @tt_bdate --會先有合約才會出貨 --避免提早出貨多抓取前1個月的出貨
 
 update a
-set f3=isnull(r1.weight,0)+isnull(r2.weight,0)
-,f4=f2-(isnull(r1.weight,0)+isnull(r2.weight,0))
-,f8=isnull(v1.weight,0)+isnull(v2.weight,0)
-,f9=f7-(isnull(v1.weight,0)+isnull(v2.weight,0))
+set f3=isnull(i1.weight,0)
+,f4=f2-isnull(i1.weight,0)
+,f8=isnull(g1.weight,0)
+,f9=f7-isnull(g1.weight,0)
 from #tmp a 
-outer apply (select SUM(qweight1)weight from #tmpa where qno1=a.noa and typea='rc2') r1
-outer apply (select SUM(qweight2)weight from #tmpa where qno2=a.noa and typea='rc2') r2
-outer apply (select SUM(qweight1)weight from #tmpa where qno1=a.noa and typea='vcc') v1
-outer apply (select SUM(qweight2)weight from #tmpa where qno2=a.noa and typea='vcc') v2
+outer apply (select SUM(qweight)weight from #tmpa where qno=a.noa and typea='ina') i1
+outer apply (select SUM(qweight)weight from #tmpa where qno=a.noa and typea='get') g1
 
 update #tmp set fx=isnull(f3,0)-isnull(f8,0)-(isnull(f2,0)-isnull(f7,0))
 

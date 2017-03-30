@@ -168,6 +168,7 @@ not ((len(@t_pno)=0 or isnull(product,'')=@t_pno)
 )
 
 delete #tmp where mount<=0 and weight<=0
+delete #tmp where storeno!='A'
 
 if((select count(*) from #tmp)>0)
 begin

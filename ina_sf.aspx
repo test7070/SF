@@ -275,7 +275,7 @@
 						ordh_weight=0;
 						break;
 					case 'checkInano_btnOk':
-						var as = _q_appendData("view_rc2", "", true);
+						var as = _q_appendData("view_ina", "", true);
                         if (as[0] != undefined) {
                             alert('互換進貨單號已存在!!!');
                         } else {
