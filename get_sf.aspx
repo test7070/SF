@@ -31,8 +31,6 @@
 
 			aPop = new Array(
 				['txtStoreno', 'lblStore', 'store', 'noa,store', 'txtStoreno,txtStore', 'store_b.aspx'],
-				['txtUno_', 'btnUno_', 'view_uccc', 'noa', 'txtUno_', 'uccc_seek_b.aspx?;;;1=0', '95%', '60%'],
-				['txtProductno_', 'btnProductno_', 'ucaucc', 'noa,product,unit', 'txtProductno_,txtProduct_,txtUnit_', 'ucaucc_b.aspx'],
 				['txtCustno', 'lblCustno', 'cust', 'noa,comp', 'txtCustno,txtComp', 'cust_b.aspx']
 			);
 
@@ -343,8 +341,31 @@
 					if (as[0] != undefined) {
 						alert('該批號已領料!!');
 						$('#btnMinus_'+n).click();
+					}else{
+						q_func('qtxt.query.getsuno_'+n, 'cuc_sf.txt,getuno,'+$('#txtUno_'+n).val()+';'+$('#txtNoa').val()+';#non'+';#non');
+						//q_gt('view_inas', "where=^^ uno='"+$('#txtUno_'+n).val()+"' ^^ ", 0, 0, 0, "getinauno_"+n);
 					}
 				}
+				/*if(t_name.substring(0,9)=='getinauno'){
+					var n=t_name.split('_')[1];
+					var as = _q_appendData('view_inas', '', true);
+					if (as[0] != undefined) {
+						$('#txtUno_'+n).val(as[0].uno);
+						$('#txtProduct_'+n).val(as[0].product);
+						$('#txtUcolor_'+n).val(as[0].ucolor);
+						$('#txtSpec_'+n).val(as[0].spec);
+						$('#txtSize_'+n).val(as[0].size);
+						$('#txtLengthb_'+n).val(as[0].lengthb);
+						$('#txtClass_'+n).val(as[0].class);
+						$('#txtMount_'+n).val(as[0].mount);
+						$('#txtWeight_'+n).val(as[0].weight);
+						$('#txtMemo_'+n).val(as[0].memo);
+						$('#txtMweight_'+n).val(as[0].mweight);
+					}else{
+						alert('批號不存在!!');
+						$('#btnMinus_'+n).click();
+					}
+				}*/
 			}
 			
 			var check_ordh=false;
@@ -440,7 +461,7 @@
                         	//bbsweight(b_seq);
 						});
 						
-						$('#txtUno__' + j).change(function() {
+						$('#txtUno_' + j).change(function() {
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
@@ -733,6 +754,28 @@
 						break;
 				}
 				t_vccno=''; 
+				if(t_func.indexOf('qtxt.query.getsuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		if(dec(as[0].mount)<=0 || dec(as[0].weight)<=0 ){
+                			alert('批號已被領用!!');
+                			$('#btnMinus_'+n).click();
+                		}else{
+                			$('#btnMinus_'+n).click();
+							q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtUno,txtMemo'
+							, as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,uno,memo', 'txtUno');
+							if(dec(n)+as.length>=q_bbsCount){
+								$('#btnPlus').click();
+							}
+							$('#txtUno_'+q_add(dec(n),as.length)).focus().select();
+                		}
+                	}else{
+                		alert('無此批號!!');
+                		$('#btnMinus_'+n).click();
+                	}
+                	sum();
+				}
 			}
 		</script>
 		<style type="text/css">
