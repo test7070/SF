@@ -19,7 +19,7 @@
             var q_name = "cub";
             var q_readonly = ['txtNoa','txtWorker','txtWorker2'];
             var q_readonlys = ['txtOrdeno', 'txtNo2','txtProductno2','txtProduct2'];
-            var q_readonlyt = [];
+            var q_readonlyt = ['txtLengthc','txtGmount','txtGweight'];
             var bbmNum = [];
             var bbsNum = [];
             var bbtNum = [];
