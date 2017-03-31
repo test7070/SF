@@ -357,6 +357,42 @@
 						q_boxClose2(s2);
 						break;
 				}
+				if(t_func.indexOf('qtxt.query.getvcctuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+						$('#btnMinut__'+n).click();
+						q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtMount,txtWeight,txtUno,txtMemo,txtOrdeno,txtNo2,txtItemno,txtItem,txtStoreno,txtStore'
+							, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno,memo,ordeno,no2,noa,noq,storeno,store', 'txtUno');
+						
+						if(dec(n)+as.length>=q_bbtCount){
+							$('#btnPlut').click();
+						}
+						$('#txtUno__'+q_add(dec(n),as.length)).focus().select();
+						//檢查批號是否重複 已 cubsnoa和cubsnoq為主
+						var t_repeat=false;
+						for (var i = 0; i < q_bbtCount; i++) {
+							var t_cubsnoa=$('#txtItemno__'+i).val();
+							var t_cubsnoq=$('#txtItem__'+i).val();
+							if(t_cubsnoa.length>0){
+								for (var j = i+1; j < q_bbtCount; j++) {
+									if(t_cubsnoa==$('#txtItemno__'+j).val() &&t_cubsnoq==$('#txtItem__'+j).val()){
+										t_repeat=true;
+										$('#btnMinut__'+j).click();
+									}
+								}
+							}
+						}
+						if(t_repeat){
+							alert('該批號重複!!');
+							$('#txtUno__'+(dec(n))).focus();
+						}
+					}else{
+						alert('無此批號!!');
+						$('#btnMinut__'+n).click();
+					}
+					bbtsum();
+                }
 			}
 
 			function q_boxClose(s2) {
@@ -895,17 +931,20 @@
 							$('#txtAddr').val(as[0].addr);
 							$('#txtAddr2').val(as[0].addr2);
 							
-							q_gt('view_cubs', "where=^^uno='"+$('#txtUno__'+n).val()+"' ^^ ", 0, 0, 0, "getcubsuno_"+n);
+							//q_gt('view_cubs', "where=^^uno='"+$('#txtUno__'+n).val()+"' ^^ ", 0, 0, 0, "getcubsuno_"+n);
+							q_func('qtxt.query.getvcctuno_'+n, 'cuc_sf.txt,getuno,'+$('#txtUno__'+n).val()+';'+$('#txtNoa').val()+';#non'+';#non');
 						}else{
 							if($('#txtCustno').val()!=as[0].custno){
 								alert('該批號訂單客戶與出貨客戶不同!!');
 								$('#btnMinut__'+b_seq).click();
 							}else{
-								q_gt('view_cubs', "where=^^uno='"+$('#txtUno__'+n).val()+"' ^^ ", 0, 0, 0, "getcubsuno_"+n);
+								//q_gt('view_cubs', "where=^^uno='"+$('#txtUno__'+n).val()+"' ^^ ", 0, 0, 0, "getcubsuno_"+n);
+								q_func('qtxt.query.getvcctuno_'+n, 'cuc_sf.txt,getuno,'+$('#txtUno__'+n).val()+';'+$('#txtNoa').val()+';#non'+';#non');
 							}
 						}
 					}else{
-						q_gt('view_cubs', "where=^^uno='"+$('#txtUno__'+b_seq).val()+"' ^^ ", 0, 0, 0, "getcubsuno_"+n);
+						//q_gt('view_cubs', "where=^^uno='"+$('#txtUno__'+b_seq).val()+"' ^^ ", 0, 0, 0, "getcubsuno_"+n);
+						q_func('qtxt.query.getvcctuno_'+n, 'cuc_sf.txt,getuno,'+$('#txtUno__'+n).val()+';'+$('#txtNoa').val()+';#non'+';#non');
 					}
 					/*else{
 						alert('該訂單批號不存在!!');
