@@ -18,7 +18,7 @@
 			q_tables = 's';
 			var q_name = "get";
 			var q_readonly = ['txtNoa', 'txtWorker','txtWorker2','txtTranstartno'];
-			var q_readonlys = ['txtMount','txtWeight'];
+			var q_readonlys = [];
 			var bbmNum = [];
 			var bbsNum = [];
 			var bbmMask = [['txtTranstart','99:99']];
