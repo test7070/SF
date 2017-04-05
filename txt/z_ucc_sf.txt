@@ -144,7 +144,7 @@ where a.gno='0'
 --刪除多次批號的資料 只保留最後一次批號(同一天依gno,noa順序)
 delete a
 from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+gno+'-'+noa+'-'+noq) maxnoa from #tmp where uno=a.uno and tablea='ucces' and gno!='0')b
-where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.gno+'-'+a.noa+'-'+noq< ISNULL(b.maxnoa,'')
+where a.tablea!='0' and isnull(b.datea,'') > a.datea and ISNULL(b.maxnoa,'')>a.datea+'-'+a.gno+'-'+a.noa+'-'+noq
 
 update a
 set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)

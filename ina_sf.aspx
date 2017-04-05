@@ -188,7 +188,7 @@
 			var carnoList = [];
 			var thisCarSpecno = '';
 			var ordh_weight=0;
-			var t_ordhno='#non';
+			var t_ordhno='#non',t_nordhno='#non';
             function q_gtPost(t_name) {
                 switch (t_name) {
                 	case 'getCardealCarno' :
@@ -372,9 +372,11 @@
 				
 				//取得UNO
 				var needuno=false;
-				for (var i = 0; i < q_bbsCount; i++) {
-					if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
-						needuno=true;
+				if($('#txtStoreno').val().toUpperCase()=='A'){
+					for (var i = 0; i < q_bbsCount; i++) {
+						if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && $('#txtProduct_'+i).val().indexOf('費')==-1){
+							needuno=true;
+						}
 					}
 				}
 				if(!getnewuno && needuno){
@@ -390,6 +392,8 @@
 					$('#txtWorker').val(r_name);
 				if (q_cur == 2)
 					$('#txtWorker2').val(r_name);
+				
+				t_nordhno=$('#txtOrdeno').val();
                 
                 var s1 = $('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val();
                 if (s1.length == 0 || s1 == "AUTO")
@@ -560,6 +564,7 @@
             function q_stPost() {
 				t_ordhno=t_ordhno.length==0?'#non':t_ordhno;
 				t_deleno=t_deleno.length==0?'#non':t_deleno;
+				t_nordhno=t_nordhno.length==0?'#non':t_nordhno;
 				
 				if(q_cur==3){
 					if(t_ordhno != '#non'){
@@ -574,10 +579,11 @@
 				if (!(q_cur == 1 || q_cur == 2))
 					return false;
 				
-				if((!emp($('#txtOrdeno').val()) || t_ordhno != '#non')){
-					q_func('qtxt.query.changeordhsgweight', 'ordh.txt,changeordhs_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_ordhno));
+				if((t_nordhno != '#non' || t_ordhno != '#non')){
+					q_func('qtxt.query.changeordhsgweight', 'ordh.txt,changeordhs_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_nordhno)+ ';' + encodeURI(t_ordhno));
 				}
 				t_ordhno='#non';
+				t_nordhno='#non';
 				
 				if(!emp($('#txtNoa').val())){
 					var today = new Date();

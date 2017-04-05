@@ -383,6 +383,7 @@
 				}
 				
 				check_ordh=false;
+				t_nordhno=$('#txtIdno').val();
 				
 				if (q_cur == 1)
 					$('#txtWorker').val(r_name);
@@ -536,6 +537,7 @@
 			function q_stPost() {
 				t_ordhno=t_ordhno.length==0?'#non':t_ordhno;
 				t_deleno=t_deleno.length==0?'#non':t_deleno;
+				t_nordhno=t_nordhno.length==0?'#non':t_nordhno;
 				
 				if(q_cur==3){
 					if(t_ordhno != '#non'){
@@ -550,10 +552,11 @@
 				if (!(q_cur == 1 || q_cur == 2))
 					return false;
 				
-				if((!emp($('#txtIdno').val()) || t_ordhno != '#non')){
-					q_func('qtxt.query.changeordhtgweight', 'ordh.txt,changeordht_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(t_ordhno));
+				if((t_nordhno != '#non' || t_ordhno != '#non')){
+					q_func('qtxt.query.changeordhtgweight', 'ordh.txt,changeordht_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_nordhno)+ ';' + encodeURI(t_ordhno));
 				}
 				t_ordhno='#non';
+				t_nordhno='#non';
 				
 				if(!emp($('#txtNoa').val())){
 					var today = new Date();
