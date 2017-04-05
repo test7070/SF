@@ -852,7 +852,7 @@
 				//取得UNO
 				var needuno=false;
 				for (var i = 0; i < q_bbsCount; i++) {
-					if(emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && ($('#txtProduct_'+i).val().indexOf('鐵線')>-1 || $('#txtProduct_'+i).val().indexOf('鋼筋')>-1)){
+					if($('#txtStoreno_'+i).val().toUpperCase()=='A' && emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && ($('#txtProduct_'+i).val().indexOf('鐵線')>-1 || $('#txtProduct_'+i).val().indexOf('鋼筋')>-1)){
 						needuno=true;
 					}
 				}
@@ -1318,12 +1318,14 @@
 								
 							//定尺
 							for (var i = 0; i < q_bbsCount; i++) {
-								if(!emp($('#txtProduct_' + i).val()) && $('#txtUcolor_'+i).val().indexOf('定尺')>-1
-								&& emp($('#txtUno_'+i).val())){
-									if(t_noa!='' && ($('#txtNoa').val().length==0 || $('#txtNoa').val()=='AUTO'))
-										$('#txtUno_'+i).val(t_noa);
-									else
-										$('#txtUno_'+i).val($('#txtNoa').val());
+								if($('#txtStoreno_'+i).val().toUpperCase()=='A'){
+									if(!emp($('#txtProduct_' + i).val()) && $('#txtUcolor_'+i).val().indexOf('定尺')>-1
+									&& emp($('#txtUno_'+i).val())){
+										if(t_noa!='' && ($('#txtNoa').val().length==0 || $('#txtNoa').val()=='AUTO'))
+											$('#txtUno_'+i).val(t_noa);
+										else
+											$('#txtUno_'+i).val($('#txtNoa').val());
+									}
 								}
 							}
 							
