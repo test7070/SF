@@ -66,13 +66,8 @@ if(LEN(@t_bdate)>0)
 create table #tmpa(
 	noa nvarchar(50),
 	typea nvarchar(10),
-	memo nvarchar(MAX),
-	total float,
-	payed float,
-	qno1 nvarchar(50),
-	qweight1 float,
-	qno2 nvarchar(50),
-	qweight2 float
+	qno nvarchar(50),
+	qweight float,
 )
 CREATE INDEX tmpa_index ON #tmpa (noa,typea)
 
