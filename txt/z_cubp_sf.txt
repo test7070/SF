@@ -305,6 +305,7 @@ and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno)
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) 
 and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
 and (len(@t_itype)=0 or isnull(a.itype,'')=@t_itype)
+and b.noq is not null
 
 if((select count(*) from #tmp)>0)
 begin
