@@ -112,6 +112,7 @@ CREATE INDEX tmpindex0 on #tmp (datea,tablea,typea,noa,noq,product,spec,size,uco
 CREATE INDEX tmpindex1 on #tmp (product,spec,size,ucolor,lengthb,class,datea,typea,noa,noq)
 CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 
+update #tmp set size=''
 --------------------------------------------------------------------
 --月成本
 create table #tmpb(
@@ -494,6 +495,8 @@ where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,
 and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and (isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
 and b.storeno between @t_bstoreno and @t_estoreno
+
+update #tmp set spec=''
 
 --------------------------------------------------------------------
 delete #tmpb

@@ -850,7 +850,8 @@
 				}
 				
 				//取得UNO
-				var needuno=false;
+				//106/04/10 用手動的方式產生
+				/*var needuno=false;
 				for (var i = 0; i < q_bbsCount; i++) {
 					if($('#txtStoreno_'+i).val().toUpperCase()=='A' && emp($('#txtUno_'+i).val()) && !emp($('#txtProduct_'+i).val()) && ($('#txtProduct_'+i).val().indexOf('鐵線')>-1 || $('#txtProduct_'+i).val().indexOf('鋼筋')>-1)){
 						needuno=true;
@@ -860,7 +861,7 @@
 				if(!getnewuno && needuno){
 					q_func('qtxt.query.getnewuno', 'cuc_sf.txt,getnewuno,rc2;'+$('#txtNoa').val()+';'+q_getPara('sys.key_rc2')+';'+$('#txtDatea').val());
 					return;
-				}
+				}*/
 				
 				getnewuno=false;
 				check_uno=false;
@@ -1019,6 +1020,46 @@
 								t_noa='#non';
 							if(!emp($('#txtUno_'+b_seq).val())){
 								q_func('qtxt.query.rc2suno_'+b_seq, 'cuc_sf.txt,getuno,'+$('#txtUno_'+b_seq).val()+';'+t_noa+';#non'+';#non');
+							}
+						});
+						
+						$('#btnGenuno_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur!=1 && q_cur!=2 && emp($('#txtUno_'+b_seq).val()) && $('#txtStoreno_'+b_seq).val()=='A' && !emp($('#txtNoa').val()) && !emp($('#txtNoq_'+b_seq).val())){
+								if(confirm("確定要產生批號?")){
+									var t_ucolor=$('#txtUcolor_'+b_seq).val();
+									if(t_ucolor.length==0){
+										t_ucolor='#non';
+									}
+									q_func('qtxt.query.insertuno_'+b_seq, 'cuc_sf.txt,insert_uno,'
+									+encodeURI(r_accy)+';'+encodeURI('rc2')+';'+encodeURI($('#txtNoa').val())+';'+encodeURI($('#txtNoq_'+b_seq).val())+';'
+									+encodeURI(r_userno)+';'+encodeURI(r_name)+';'+encodeURI(t_ucolor));
+								}
+							}else{
+								if(!emp($('#txtUno_'+b_seq).val())){
+									alert('批號已存在!!')
+								}
+								if($('#txtStoreno_'+b_seq).val()!='A'){
+									alert('進貨倉庫非【三泰本倉】!!')
+								}
+							}
+						});
+						$('#btnDeleuno_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur!=1 && q_cur!=2 && !emp($('#txtUno_'+b_seq).val()) && !emp($('#txtNoa').val()) && !emp($('#txtNoq_'+b_seq).val())){
+								if(confirm("確定要刪除批號【"+$('#txtUno_'+b_seq).val()+"】?")){
+									q_func('qtxt.query.deleuno_'+b_seq, 'cuc_sf.txt,dele_uno,'
+									+encodeURI(r_accy)+';'+encodeURI('rc2')+';'+encodeURI($('#txtNoa').val())+';'+encodeURI($('#txtNoq_'+b_seq).val())+';'
+									+encodeURI(r_userno)+';'+encodeURI(r_name)+';'+encodeURI($('#txtUno_'+b_seq).val()));
+								}
+							}else{
+								if(emp($('#txtUno_'+b_seq).val())){
+									alert('批號不存在!!')
+								}
 							}
 						});
 					}
@@ -1199,8 +1240,16 @@
 				_readonly(t_para, empty);
 				if (t_para) {
 					$('#combAddr').attr('disabled', 'disabled');
+					for (var i = 0; i < q_bbsCount; i++) {
+						$('#btnGenuno_'+i).removeAttr('disabled');
+						$('#btnDeleuno_'+i).removeAttr('disabled');
+					}
 				} else {
 					$('#combAddr').removeAttr('disabled');
+					for (var i = 0; i < q_bbsCount; i++) {
+						$('#btnGenuno_'+i).attr('disabled', 'disabled');
+						$('#btnDeleuno_'+i).attr('disabled', 'disabled');
+					}
 				}
 				
 				//限制帳款月份的輸入 只有在備註的第一個字為*才能手動輸入
@@ -1409,6 +1458,56 @@
 	                		check_uno=true;
 	                		btnOk();
 	                	}
+                	}
+				}
+				
+				if(t_func.indexOf('qtxt.query.insertuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		if(as[0].terr.length>0){
+                			alert(as[0].terr);
+                		}else{
+                			if($('#txtNoa').val()==as[0].noa && $('#txtNoq_'+n).val()==as[0].noq){
+                				$('#txtUno_'+n).val(as[0].uno);
+                				for (var j = 0; j < abbs.length; j++) {
+									if (abbs[j]['noa'] == as[0].noa && abbs[j]['noq'] == as[0].noq) {
+	                                    abbs[j]['uno'] = as[0].uno;
+	                                    break;
+	                                }
+	                            }
+                			}else{
+                				//重刷畫面
+                				location.href=location.href;
+                			}
+                		}
+                	}else{
+                		alert('產生批號失敗!!')
+                	}
+				}
+				
+				if(t_func.indexOf('qtxt.query.deleuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		if(as[0].terr.length>0){
+                			alert(as[0].terr);
+                		}else{
+                			if($('#txtNoa').val()==as[0].noa && $('#txtNoq_'+n).val()==as[0].noq){
+                				$('#txtUno_'+n).val('');
+                				for (var j = 0; j < abbs.length; j++) {
+									if (abbs[j]['noa'] == as[0].noa && abbs[j]['noq'] == as[0].noq) {
+	                                    abbs[j]['uno'] = as[0].uno;
+	                                    break;
+	                                }
+	                            }
+                			}else{
+                				//重刷畫面
+                				location.href=location.href;
+                			}
+                		}
+                	}else{
+                		alert('刪除批號失敗!!')
                 	}
 				}
 				
@@ -1733,7 +1832,11 @@
 				<tr style='background:#cad3ff;'>
 					<td><input class="btn" id="btnMinus.*" type="button" value='－' style=" font-weight: bold;" /></td>
 					<td><input id="txtNoq.*" type="text" class="txt c1"/></td>
-					<td><input id="txtUno.*" type="text" class="txt c1"/></td>
+					<td>
+						<input id="txtUno.*" type="text" class="txt c1"/>
+						<input id="btnGenuno.*" type="button" value="產生"/>
+						<input id="btnDeleuno.*" type="button" value="刪除"/>
+					</td>
 					<!--<td>
 						<input id="txtProductno.*" type="text" class="txt c1" style="width: 83%;"/>
 						<input class="btn" id="btnProductno.*" type="button" value='.' style="font-weight: bold;" />

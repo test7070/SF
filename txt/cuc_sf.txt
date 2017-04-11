@@ -885,3 +885,191 @@ cucutocubs:--cucutocubs
 		EXECUTE sp_executesql @cmd
 	END
 ;
+-------------------------------------------------------------------------------------------------------------------------------
+insert_uno:--insert_uno
+SET QUOTED_IDENTIFIER OFF
+declare @cmd nvarchar(max) = ''
+declare @accy nvarchar(max) = [1]
+declare @tablea nvarchar(max) = [2]
+declare @noa nvarchar(max) = [3]
+declare @noq nvarchar(max) = [4]
+declare @userno nvarchar(max) = [5]
+declare @namea nvarchar(max) = [6]
+declare @ucolor nvarchar(max) = case when '#non'=[7] then '' else [7] end
+
+declare @t_err nvarchar(max) = '參數錯誤'
+declare @uno nvarchar(max) = ''
+declare @num nvarchar(max) = ''
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+
+--已使用的uno
+create table #tmp( 
+	uno nvarchar(50)
+)
+-------------------------------------------------------------------
+if(@ucolor not like '%定尺%')
+begin
+	--盤點
+	insert #tmp
+	select a.uno from view_ucces a left join view_ucce b on a.noa=b.noa where len(a.uno)>0 group by a.uno
+	--進貨
+	insert #tmp
+	select a.uno from view_rc2s a left join view_rc2 b on a.noa = b.noa where len(a.uno)>0 group by a.uno
+	--入庫
+	insert #tmp
+	select a.uno from view_cubs a left join view_cub b on a.noa=b.noa where len(a.uno)>0 group by a.uno
+	--互換進
+	insert #tmp
+	select a.uno from view_inas a left join view_ina b on a.noa=b.noa where len(a.uno)>0 group by a.uno
+	--出貨退回
+	insert #tmp
+	select b.uno from view_vcc a left join view_vcct b on a.noa = b.noa where len(b.uno)>0 group by b.uno
+	--領料
+	insert #tmp
+	select a.uno from view_cubt a left join view_cub b on a.noa=b.noa where len(a.uno)>0 group by a.uno
+	--互換出
+	insert #tmp
+	select a.uno from view_gets a left join view_get b on a.noa=b.noa where len(a.uno)>0 group by a.uno
+end
+----------------------------------------------------------------------------------
+
+if(len(@noa)>0 and len(@noq)>0)
+begin
+	if(@tablea='rc2')
+	begin
+		set @accy=isnull((select top 1 accy from view_rc2s where noa=@noa and noq=@noq),'')
+		set @uno=isnull((select top 1 uno from view_rc2s where noa=@noa and noq=@noq),'')
+		if(len(@accy)=0)
+		begin
+			set @t_err='進貨單號或品項不存在!!'
+		end
+		else if (len(@uno)>0)
+		begin
+			set @t_err='進貨批號已存在!!'
+		end
+		else
+		begin
+			if(@ucolor not like '%定尺%')
+			begin
+				set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from #tmp where uno like @noa+'-%'),'000')
+				set @num=right('000'+CAST(CAST(@num as int)+1 as nvarchar(10)),3)
+				set @uno=@noa+'-'+@num
+				--檢查其他tablea批號是否重覆
+				while ((select count(*) from #tmp where uno=@uno)>0)
+				begin
+					set @num=right('000'+CAST(CAST(@num as int)+1 as nvarchar(10)),3)
+					set @uno=@noa+'-'+@num
+				end
+			end
+			else
+			begin
+				set @uno=@noa
+			end
+			
+			EXEC("update rc2s"+@accy+" set uno='"+@uno+"' where noa='"+@noa+"' and noq='"+@noq+"'")
+			set @t_err=''
+		end
+	end
+	else if(@tablea='ina')
+	begin
+		set @accy=isnull((select top 1 accy from view_inas where noa=@noa and noq=@noq),'')
+		set @uno=isnull((select top 1 uno from view_inas where noa=@noa and noq=@noq),'')
+		if(len(@accy)=0)
+		begin
+			set @t_err='互換進貨單號或品項不存在!!'
+		end
+		else if (len(@uno)>0)
+		begin
+			set @t_err='互換進貨批號已存在!!'
+		end
+		else
+		begin
+			if(@ucolor not like '%定尺%')
+			begin
+				set @num=isnull((select left(replace(MAX(uno),@noa+'-',''),3) from #tmp where uno like @noa+'-%'),'000')
+				set @num=right('000'+CAST(CAST(@num as int)+1 as nvarchar(10)),3)
+				set @uno=@noa+'-'+@num
+				--檢查其他tablea批號是否重覆
+				while ((select count(*) from #tmp where uno=@uno)>0)
+				begin
+					set @num=right('000'+CAST(CAST(@num as int)+1 as nvarchar(10)),3)
+					set @uno=@noa+'-'+@num
+				end
+			end
+			else
+			begin
+				set @uno=@noa
+			end
+			
+			EXEC("update inas"+@accy+" set uno='"+@uno+"' where noa='"+@noa+"' and noq='"+@noq+"'")
+			set @t_err=''
+		end
+	end
+	else
+	begin
+		set @t_err='批號寫入錯誤!!'
+	end
+end
+
+select @noa noa,@noq noq,@uno uno,@t_err terr
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+;
+--------------------------------------------------------------------------------------------------------------
+dele_uno:--dele_uno
+SET QUOTED_IDENTIFIER OFF
+declare @cmd nvarchar(max) = ''
+declare @accy nvarchar(max) = [1]
+declare @tablea nvarchar(max) = [2]
+declare @noa nvarchar(max) = [3]
+declare @noq nvarchar(max) = [4]
+declare @userno nvarchar(max) = [5]
+declare @namea nvarchar(max) = [6]
+
+declare @t_err nvarchar(max) = '參數錯誤'
+
+if(len(@noa)>0 and len(@noq)>0)
+begin
+	if(@tablea='rc2')
+	begin
+		set @accy=isnull((select top 1 accy from view_rc2s where noa=@noa and noq=@noq),'')
+		if(len(@accy)=0)
+		begin
+			set @t_err='進貨單號或品項不存在!!'
+		end
+		else
+		begin
+			EXEC("update rc2s"+@accy+" set uno='' where noa='"+@noa+"' and noq='"+@noq+"'")
+			set @t_err=''
+		end
+	end
+	else if(@tablea='ina')
+	begin
+		set @accy=isnull((select top 1 accy from view_inas where noa=@noa and noq=@noq),'')
+		if(len(@accy)=0)
+		begin
+			set @t_err='互換進貨單號或品項不存在!!'
+		end
+		else
+		begin
+			EXEC("update inas"+@accy+" set uno='' where noa='"+@noa+"' and noq='"+@noq+"'")
+			set @t_err=''
+		end
+	end
+	else
+	begin
+		set @t_err='刪除批號錯誤!!'
+	end
+end
+
+select @noa noa,@noq noq,@t_err terr
+;
