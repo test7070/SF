@@ -500,6 +500,47 @@
 						$('#txtMweight_' + j).focusout(function() {
 							sum();
 						});
+						
+						$('#btnGenuno_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur!=1 && q_cur!=2 && emp($('#txtUno_'+b_seq).val()) && $('#txtStoreno').val()=='A' && !emp($('#txtNoa').val()) && !emp($('#txtNoq_'+b_seq).val())){
+								if(confirm("確定要產生批號?")){
+									var t_ucolor=$('#txtUcolor_'+b_seq).val();
+									if(t_ucolor.length==0){
+										t_ucolor='#non';
+									}
+									q_func('qtxt.query.insertuno_'+b_seq, 'cuc_sf.txt,insert_uno,'
+									+encodeURI(r_accy)+';'+encodeURI('ina')+';'+encodeURI($('#txtNoa').val())+';'+encodeURI($('#txtNoq_'+b_seq).val())+';'
+									+encodeURI(r_userno)+';'+encodeURI(r_name)+';'+encodeURI(t_ucolor));
+								}
+							}else{
+								if(!emp($('#txtUno_'+b_seq).val())){
+									alert('批號已存在!!')
+								}
+								if($('#txtStoreno').val()!='A'){
+									alert('進貨倉庫非【三泰本倉】!!')
+								}
+							}
+						});
+						
+						$('#btnDeleuno_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur!=1 && q_cur!=2 && !emp($('#txtUno_'+b_seq).val()) && !emp($('#txtNoa').val()) && !emp($('#txtNoq_'+b_seq).val())){
+								if(confirm("確定要刪除批號【"+$('#txtUno_'+b_seq).val()+"】?")){
+									q_func('qtxt.query.deleuno_'+b_seq, 'cuc_sf.txt,dele_uno,'
+									+encodeURI(r_accy)+';'+encodeURI('ina')+';'+encodeURI($('#txtNoa').val())+';'+encodeURI($('#txtNoq_'+b_seq).val())+';'
+									+encodeURI(r_userno)+';'+encodeURI(r_name)+';'+encodeURI($('#txtUno_'+b_seq).val()));
+								}
+							}else{
+								if(emp($('#txtUno_'+b_seq).val())){
+									alert('批號不存在!!')
+								}
+							}
+						});
                     }
                 }
                 _bbsAssign();
@@ -856,6 +897,56 @@
                 	}
 				}
 				t_rc2no='';
+				
+				if(t_func.indexOf('qtxt.query.insertuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		if(as[0].terr.length>0){
+                			alert(as[0].terr);
+                		}else{
+                			if($('#txtNoa').val()==as[0].noa && $('#txtNoq_'+n).val()==as[0].noq){
+                				$('#txtUno_'+n).val(as[0].uno);
+                				for (var j = 0; j < abbs.length; j++) {
+									if (abbs[j]['noa'] == as[0].noa && abbs[j]['noq'] == as[0].noq) {
+	                                    abbs[j]['uno'] = as[0].uno;
+	                                    break;
+	                                }
+	                            }
+                			}else{
+                				//重刷畫面
+                				location.href=location.href;
+                			}
+                		}
+                	}else{
+                		alert('產生批號失敗!!')
+                	}
+				}
+				
+				if(t_func.indexOf('qtxt.query.deleuno_')>-1){
+					var n=t_func.split('_')[1];
+                	var as = _q_appendData("tmp0", "", true, true);
+                	if (as[0] != undefined) {
+                		if(as[0].terr.length>0){
+                			alert(as[0].terr);
+                		}else{
+                			if($('#txtNoa').val()==as[0].noa && $('#txtNoq_'+n).val()==as[0].noq){
+                				$('#txtUno_'+n).val('');
+                				for (var j = 0; j < abbs.length; j++) {
+									if (abbs[j]['noa'] == as[0].noa && abbs[j]['noq'] == as[0].noq) {
+	                                    abbs[j]['uno'] = as[0].uno;
+	                                    break;
+	                                }
+	                            }
+                			}else{
+                				//重刷畫面
+                				location.href=location.href;
+                			}
+                		}
+                	}else{
+                		alert('刪除批號失敗!!')
+                	}
+				}
 			}
 		</script>
 		<style type="text/css">
@@ -1109,7 +1200,11 @@
 						<input id="txtNoq.*" type="text" style="display: none;" />
 					</td>
 					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
-					<td><input  id="txtUno.*" type="text" class="txt c1"/></td>
+					<td>
+						<input id="txtUno.*" type="text" class="txt c1"/>
+						<input id="btnGenuno.*" type="button" value="入庫"/>
+						<input id="btnDeleuno.*" type="button" value="刪除"/>
+					</td>
 					<td>
 						<input id="txtProduct.*" type="text" class="txt c1" style="width: 90px;"/>
 						<select id="combProduct.*" class="txt" style="width: 20px;"> </select>

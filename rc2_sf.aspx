@@ -1834,7 +1834,7 @@
 					<td><input id="txtNoq.*" type="text" class="txt c1"/></td>
 					<td>
 						<input id="txtUno.*" type="text" class="txt c1"/>
-						<input id="btnGenuno.*" type="button" value="產生"/>
+						<input id="btnGenuno.*" type="button" value="入庫"/>
 						<input id="btnDeleuno.*" type="button" value="刪除"/>
 					</td>
 					<!--<td>

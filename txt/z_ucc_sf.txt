@@ -2084,6 +2084,7 @@ from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 and b.storeno='A' --106/04/05
+and len(isnull(b.uno,''))>0 --106/04/11
 
 --進
 insert #tmp
@@ -2095,17 +2096,18 @@ from view_rc2 a left join view_rc2s b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 and b.storeno='A' --106/04/05
+and len(isnull(b.uno,''))>0 --106/04/11
 
---銷
-insert #tmp
-select '5','vccs',a.accy,a.noa,b.noq,a.datea,'',b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
-,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,0,0,'vcc_sf?noa=$noa'
-from view_vcc a left join view_vccs b on a.noa=b.noa
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and (len(@x_uno)=0)
-and b.storeno='A' --106/04/05
+--銷 -106/04/11 只需要批號的資料 所以不抓vccs
+--insert #tmp
+--select '5','vccs',a.accy,a.noa,b.noq,a.datea,'',b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+--,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
+--,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,0,0,'vcc_sf?noa=$noa'
+--from view_vcc a left join view_vccs b on a.noa=b.noa
+--where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+--and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
+--and (len(@x_uno)=0)
+--and b.storeno='A' --106/04/05
 
 insert #tmp
 select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
@@ -2117,6 +2119,7 @@ outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate 
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 and b.storeno='A' --106/04/05
+and len(isnull(b.uno,''))>0 --106/04/11
 
 update  a
 set storeno=isnull(b.storeno,'')
