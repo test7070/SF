@@ -54,8 +54,10 @@
 				var tt_weight=0;
 				for (var j = 0; j < q_bbsCount; j++) {
 					t_weight=$('#txtWeight_' + j).val();
-					t_price=$('#txtMweight_' + j).val();
+					/*t_price=$('#txtMweight_' + j).val();
 					t_money = q_mul(dec(t_weight), dec(t_price));
+					*/
+					t_money=dec($('#txtLengthc_'+j).val());
 					t1=q_add(t1,t_money);
 					tt_weight=q_add(tt_weight,dec(t_weight));
 				}
@@ -86,7 +88,8 @@
 				, ['txtMount', 15, q_getPara('vcc.weightPrecision'), 1], ['txtTranstyle', 15, q_getPara('vcc.weightPrecision'), 1], ['txtTweight', 15, q_getPara('vcc.weightPrecision'), 1]
             	, ['txtPrice', 12, 3, 1], ['txtTranmoney', 15, 0, 1]]
 				bbsNum = [['txtLengthb', 10, 2, 1], ['txtMount', 10, q_getPara('vcc.mountPrecision'), 1]
-				, ['txtWeight', 10, q_getPara('vcc.weightPrecision'), 1], ['txtMweight', 10, q_getPara('vcc.pricePrecision'), 1]];
+				, ['txtWeight', 10, q_getPara('vcc.weightPrecision'), 1], ['txtMweight', 10, q_getPara('vcc.pricePrecision'), 1]
+				, ['txtLengthc', 15, 0, 1]];
 				
 				q_gt('ucc', "1=1", 0, 0, 0, "bbsucc");
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
@@ -156,8 +159,6 @@
 					sum();
 				});
 			}
-			
-			
 			
 			function q_popPost(s1) {
 				switch (s1) {
@@ -472,9 +473,27 @@
 							}
 						});
 						$('#txtWeight_' + j).focusout(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							var t_weight=$('#txtWeight_' + b_seq).val();
+							var t_price=$('#txtMweight_' + b_seq).val();
+							var t_money = q_mul(dec(t_weight), dec(t_price));
+							$('#txtLengthc_'+b_seq).val(t_money);
 							sum();
 						});
 						$('#txtMweight_' + j).focusout(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							var t_weight=$('#txtWeight_' + b_seq).val();
+							var t_price=$('#txtMweight_' + b_seq).val();
+							var t_money = q_mul(dec(t_weight), dec(t_price));
+							$('#txtLengthc_'+b_seq).val(t_money);
+							sum();
+						});
+						
+						$('#txtLengthc_' + j).focusout(function() {
 							sum();
 						});
 					}
@@ -1022,7 +1041,7 @@
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:1%;"><input class="btn"  id="btnPlus" type="button" value='＋' style="font-weight: bold;"  /></td>
 					<td align="center" style="width:35px;">項序</td>
-					<td style="width:120px; text-align: center;"><a id="lblUno_st" > </a></td>
+					<td style="width:120px; text-align: center;display: none;"><a id="lblUno_st" > </a></td>
 					<td style="width:120px; text-align: center;">品名</td>
 					<td style="width:150px; text-align: center;">類別</td>
 					<td style="width:110px; text-align: center;">材質</td>
@@ -1032,6 +1051,7 @@
 					<td style="width:70px; text-align: center;">數量(件)</td>
 					<td style="width:80px; text-align: center;">重量kg</td>
 					<td style="width:80px; text-align: center;">單價</td>
+					<td style="width:100px; text-align: center;">小計</td>
 					<td style=" text-align: center;">單項備註</td>
 				</tr>
 				<tr  style='background:#cad3ff;'>
@@ -1040,7 +1060,7 @@
 						<input id="txtNoq.*" type="text" style="display: none;" />
 					</td>
 					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
-					<td><input  id="txtUno.*" type="text" class="txt c1"/></td>
+					<td style="display: none;"><input  id="txtUno.*" type="text" class="txt c1"/></td>
 					<td>
 						<input id="txtProduct.*" type="text" class="txt c1" style="width: 90px;"/>
 						<select id="combProduct.*" class="txt" style="width: 20px;"> </select>
@@ -1062,6 +1082,7 @@
 					<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtMweight.*" type="text" class="txt num c1"/></td>
+					<td><input id="txtLengthc.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtMemo.*" type="text" class="txt c1"/></td>
 				</tr>
 			</table>
