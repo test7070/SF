@@ -591,7 +591,11 @@
 								t_vccno=as[0].transtartno;
 							}
 						}
-						q_func('vcc_post.post.get2vcc20', r_accy + ',' + t_vccno + ',0');
+						if(t_vccno.length>0)
+							q_func('vcc_post.post.get2vcc20', r_accy + ',' + t_vccno + ',0');
+						else{
+							q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+						}
 					}
 				}
 			}

@@ -664,6 +664,8 @@
 						}
 						if(t_rc2no.length>0)
 							q_func('rc2_post.post.ina2rc220', r_accy + ',' + t_rc2no + ',0');
+						else
+							q_func('qtxt.query.ina2rc2.1', 'ina.txt,ina2rc2_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_rc2'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
 					}
 				}
 			}
