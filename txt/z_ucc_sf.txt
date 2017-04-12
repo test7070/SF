@@ -785,7 +785,7 @@ select '0','ucce',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,b.weight,b.price,b.total,b.price,b.total
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '加工費%')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --進
@@ -796,7 +796,7 @@ select '1','rc2s',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,case when a.typea='2' then -1 else 1 end*b.total
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
-and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '加工費%')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --銷
@@ -807,7 +807,7 @@ select '5','vccs',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 from view_vcc a left join view_vccs b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
 and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '加工費%')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 insert #tmp
@@ -817,7 +817,7 @@ select '5','vcct',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 from view_vcc a left join view_vcct b on a.noa=b.noa
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
-and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '加工費%')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --互換
@@ -828,7 +828,7 @@ select '2','inas',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,b.weight*b.mweight,b.mweight,b.weight*b.mweight
 from view_ina a left join view_inas b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
-and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '加工費%')
 and a.storeno between @t_bstoreno and @t_estoreno
 
 --出
@@ -838,7 +838,7 @@ select '6','gets',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,b.weight*b.mweight,b.mweight,b.weight*b.mweight
 from view_get a left join view_gets b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
-and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%')
+and not(isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '加工費%')
 and a.storeno between @t_bstoreno and @t_estoreno
 
 CREATE INDEX tmpindex0 on #tmp (datea,tablea,typea,noa,noq,product,spec,size,ucolor,lengthb,class)

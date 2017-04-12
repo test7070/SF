@@ -480,13 +480,13 @@
 					for(var i=now_count;i<(now_count+bbtaddcount);i++){
 	    				string+='<tr id="cucu_tr'+i+'">';
 	    				string+='<td style="text-align: center;"><input id="btnMinut__'+i+'" class="minut" type="button" style="font-size: medium; font-weight: bold;" value="－"/></td>';
-	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textProduct__'+i+'"  type="text" class="txt c3" value="鋼筋"/><select id="combProduct__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textProduct__'+i+'"  type="text" class="txt c3" value=""/><select id="combProduct__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textUcolor__'+i+'"  type="text" class="txt c3" value="" /><select id="combUcolor__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textSpec__'+i+'"  type="text" class="txt c3" /><select id="combSpec__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textSize__'+i+'"  type="text" class="txt c3 sizea" style="width:50%;" /><select id="combSize__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textLengthb__'+i+'"  type="text" class="txt num c1" /></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textClass__'+i+'"  type="text" class="txt c3" /><select id="combClass__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
-	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textImount__'+i+'"  type="text" class="txt num c1" /></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textImount__'+i+'"  type="text" class="txt num c1" value="1"/></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textIlengthc__'+i+'"  type="text" class="txt num c1" /></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textIweight__'+i+'"  type="text" class="txt num c1" /></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textMemo__'+i+'"  type="text" class="txt c1" /></td>';
@@ -1334,6 +1334,57 @@
                     	}
                     	Unlock();
                     	break;
+                    case 'spec':
+						var as = _q_appendData("spec", "", true);
+						t_spec='@';
+						for ( i = 0; i < as.length; i++) {
+							t_spec+=","+as[i].noa;
+						}
+						
+						$('#cucu_table .comb').each(function(index) {
+							//帶入選項值
+							var n=$(this).attr('id').split('__')[1];
+							var objname=$(this).attr('id').split('__')[0];
+							if(objname=='combSpec'){
+								$(this).text(''); //清空資料
+								q_cmbParse("combSpec__"+n, t_spec);
+							}
+						});
+						break;
+					case 'color':
+						var as = _q_appendData("color", "", true);
+						t_ucolor='@';
+						for ( i = 0; i < as.length; i++) {
+							t_ucolor+=","+as[i].color;
+						}
+						
+						$('#cucu_table .comb').each(function(index) {
+							//帶入選項值
+							var n=$(this).attr('id').split('__')[1];
+							var objname=$(this).attr('id').split('__')[0];
+							if(objname=='combUcolor'){
+								$(this).text(''); //清空資料
+								q_cmbParse("combUcolor__"+n, ',定尺,板料,亂尺');
+							}
+						});
+						break;
+					case 'class':
+						var as = _q_appendData("class", "", true);
+						t_class='@';
+						for ( i = 0; i < as.length; i++) {
+							t_class+=","+as[i].noa;
+						}
+						
+						$('#cucu_table .comb').each(function(index) {
+							//帶入選項值
+							var n=$(this).attr('id').split('__')[1];
+							var objname=$(this).attr('id').split('__')[0];
+							if(objname=='combClass'){
+								$(this).text(''); //清空資料
+								q_cmbParse("combClass__"+n, t_class);
+							}
+						});
+						break;
 					case 'mech':
 						var as = _q_appendData("mech", "", true);
 						t_mech='@',t_select='';
