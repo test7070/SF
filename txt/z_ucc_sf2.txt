@@ -779,6 +779,8 @@ gno,product,spec,size,ucolor,dbo.getComma(lengthb,-1)lengthb,class
 ,dbo.getComma(lp,2)lp
 ,dbo.getComma(lm,2)lm
 ,REPLACE(CONVERT (NVARCHAR(10), GETDATE(),20 ),'-','/') today
+,case when @t_bstoreno='' then isnull((select top 1 store from store order by noa),'') else @t_bstoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end bstore
+,case when @t_estoreno=char(255) then isnull((select top 1 store from store order by noa desc),'') else @t_estoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end estore
 from #tmpa order by gno,product,spec,size
 
 IF OBJECT_ID('tempdb..#tmp')is not null
