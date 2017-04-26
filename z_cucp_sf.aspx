@@ -75,7 +75,11 @@
                     },{
 						type : '5',
 						name : 'xorder',//[13]
-						value :('memo@備註(區域),pic@加工型式,#non@無').split(',')
+						value :('#non@預設,memo@備註(區域),pic@加工型式,parafg@是否續接').split(',')
+					},{
+						type : '5',
+						name : 'isparafg',//[14]
+						value :('#non@全部,1@需續接,2@不續接').split(',')
 					}]
                 });
 				 q_popAssign();

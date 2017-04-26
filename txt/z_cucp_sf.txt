@@ -232,6 +232,7 @@ declare @t_memo nvarchar(100) = case when '#non'= [10] then '' else [10] end
 declare @t_bpicno nvarchar(100) = case when '#non'= [11] then '' else [11] end
 declare @t_epicno nvarchar(100) = case when '#non'= [12] then char(255) else [12] end
 declare @t_order nvarchar(100) = case when '#non'= [13] then '' else [13] end
+declare @t_isparafg nvarchar(100) = case when '#non'= [14] then '' else [14] end
 ----------------------------------------------------------------------------------------------------------------------------
 
 declare @tmp table(
@@ -278,6 +279,11 @@ and (len(@t_size)=0 or b.size=@t_size)
 and (len(@t_memo)=0 or b.memo=@t_memo)
 and (b.picno between @t_bpicno and @t_epicno)
 
+if(@t_isparafg='1') --需續接
+	delete @tmp where not(isnull(paraf,'')!='' or isnull(parag,'')!='')
+if(@t_isparafg='2') --不需續接
+	delete @tmp where (isnull(paraf,'')!='' or isnull(parag,'')!='')
+
 update a
 set tmemo=stuff((select CHAR(59)+size+'-'+spec+'='+dbo.getComma(SUM(weight),0)+'KG' from @tmp where noa=a.noa group by size,spec order by cast(dbo.get_num(size) as int),spec FOR XML PATH('')),1,1,'')
 from @tmp a
@@ -292,12 +298,13 @@ from @tmp a
 
 if(@t_order='memo')
 begin
+	insert @tmp(gno,noa,spec,size,idno,weight)
+	select '1',noa,spec,size,MAX(idno)+1,sum(weight) from @tmp group by noa,spec,size
+	
 	update a
 	set idno=rr
-	from (select idno,ROW_NUMBER() over (order by memo,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
+	from (select idno,ROW_NUMBER() over (order by cast(dbo.get_num(size) as int),spec,gno,memo,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
 	
-	insert @tmp(gno,noa,idno,weight)
-	select '1',noa,MAX(idno)+1,sum(weight) from @tmp group by noa
 end
 else if(@t_order='pic')
 begin
@@ -305,21 +312,32 @@ begin
 	update @tmp
 	set picno2=case when picname='直料' then '1' else '2' end
 	
-	insert @tmp(gno,noa,picno2,weight)
-	select '1',noa,picno2,sum(weight) from @tmp group by noa,picno2
+	insert @tmp(gno,noa,picno2,spec,size,weight)
+	select '1',noa,picno2,spec,size,sum(weight) from @tmp group by noa,picno2,spec,size
 	
 	update a
 	set idno=rr
-	from (select idno,ROW_NUMBER() over (order by picno2,gno,picno,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
+	from (select idno,ROW_NUMBER() over (order by picno2,cast(dbo.get_num(size) as int),spec,gno,picno,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
+end
+else if(@t_order='parafg')
+begin	
+	insert @tmp(gno,noa,spec,size,idno,weight)
+	select '1',noa,spec,size,MAX(idno)+1,sum(weight) from @tmp group by noa,spec,size
+	
+	update a
+	set idno=rr
+	from (select idno,ROW_NUMBER() over (order by cast(dbo.get_num(size) as int),spec,gno
+	,case when isnull(paraf,'')!='' or isnull(parag,'')!='' then 1 else 0 end
+	,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
 end
 else
 begin
+	insert @tmp(gno,noa,spec,size,idno,weight)
+	select '1',noa,spec,size,MAX(idno)+1,sum(weight) from @tmp group by noa,spec,size
+	
 	update a
 	set idno=rr
-	from (select idno,ROW_NUMBER() over (order by cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
-	
-	insert @tmp(gno,noa,idno,weight)
-	select '1',noa,MAX(idno)+1,sum(weight) from @tmp group by noa
+	from (select idno,ROW_NUMBER() over (order by cast(dbo.get_num(size) as int),spec,gno,cast(dbo.get_num(size) as int),spec,lengthb desc,noq)rr from @tmp)a
 end
 
 select
