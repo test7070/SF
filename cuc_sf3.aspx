@@ -1670,7 +1670,9 @@
                         	func_cubno=as[0].cubno;
                         	if(func_cubno.length>0){
 	                        	q_func('cub_post.post', r_accy + ',' + encodeURI(func_cubno) + ',1');
-	                        	//q_func( 'barvu.gen1', func_cubno+','+$('#combMechno2').val());
+	                        	if(confirm("是否要列印條碼?")){
+	                        		q_func( 'barvu.gen1', func_cubno+','+$('#combMechno').val());
+	                        	}
 	                        	func_cubno='';
                         	}else{
                         		alert('加工單產生失敗!!');
@@ -1729,7 +1731,9 @@
                         	func_cubno=as[0].cubno;
                         	if(func_cubno.length>0){
 	                        	q_func('cub_post.post.2', r_accy + ',' + encodeURI(func_cubno) + ',1');
-	                        	//q_func( 'barvu.gen1', func_cubno+','+$('#combMechno2').val());
+	                        	if(confirm("是否要列印條碼?")){
+	                        		q_func( 'barvu.gen1', func_cubno+','+$('#combMechno').val());
+	                        	}
 	                        	func_cubno='';
                         	}else{
                         		alert('入庫失敗!!');

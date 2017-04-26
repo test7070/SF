@@ -124,8 +124,8 @@
 				
 				$('#btnUnoprint').click(function() {
 					if(!emp($('#txtNoa').val())){
-						//q_func( 'barvu.gen1', $('#txtNoa').val()+','+$('#combMechno2').val());
-						alert('暫不開放!!')
+						q_func( 'barvu.gen1', $('#txtNoa').val()+','+$('#txtMechno').val());
+						//alert('暫不開放!!')
 					}
 				});
 				
