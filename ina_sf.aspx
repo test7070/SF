@@ -99,6 +99,15 @@
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
                 q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
+				q_gt('mech', '1=1 ', 0, 0, 0, "");
+				
+				$('#btnUnoprint').click(function() {
+					if(!emp($('#txtNoa').val()) && !emp($('#combMechno').val())){
+						q_func( 'barvu.genBar','ina,'+$('#txtNoa').val()+','+$('#combMechno').val())
+					}else{
+						alert('請選擇列印機台!!')
+					}
+				});
 				
 				$('#lblOrdeno_sf').click(function() {
 					var t_where1="1=0^^";//cont
@@ -194,6 +203,15 @@
 			var t_ordhno='#non',t_nordhno='#non';
             function q_gtPost(t_name) {
                 switch (t_name) {
+                	case 'mech':
+						var as = _q_appendData("mech", "", true);
+						t_mech='@';
+						for (var i = 0; i < as.length; i++) {
+							t_mech+=","+as[i].noa+"@"+as[i].mech;
+						}
+						$('#combMechno').text();
+						q_cmbParse("combMechno", t_mech);
+						break;
                 	case 'getCardealCarno' :
 						var as = _q_appendData("cardeals", "", true);
 						carnoList = as;
@@ -691,6 +709,7 @@
             function readonly(t_para, empty) {
                 _readonly(t_para, empty);
                 if(t_para){
+                	$('#btnUnoprint').removeAttr('disabled');
                 	for (var i = 0; i < q_bbsCount; i++) {
                 		$('#combProduct_'+i).attr('disabled', 'disabled');
                 		$('#combUcolor_'+i).attr('disabled', 'disabled');
@@ -698,6 +717,7 @@
                 		$('#combClass_'+i).attr('disabled', 'disabled');
                 	}
                 }else{
+                	$('#btnUnoprint').attr('disabled', 'disabled');
                 	for (var i = 0; i < q_bbsCount; i++) {
                 		$('#combProduct_'+i).removeAttr('disabled');
                 		$('#combUcolor_'+i).removeAttr('disabled');
@@ -1190,6 +1210,8 @@
 						<input id="txtStoreno"  type="text"  class="txt c2"/>
 						<input id="txtStore"  type="text" class="txt c3"/>
 					</td>
+					<td><span> </span><a id="lblMechno_sf" class="lbl">列印機台</a></td>
+					<td><select id="combMechno" class="txt c1"> </select></td>
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
@@ -1198,6 +1220,7 @@
 					<td><input id="txtWorker2" type="text" class="txt c1"/></td>
 					<td><span> </span><a id="lblTranstartno_sf" class="lbl">立帳單號</a></td>
 					<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
+					<td colspan="2" style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
 				</tr>
 			</table>
 		</div>

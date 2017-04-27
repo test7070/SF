@@ -52,6 +52,7 @@
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
 				q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
+				q_gt('mech', '1=1 ', 0, 0, 0, "");
 			});
 
 			function main() {
@@ -110,6 +111,14 @@
 				$('#lblTranadd').text('車空重');
 				$('#lblBenifit').text('車總重');
 				$('#lblWeight').text('淨重');
+				
+				$('#btnUnoprint').click(function() {
+					if(!emp($('#txtNoa').val()) && !emp($('#combMechno').val())){
+						q_func( 'barvu.genBar','rc2,'+$('#txtNoa').val()+','+$('#combMechno').val())
+					}else{
+						alert('請選擇列印機台!!')
+					}
+				});
 				
 				$('#txtTranadd').change(function() {
 					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
@@ -436,6 +445,15 @@
 							t_class+=","+as[i].noa;
 						}
 						q_cmbParse("combClass", t_class,'s');
+						break;
+					case 'mech':
+						var as = _q_appendData("mech", "", true);
+						t_mech='@';
+						for (var i = 0; i < as.length; i++) {
+							t_mech+=","+as[i].noa+"@"+as[i].mech;
+						}
+						$('#combMechno').text();
+						q_cmbParse("combMechno", t_mech);
 						break;
 					case 'getCardealCarno' :
 						var as = _q_appendData("cardeals", "", true);
@@ -1240,12 +1258,14 @@
 				_readonly(t_para, empty);
 				if (t_para) {
 					$('#combAddr').attr('disabled', 'disabled');
+					$('#btnUnoprint').removeAttr('disabled');
 					for (var i = 0; i < q_bbsCount; i++) {
 						$('#btnGenuno_'+i).removeAttr('disabled');
 						$('#btnDeleuno_'+i).removeAttr('disabled');
 					}
 				} else {
 					$('#combAddr').removeAttr('disabled');
+					$('#btnUnoprint').attr('disabled', 'disabled');
 					for (var i = 0; i < q_bbsCount; i++) {
 						$('#btnGenuno_'+i).attr('disabled', 'disabled');
 						$('#btnDeleuno_'+i).attr('disabled', 'disabled');
@@ -1768,8 +1788,10 @@
 						<td colspan='2'><input id="textQno1" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblQweight1" class="lbl">合約重量</a></td>
 						<td colspan='2'><input id="textQweight1" type="text" class="txt num c1"  style="width:70%;"/>&nbsp; KG</td>
+						<td><span> </span><a id="lblMechno_sf" class="lbl">列印機台</a></td>
+						<td><select id="combMechno" class="txt c1"> </select></td>
 					</tr>
-					<tr  style="display: none;">
+					<tr style="display: none;">
 						<td><span> </span><a id="lblQno2" class="lbl btn">合約2號碼</a></td>
 						<td colspan='2'><input id="textQno2" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblQweight2" class="lbl">合約2重量</a></td>
@@ -1780,6 +1802,7 @@
 						<td colspan='2'><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id='lblWorker2' class="lbl"> </a></td>
 						<td colspan='2'><input id="txtWorker2" type="text" class="txt c1"/></td>
+						<td colspan='2' style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
 					</tr>
 				</table>
 			</div>
