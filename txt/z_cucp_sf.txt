@@ -286,7 +286,7 @@ if(@t_isparafg='2') --不需續接
 	delete @tmp where (isnull(paraf,'')!='' or isnull(parag,'')!='')
 
 update a
-set tmemo=stuff((select CHAR(59)+size+'-'+spec+'='+dbo.getComma(SUM(weight),0)+'KG' from @tmp where noa=a.noa group by size,spec order by cast(dbo.get_num(size) as int),spec FOR XML PATH('')),1,1,'')
+set tmemo=stuff((select CHAR(59)+size+'-'+spec+'='+dbo.getComma(SUM(weight),0)+'KG ' from @tmp where noa=a.noa group by size,spec order by cast(dbo.get_num(size) as int),spec FOR XML PATH('')),1,1,'')
 from @tmp a
 
 update a
@@ -396,7 +396,7 @@ dbo.getComma(lengthc,0) lengthc,
 dbo.getComma(mount,0) mount,
 dbo.getComma(weight,0) weight
 ,case when len(isnull(imgdata,''))>0 then 
-			'<img src="'+imgdata+'" style="width:150px'+char(59)+'height:50px'+char(59)+'"/>' 
+			'<img src="'+imgdata+'" style="width:140px'+char(59)+'height:50px'+char(59)+'"/>' 
 			else '<span style="display:block'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end image1
 ,*
 from @tmp
