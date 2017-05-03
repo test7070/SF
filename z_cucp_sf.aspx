@@ -80,6 +80,10 @@
 						type : '5',
 						name : 'isparafg',//[14]
 						value :('#non@全部,1@需續接,2@不續接').split(',')
+					},{
+						type : '8',
+						name : 'ispage',//[15]
+						value :('1@材質號數分頁').split(',')
 					}]
                 });
 				 q_popAssign();
@@ -136,6 +140,10 @@
 				$('#combSpec').css('font-size','medium');
 				$('#Xsize select').css('font-size','medium');
 				$('#Xorder select').css('font-size','medium');
+				
+				$('#Ispage').css('width','300px');
+				$('#chkIspage').css('width','200px');
+				$('#chkIspage span').css('width','150px');
             }
 
             function q_boxClose(s2) {
