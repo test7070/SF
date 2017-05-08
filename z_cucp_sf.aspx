@@ -84,6 +84,10 @@
 						type : '8',
 						name : 'ispage',//[15]
 						value :('1@材質號數分頁').split(',')
+					},{
+						type : '8',
+						name : 'istotalmount',//[16]
+						value :('1@顯示總料').split(',')
 					}]
                 });
 				 q_popAssign();
@@ -144,6 +148,16 @@
 				$('#Ispage').css('width','300px');
 				$('#chkIspage').css('width','200px');
 				$('#chkIspage span').css('width','150px');
+				$('#Ispage').css('height','30px');
+				$('#chkIspage input').css('margin-top','8px');
+				$('#chkIspage span').css('margin-top','5px');
+				
+				$('#Istotalmount').css('width','300px');
+				$('#chkIstotalmount').css('width','200px');
+				$('#chkIstotalmount span').css('width','150px');
+				$('#Istotalmount').css('height','30px');
+				$('#chkIstotalmount input').css('margin-top','8px');
+				$('#chkIstotalmount span').css('margin-top','5px');
             }
 
             function q_boxClose(s2) {

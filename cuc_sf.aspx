@@ -888,6 +888,15 @@
                 		}
                 	}
 				});
+				
+				for (var j = 0; j < q_bbsCount; j++) {
+                	if($('#canvas_'+j).length>0){
+						$('#imgPic_'+j).attr('src', $('#txtImgdata_'+j).val());
+						var imgwidth = $('#imgPic_'+j).width();
+                        var imgheight = $('#imgPic_'+j).height();
+						$("#canvas_"+j)[0].getContext("2d").drawImage($('#imgPic_'+j)[0],0,0,imgwidth,imgheight,0,0,150,50);
+                	}
+                }
             }
             
             function q_bbsLenShow( t_start, t_end){
