@@ -67,7 +67,7 @@ select '0' gno,a.noa,'',a.datea
 	,b.mount,b.weight,b.mweight,b.lengthc
 	,round((a.tax*(case when a.money=0 then 0 else (b.lengthc/a.money) end)),0)
 	,(round((a.tax*(case when a.money=0 then 0 else (b.lengthc/a.money) end)),0)+b.lengthc)
-	,a.memo,b.ucolor,b.spec,b.size,b.lengthb,a.carno,'ina'+b.accy,a.store
+	,a.memo,b.ucolor,b.spec,b.size,b.lengthb,a.carno,'ina'+b.accy,b.store
 	,a.ordeno
 	,case when len(dbo.get_num(size))=1 then '0'+dbo.get_num(size) else dbo.get_num(size) end
 from view_inas b left join view_ina a on a.noa = b.noa left join tgg c on a.tggno = c.noa 
