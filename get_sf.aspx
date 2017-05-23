@@ -377,8 +377,8 @@
 					return;
 				}
 				
-				if(!check_ordh && !emp($('#txtOrdeno').val())){
-					var t_where = "where=^^ noa='"+$('#txtOrdeno').val()+"'^^";
+				if(!check_ordh && !emp($('#txtIdno').val())){
+					var t_where = "where=^^ noa='"+$('#txtIdno').val()+"'^^";
 					q_gt('ordh', t_where, 0, 0, 0, "ordh_btnOk", r_accy);
 					return;
 				}
