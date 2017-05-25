@@ -99,7 +99,7 @@
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
                 q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
-				q_gt('mech', '1=1 ', 0, 0, 0, "");
+				q_gt('mech', "where=^^mech='辦公室'^^", 0, 0, 0, "");
 				
 				$('#btnUnoprint').click(function() {
 					if(!emp($('#txtNoa').val()) && !emp($('#combMechno').val())){
@@ -205,9 +205,9 @@
                 switch (t_name) {
                 	case 'mech':
 						var as = _q_appendData("mech", "", true);
-						t_mech='@';
+						t_mech='';
 						for (var i = 0; i < as.length; i++) {
-							t_mech+=","+as[i].noa+"@"+as[i].mech;
+							t_mech=as[i].noa+"@"+as[i].mech;
 						}
 						$('#combMechno').text();
 						q_cmbParse("combMechno", t_mech);
