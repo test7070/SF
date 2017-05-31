@@ -81,6 +81,7 @@
 				$('#txtMoney').val(FormatNumber(t_money));
 				$('#txtTax').val(FormatNumber(t_tax));
 				$('#txtTotal').val(FormatNumber(t_total));
+				bbssum();
 			}
 			
 			var t_cont1='#non',t_cont2='#non';
@@ -1085,6 +1086,8 @@
 				_bbsAssign();
 				refreshBbm();
 				HiddenTreat();
+				bbssum();
+				
 				$('#div_orde').hide();
 				$('#lblNoq_s').text('項序');
 				$('#lblProductno_s').text('品號');
@@ -1179,6 +1182,22 @@
                 	}
 				});
 			}
+			
+			function bbssum() {
+            	var sot_mount=0,sot_weight=0;
+                for (var i = 0; i < q_bbsCount; i++) {
+	                sot_mount=q_add(sot_mount,dec($('#txtMount_'+i).val()));
+	                sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
+				}
+				if(sot_mount!=0)
+					$('#lblSot_mount').text(FormatNumber(sot_mount));
+				else
+					$('#lblSot_mount').text('');
+				if(sot_weight!=0){
+					$('#lblSot_weight').text(FormatNumber(sot_weight));
+				}else
+					$('#lblSot_weight').text('');
+            }
 
 			function btnIns() {
 				_btnIns();
@@ -1841,8 +1860,12 @@
 					</td>
 					<!--<td align="center" style="width:40px;"><a id='lblUnit_s'> </a></td>-->
 					<td align="center" style="width:70px;"><a id='lblLengthc_s'> </a></td>
-					<td align="center" style="width:75px;"><a id='lblMount_s'> </a></td>
-					<td align="center" style="width:90px;"><a id='lblWeight_s'> </a></td>
+					<td align="center" style="width:75px;">
+						<a id='lblMount_s'> </a>
+						<BR><a id='lblSot_mount'> </a></td>
+					<td align="center" style="width:90px;">
+						<a id='lblWeight_s'> </a>
+						<BR><a id='lblSot_weight'> </a></td>
 					<td align="center" style="width:90px;"><a id='lblPrice_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblTotal_s'> </a></td>
 					<td align="center" style="width:180px;">

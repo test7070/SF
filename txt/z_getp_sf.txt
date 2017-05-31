@@ -52,7 +52,7 @@ end
 else
 begin
 	insert into @tmp1
-	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.namea,a.idno,a.tweight,cast(a.transtyle as float),a.mount,'','',
+	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.namea,a.idno,a.tweight,cast(REPLACE(transtyle, ',','') as float),a.mount,'','',
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
 		   a.trantype,a.transtart,a.cardeal,b.store,a.carno
 	from view_get a

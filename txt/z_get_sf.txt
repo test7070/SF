@@ -1090,14 +1090,14 @@ from @result a outer apply (select MAX(page)xpage from @result where custno=a.cu
 where gno='3' and a.page=b.xpage
 
 select gno,idno,page,noa,noq,datea,custno,addr2,comp,onoa,odate,xproduct xpdt,unit, qhref 
-,dbo.getComma(mount,@mount_decimal) mount 
-,dbo.getComma(weight,@weight_decimal) weight 
+,dbo.getComma(mount,0) mount 
+,dbo.getComma(weight,0) weight 
 ,dbo.getComma(oweight,0) oweight 
 ,dbo.getComma(oprice,2) oprice
 ,dbo.getComma(price,-1)price 
-,dbo.getComma(total,@total_decimal) total 
-,dbo.getComma(tax,@total_decimal) tax
-,dbo.getComma(totax,@total_decimal) totax 
+,dbo.getComma(total,0) total 
+,dbo.getComma(tax,0) tax
+,dbo.getComma(totax,0) totax 
 ,pcount ,ucolor,spec ,size,length,carno
 from @result order by custno,addr2,page,gno,datea,noa,noq,idno
 ;

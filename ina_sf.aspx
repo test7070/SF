@@ -79,6 +79,7 @@
 				$('#txtTax').val(FormatNumber(t_tax));
 				$('#txtTotal').val(FormatNumber(t_total));
 				$('#txtWeight').val(tt_weight);
+				bbssum();
 			}
 
             function mainPost() {
@@ -584,6 +585,7 @@
                     }
                 }
                 _bbsAssign();
+                bbssum();
             }
             
             function bbsweight(n) {
@@ -609,6 +611,22 @@
             	var t_mount=dec($('#txtMount_'+n).val());
             	
             	$('#txtWeight_'+n).val(round(q_mul(q_mul(t_weight,t_lengthb),t_mount),0));
+            }
+            
+            function bbssum() {
+            	var sot_mount=0,sot_weight=0;
+                for (var i = 0; i < q_bbsCount; i++) {
+	                sot_mount=q_add(sot_mount,dec($('#txtMount_'+i).val()));
+	                sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
+				}
+				if(sot_mount!=0)
+					$('#lblSot_mount').text(FormatNumber(sot_mount));
+				else
+					$('#lblSot_mount').text('');
+				if(sot_weight!=0){
+					$('#lblSot_weight').text(FormatNumber(sot_weight));
+				}else
+					$('#lblSot_weight').text('');
             }
 
             function btnIns() {
@@ -1236,8 +1254,10 @@
 					<td style="width:75px; text-align: center;">號數</td>
 					<td style="width:75px; text-align: center;">米數</td>
 					<td style="width:90px; text-align: center;">廠牌</td>
-					<td style="width:70px; text-align: center;">數量(件)</td>
-					<td style="width:80px; text-align: center;">重量kg</td>
+					<td style="width:70px; text-align: center;">數量(件)
+						<BR><a id='lblSot_mount'> </a></td>
+					<td style="width:80px; text-align: center;">重量kg
+						<BR><a id='lblSot_weight'> </a></td>
 					<td style="width:80px; text-align: center;">單價</td>
 					<td style="width:100px; text-align: center;">小計</td>
 					<td style=" text-align: center;">單項備註</td>
