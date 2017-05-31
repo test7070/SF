@@ -1984,7 +1984,7 @@ gno,product,spec,size,ucolor,dbo.getComma(lengthb,-1)lengthb,class
 ,dbo.getComma(tmoney,2) tmoney
 ,case when isnull(tweight,0)=0 then dbo.getComma(0,2) else dbo.getComma(round(tmoney/tweight,2),2) end tprice
 ,case when isnull(product,'') like '續接器%' or isnull(product,'') like '水泥方塊%' then '件數' else '重量' end utype
-from #tmpa a order by product,ucolor,spec,size,lengthb,class,storeno,datea,gno,typea,noa,noq
+from #tmpa a order by product,spec,size,storeno,gno,datea,typea,noa,noq,ucolor,lengthb,class
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
