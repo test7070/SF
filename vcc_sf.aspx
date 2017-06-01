@@ -1027,8 +1027,9 @@
 					if(t_imgorg.length==0){
 						return;
 					}
-										
-					$('#imgPic_'+n).attr('src',t_imgorg);
+					var image = document.getElementById('imgPic_'+n);
+					//$('#imgPic_'+n).attr('src',t_imgorg);
+					image.src=t_imgorg;
 					var imgwidth = 300;
 					var imgheight = 100;
 					$('#canvas_'+n).width(imgwidth).height(imgheight);
@@ -1036,23 +1037,36 @@
 					var ctx = c.getContext("2d");		
 					c.width = imgwidth;
 					c.height = imgheight;
-					ctx.drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight);
-					
-					//------------------------------
-					$('#imgPic_'+n).attr('src',c.toDataURL());
-					//條碼用圖形
-					xx_width = 355;
-					xx_height = 119;						
-					$('#canvas_'+n).width(xx_width).height(xx_height);
-					c.width = xx_width;
-					c.height = xx_height;
-					$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,xx_width,xx_height);
-					//報表用圖形 縮放為150*50
-					$('#canvas_'+n).width(150).height(50);
-					c.width = 150;
-					c.height = 50;
-					$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,150,50);
-					$('#txtStore2_'+n).val(c.toDataURL());
+					image.onload = function() {
+						ctx.drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight);
+						image.src=c.toDataURL();
+						chgimg2(n);
+					}
+				}
+			}
+			
+			function chgimg2(n) { //a_img
+				if(($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1) && $('#txtClass_'+n).val()!=''){
+					var image = document.getElementById('imgPic_'+n);
+					var c = document.getElementById("canvas_"+n);
+					var imgwidth = 300;
+					var imgheight = 100;
+					image.onload = function() {
+						//------------------------------
+						//條碼用圖形
+						xx_width = 355;
+						xx_height = 119;						
+						$('#canvas_'+n).width(xx_width).height(xx_height);
+						c.width = xx_width;
+						c.height = xx_height;
+						$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,xx_width,xx_height);
+						//報表用圖形 縮放為150*50
+						$('#canvas_'+n).width(150).height(50);
+						c.width = 150;
+						c.height = 50;
+						$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,150,50);
+						$('#txtStore2_'+n).val(c.toDataURL());
+					}
 				}
 				chgbbswidth();
 			}
