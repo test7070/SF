@@ -102,7 +102,7 @@
 				,['txtTranadd', 15, q_getPara('vcc.weightPrecision'), 1],['txtBenifit', 15, q_getPara('vcc.weightPrecision'), 1],['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]
 				,['textQweight1', 15, q_getPara('vcc.weightPrecision'), 1],['textQweight2', 15, q_getPara('vcc.weightPrecision'), 1]
 				,['txtPrice', 12, 3, 1],['txtCartrips', 11, 0, 1]];
-				bbsNum = [['txtPrice', 12, q_getPara('vcc.pricePrecision'), 1], ['txtMount', 9, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]];
+				bbsNum = [['txtPrice', 12, q_getPara('vcc.pricePrecision'), 1],['txtTranmoney', 12, q_getPara('vcc.pricePrecision'), 1],  ['txtMount', 9, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]];
 				bbtNum = [['txtMount', 10, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1]];
 				//q_cmbParse("cmbTranstyle", q_getPara('sys.transtyle'));
 				q_cmbParse("cmbTypea", q_getPara('vcc.typea'));
@@ -1249,15 +1249,48 @@
 								
 								var tproduct=$('#txtProduct_'+b_seq).val();
 								
-								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1)
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
-								else
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
 								
 								bbssum();
 								sum();
 							}
 						});
+						
+						$('#txtTranmoney_' + i).change(function() {
+							if (q_cur == 1 || q_cur == 2){
+								t_IdSeq = -1;
+								q_bodyId($(this).attr('id'));
+								b_seq = t_IdSeq;
+								
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
+								
+								bbssum();
+								sum();
+							}
+						});
+						
 						$('#txtTotal_' + i).change(function() {
 							if (q_cur == 1 || q_cur == 2)
 								sum();
@@ -1270,10 +1303,17 @@
 								b_seq = t_IdSeq;
 								var tproduct=$('#txtProduct_'+b_seq).val();
 								
-								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1)
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
-								else
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
 									
 								bbssum();
 								sum();
@@ -1287,10 +1327,17 @@
 								b_seq = t_IdSeq;
 								var tproduct=$('#txtProduct_'+b_seq).val();
 								
-								if(tproduct.indexOf('費')>-1 || tproduct.indexOf('續接')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1)
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
-								else
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
 								
 								bbssum();
 								sum();
@@ -1313,6 +1360,21 @@
 							if(q_cur==1 || q_cur==2){
 								$('#txtUcolor_'+b_seq).val($('#combUcolor_'+b_seq).find("option:selected").text());
 								chgimg(b_seq);
+								
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
+								sum();
 							}
 						});
 						
@@ -1322,6 +1384,21 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								chgimg(b_seq);
+								
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
+								sum();
 							}
 						});
 						
@@ -1337,6 +1414,21 @@
 							if(q_cur==1 || q_cur==2){
 								$('#txtSpec_'+b_seq).val($('#combSpec_'+b_seq).find("option:selected").text());
 								chgimg(b_seq);
+								
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
+								sum();
 							}
 						});
 						
@@ -1346,6 +1438,21 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								chgimg(b_seq);
+								
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
+								sum();
 							}
 						});
 						
@@ -1378,6 +1485,21 @@
 								chgcombUcolor(b_seq);
 								chgcombClass(b_seq);
 								chgimg(b_seq);
+								
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
+								sum();
 							}
 						});
 						
@@ -1390,6 +1512,21 @@
 								chgcombUcolor(b_seq);
 								chgcombClass(b_seq);
 								chgimg(b_seq);
+								
+								var tproduct=$('#txtProduct_'+b_seq).val();
+								
+								if(tproduct.indexOf('續接器')>-1){
+									var t_money1=emp($('#txtUcolor_'+b_seq).val())?0:round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									var t_money2=emp($('#txtSpec_'+b_seq).val())?0:round(q_mul(q_float('txtTranmoney_' + b_seq), q_float('txtMount_' + b_seq)), 0);
+									$('#txtTotal_' + b_seq).val(q_add(t_money1,t_money2));
+								}else if(tproduct.indexOf('續接')>-1 || tproduct.indexOf('費')>-1 || tproduct.indexOf('組接')>-1 || tproduct.indexOf('水泥方塊')>-1){
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
+								}else{
+									$('#txtTranmoney_'+b_seq).val('');
+									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
+								}
+								sum();
 							}
 						});
 						
@@ -1417,6 +1554,7 @@
 				$('#lblMount_s').text('數量(件)');
 				$('#lblWeight_s').text('重量(KG)');
 				$('#lblPrice_s').text('單價');
+				$('#lblTranmoney_s').text('單價2');
 				$('#lblTotal_s').text('小計');
 				$('#lblMemo_s').text('備註');
 				$('#lblStore_s').text('出貨倉庫');
@@ -2254,7 +2392,7 @@
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' style="width: 1590px;"><!--1900px-->
+		<div class='dbbs' style="width: 1680px;"><!--1900px-->
 			<table id="tbbs" class='tbbs'>
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:40px;"><input class="btn"  id="btnPlus" type="button" value='＋' style="font-weight: bold;width:" /></td>
@@ -2278,6 +2416,7 @@
 						<BR><a id='lblSot_weight'> </a>
 					</td>
 					<td align="center" style="width:85px;"><a id='lblPrice_s'> </a></td>
+					<td align="center" style="width:85px;"><a id='lblTranmoney_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblTotal_s'> </a></td>
 					<td align="center" style="width:150px;"><a id='lblStore_s'> </a><input class="btn"  id="btnStoreCopy" type="button" value='≡' style="font-weight: bold;"  /></td>
 					<td align="center" style="width:200px;"><a id='lblMemo_s'> </a></td>
@@ -2317,6 +2456,7 @@
 					<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtPrice.*" type="text" class="txt num c1"/></td>
+					<td><input id="txtTranmoney.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtTotal.*" type="text" class="txt num c1"/></td>
 					<td>
 						<input id="txtStoreno.*" type="text" class="txt c1" style="width: 65%"/>
