@@ -125,16 +125,16 @@
 				
 				$('#txtTranadd').change(function() {
 					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
-					$('#txtWeight').change();
+					//$('#txtWeight').change();
 				});
 				$('#txtBenifit').change(function() {
 					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
-					$('#txtWeight').change();
+					//$('#txtWeight').change();
 				});
 				
 				$('#txtWeight').change(function() {
-					//105/12/07 增加
-					var t_weight=dec($('#txtWeight').val());
+					//105/12/07 增加 //106/06/08 功能取消
+					/*var t_weight=dec($('#txtWeight').val());
 					if(t_weight!=0){
 						for (var i = 0; i < q_bbsCount; i++) {
 							if(dec($('#txtWeight_'+i).val())!=0){
@@ -155,7 +155,7 @@
 							$('#btnPlus').click();
 						}
 						$('#txtWeight_'+t_n).val(t_weight);
-					}
+					}*/
 				});
 				
 				//限制帳款月份的輸入 只有在備註的第一個字為*才能手動輸入					
@@ -987,7 +987,7 @@
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtMount_' + b_seq)), 0));
 								else
 									$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), q_float('txtWeight_' + b_seq)), 0));
-								$('#txtWeight').change();
+								//$('#txtWeight').change();
 								sum();
 							}
 						});
