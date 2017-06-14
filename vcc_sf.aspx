@@ -1530,6 +1530,12 @@
 							}
 						});
 						
+						$('#txtOrdeno_'+i).click(function() {
+						    for (var j = 0; j < q_bbsCount; j++) {
+                                q_pop('txtOrdeno', "get_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";charindex(noa,'" + $('#txtOrdeno_'+j).val() + "')>0;" + r_accy + '_' + r_cno, 'get', 'noa', '', "92%", "1024px", '互換出貨作業', true);
+                            }
+                        });
+						
 						$('#btnMinus_' + i).click(function() {
 							setTimeout(bbssum,10);
 							sum();
