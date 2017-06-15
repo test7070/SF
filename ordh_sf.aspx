@@ -50,6 +50,8 @@
                 bbtKey = ['noa', 'noq'];
                 q_brwCount();
                 q_gt(q_name, q_content, q_sqlCount, 1);
+                //2017/06/15 智勝 簽約公司預設 A智勝
+                q_gt('acomp', 'stop=1 ', 0, 0, 0, "cno_acomp");
             });
 
             function main() {
@@ -219,9 +221,17 @@
                 }
                 b_pop = '';
             }
-
+            var z_cno = r_cno, z_acomp = r_comp, z_nick = r_comp.substr(0, 2);
             function q_gtPost(t_name) {
                 switch (t_name) {
+                    case 'cno_acomp':
+                        var as = _q_appendData("acomp", "", true);
+                        if (as[0] != undefined) {
+                            z_cno = as[0].noa;
+                            z_acomp = as[0].acomp;
+                            z_nick = as[0].nick;
+                        }
+                        break;
                 	case 'custms':
                 		var as = _q_appendData("custms", "", true);
                 		var t_account='@';
@@ -276,7 +286,6 @@
             }
 
             function btnOk() {
-            	
             	if($('#txtPrice_0').val())
 					$('#txtF5').val($('#txtPrice_0').val());
 				else
@@ -500,6 +509,8 @@
                 _btnIns();
                 $('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val('AUTO');
                 $('#txtDatea').val(q_date());
+                $('#txtCno').val(z_cno);
+                $('#txtAcomp').val(z_acomp);
                 $('#txtDatea').focus();
                 refreshBbm();
             }
