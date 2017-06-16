@@ -50,6 +50,7 @@
 				}
 				$('#lblDatea').text('訂約日期');
 				$('#lblPrice').text('單價');
+				$('#lblAddr').text('工地');
 				$('#lblEweight').text('合約餘量');
             }
             
@@ -66,6 +67,7 @@
 			}
 			$('#lblDatea').text('訂約日期');
 			$('#lblPrice').text('單價');
+			$('#lblAddr').text('工地');
 			$('#lblEweight').text('合約餘量');
 		}
 		</script>
@@ -79,17 +81,19 @@
 					<th align="center" > </th>
 					<th align="center" style='color:Blue;' ><a id='lblNoa'> </a></th>
 					<th align="center" style='color:Blue;' ><a id='lblPrice'> </a></th>
+					<th align="center" style='color:Blue;display: none;' ><a id='lblAddr'> </a></th>
 					<th align="center" style='color:Blue;' ><a id='lblEweight'> </a></th>
 					<th align="center" style='color:Blue;' ><a id='lblMemo'> </a></th>
 				</tr>
 				<tr>
 					<td style="width:2%;"><input name="sel"  id="radSel.*" type="radio" /></td>
-					<td style="width:23%;"><input class="txt" id="txtNoa.*" type="text" style="width:98%;"  readonly="readonly" /></td>
+					<td style="width:23%;"><input class="txt" id="txtNoa.*" type="text" style="width:98%;"  readonly="readonly" /></td>		
 					<td style="width:15%;"><input class="txt" id="txtPrice.*" type="text" style="width:98%;text-align: right;"  readonly="readonly" /></td>
+					<td style="width:15%;display: none;"><input class="txt" id="txtAddr.*" type="text" style="width:98%;text-align: right;"  readonly="readonly" /></td>
 					<td style="width:20%;"><input class="txt" id="txtEweight.*" type="text" style="width:98%;text-align: right;"  readonly="readonly" /></td>					
 					<td style="width:40%;">
 						<textarea class="txt" id="txtMemo.*" cols="10" rows="2" style="width:98%;text-align: left;"  readonly="readonly" > </textarea>
-					</td>
+					</td>                                
 				</tr>
 			</table>
 			<!--#include file="../inc/brow_ctrl.inc"-->

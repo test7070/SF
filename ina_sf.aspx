@@ -133,6 +133,10 @@
 					q_gt('cardeal', t_where, 0, 0, 0, "getCardealCarno");
 				});
 				
+				$('#lblTranstartno_sf').click(function() {
+                    q_pop('txtTranstartno', "rc2_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";charindex(noa,'" + $('#txtTranstartno').val() + "')>0;" + r_accy + '_' + r_cno, 'vcc', 'rc2', '', "92%", "1024px", '進貨作業', true);
+                });
+				
 				$('#txtTweight').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtMount').val(q_sub(dec($('#txtTweight').val()),dec($('#txtTranstyle').val())));
@@ -1273,7 +1277,7 @@
 					<td><input id="txtWorker" type="text" class="txt c1"/></td>
 					<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 					<td><input id="txtWorker2" type="text" class="txt c1"/></td>
-					<td><span> </span><a id="lblTranstartno_sf" class="lbl">立帳單號</a></td>
+					<td><span> </span><a id="lblTranstartno_sf" class="lbl btn">立帳單號</a></td>
 					<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
 					<td colspan="2" style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
 				</tr>
