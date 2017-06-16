@@ -108,7 +108,12 @@
                 q_langShow();
                 
                 if(r_len==4){                	
-                	$.datepicker.r_len=4;
+                	$.datepicker.r_len=r_len;
+                	//格式(有設定格式要在重新設定模板，否則格式無效)
+                	//$.datepicker.r_dateformat=q_getPara('sys.dateformat');
+                	//民國模板(預設)
+                	//$.datepicker.setDefaults($.datepicker.regional[""]);
+                	//英文模板
 					//$.datepicker.setDefaults($.datepicker.regional["ENG"]);
                 }
 
