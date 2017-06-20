@@ -20,7 +20,7 @@
 			var q_readonly = ['txtNoa','txtStore','txtWorker','txtWorker2'];
 			var q_readonlys = ['txtStore'];
 			var bbmNum = [];
-			var bbsNum = [['txtMount', 10, 2, 1], ['txtPrice', 10, 2, 1], ['txtTotal', 10, 0, 1]];
+			var bbsNum = [];
 			var bbmMask = [];
 			var bbsMask = [];
 			q_sqlCount = 6;
@@ -28,9 +28,7 @@
 			brwList = [];
 			brwNowPage = 0;
 			brwKey = 'Datea';
-			aPop = new Array(
-				['txtStoreno_', 'btnStoreno_', 'store', 'noa,store', 'txtStoreno_,txtStore_', 'store_b.aspx']
-			);
+			aPop = new Array(['txtStoreno_', 'btnStoreno_', 'store', 'noa,store', 'txtStoreno_,txtStore_', 'store_b.aspx']);
 
 			$(document).ready(function() {
 				bbmKey = ['noa'];
@@ -42,6 +40,7 @@
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
 				q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
+				q_gt('adpro', '1=1 ', 0, 0, 0, "bbspro");
 			});
 
 			function main() {
@@ -61,7 +60,7 @@
 				var t_where = "where=^^ 1=1 ^^";
 				q_gt('ucc', t_where, 0, 0, 0, "");
 				
-				document.title='成本調整作業';
+				document.title='庫存調整單';
 			}
 
 			function q_boxClose(s2) {
@@ -77,7 +76,8 @@
 				}
 				b_pop = '';
 			}
-
+			
+			var a_spec='@',a_color='@',a_pro='@',a_class='@'; //106/01/04 續接器 類別 材質改抓續接參數 廠牌 =直彎
 			function q_gtPost(t_name) {
 				switch (t_name) {
 					case 'ucc':
@@ -93,6 +93,7 @@
 						var t_spec='@';
 						for ( i = 0; i < as.length; i++) {
 							t_spec+=","+as[i].noa;
+							a_spec+=","+as[i].noa;
 						}
 						q_cmbParse("combSpec", t_spec,'s');
 						break;
@@ -101,6 +102,7 @@
 						var t_color='@';
 						for ( i = 0; i < as.length; i++) {
 							t_color+=","+as[i].color;
+							a_color+=","+as[i].color;
 						}
 						q_cmbParse("combUcolor", t_color,'s');
 						break;
@@ -109,8 +111,16 @@
 						var t_class='@';
 						for ( i = 0; i < as.length; i++) {
 							t_class+=","+as[i].noa;
+							a_class+=","+as[i].noa;
 						}
 						q_cmbParse("combClass", t_class,'s');
+						break;
+					case 'bbspro':
+						var as = _q_appendData("adpro", "", true);
+						a_pro='@';
+						for (var i = 0; i < as.length; i++) {
+							a_pro+=","+as[i].product;
+						}
 						break;
 					case q_name:
 						if (q_cur == 4)
@@ -173,46 +183,7 @@
                             var n = $(this).attr('id').replace('txtStoreno_', '');
                             $('#btnStore_' + n).click();
                         });
-                        
-                        $('#txtMount_' + j).change(function() {
-							t_IdSeq = -1;
-							q_bodyId($(this).attr('id'));
-							b_seq = t_IdSeq;
-							var t_unit=trim($('#txtUnit_' + b_seq).val()),t_mount=0;
-							if (t_unit.length == 0 || t_unit == 'KG' || t_unit == 'M2' || t_unit == 'M' || t_unit == '批' || t_unit == '公斤' || t_unit == '噸' || t_unit == '頓' || t_unit == 'T') {
-								t_mount = $('#txtWeight_' + b_seq).val();
-							}else{
-								t_mount = $('#txtMount_' + b_seq).val();
-							}
-							$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), dec(t_mount)), 0));
-						});
-						
-						$('#txtWeight_' + j).change(function() {
-							t_IdSeq = -1;
-							q_bodyId($(this).attr('id'));
-							b_seq = t_IdSeq;
-							var t_unit=trim($('#txtUnit_' + b_seq).val()),t_mount=0;
-							if (t_unit.length == 0 || t_unit == 'KG' || t_unit == 'M2' || t_unit == 'M' || t_unit == '批' || t_unit == '公斤' || t_unit == '噸' || t_unit == '頓' || t_unit == 'T') {
-								t_mount = $('#txtWeight_' + b_seq).val();
-							}else{
-								t_mount = $('#txtMount_' + b_seq).val();
-							}
-							$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), dec(t_mount)), 0));
-						});
-						
-						$('#txtPrice_' + j).change(function() {
-							t_IdSeq = -1;
-							q_bodyId($(this).attr('id'));
-							b_seq = t_IdSeq;
-							var t_unit=trim($('#txtUnit_' + b_seq).val()),t_mount=0;
-							if (t_unit.length == 0 || t_unit == 'KG' || t_unit == 'M2' || t_unit == 'M' || t_unit == '批' || t_unit == '公斤' || t_unit == '噸' || t_unit == '頓' || t_unit == 'T') {
-								t_mount = $('#txtWeight_' + b_seq).val();
-							}else{
-								t_mount = $('#txtMount_' + b_seq).val();
-							}
-							$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), dec(t_mount)), 0));
-						});
-						
+                        					
 						$('#txtSize_' + j).change(function() {
 							 if ($(this).val().substr(0, 1) != '#')
                         		$(this).val('#' + $(this).val());
@@ -246,8 +217,19 @@
 							t_IdSeq = -1;
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
-							if(q_cur==1 || q_cur==2)
+							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
+								chgcombSpec(b_seq);
+							}
+						});
+						
+						$('#txtProduct_' + j).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								chgcombSpec(b_seq);
+							}
 						});
 					}
 				}
@@ -265,6 +247,20 @@
 				$('#lblWeight_s').text('重量(KG)');
 				$('#lblMoney_s').text('小計');
 				$('#lblMemo_s').text('備註');
+				
+				if(q_cur==1 || q_cur==2){
+					for (var j = 0; j < q_bbsCount; j++) {
+						chgcombSpec(j);
+					}
+				}
+			}
+			
+			function chgcombSpec(n) {
+				$('#combSpec_'+n).text('');
+				if($('#txtProduct_'+n).val().indexOf('續接')>-1 || $('#txtProduct_'+n).val().indexOf('組接')>-1)
+					q_cmbParse("combSpec_"+n, a_pro);
+				else
+					q_cmbParse("combSpec_"+n, a_spec);
 			}
 
 			function btnIns() {
@@ -272,8 +268,6 @@
 				$('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val('AUTO');
 				$('#txtDatea').val(q_date());
 				$('#txtDatea').focus();
-				$('#cmbKind').val(1);
-				
 			}
 
 			function btnModi() {
