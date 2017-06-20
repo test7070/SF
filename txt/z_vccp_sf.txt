@@ -1,0 +1,138 @@
+﻿z_vccp_sf01:--z_vccp_sf01
+declare @t_bxnoa nvarchar(20)
+declare @t_exnoa nvarchar(20)
+declare @t_xshowtaxname nvarchar(1)
+declare @t_xaddr2 nvarchar(100)
+
+set @t_bxnoa = case when '#non' =[2] then '' else [2] end
+set @t_exnoa = case when '#non' = [3] then CHAR(255) else [3] end
+set @t_xshowtaxname  = case when '#non' = [4] then '' else [4] end
+set @t_xaddr2 = case when '#non' = [5] then '' else [5] end
+---------------------------------------------------------------------------------
+declare @tmp1 table(
+	gno nvarchar(1),
+	page int,
+	idno int, 
+	noa nvarchar(30),
+	noq nvarchar(10),
+	datea nvarchar(20),
+	custno nvarchar(30),
+	comp nvarchar(100),
+	addr nvarchar(max),
+	conn nvarchar(50),
+	qno nvarchar(max),
+	tweight float,
+	eweight float,
+	nweight float,
+	price float,
+	total float,
+	memo nvarchar(MAX),
+	cartrips float,
+ 	
+	class nvarchar(30),
+	spec nvarchar(100),
+	product nvarchar(max),
+	pmemo nvarchar(max),
+	size nvarchar(max),
+	img nvarchar(MAX),
+	lengthb float,
+	pmount float,
+	pweight float,
+	
+	trantype nvarchar(10),
+	taxname nvarchar(10),
+	intime nvarchar(10),
+	cardeal nvarchar(20),
+	store nvarchar(50),
+	carno nvarchar(20),
+	worker nvarchar(50)
+)
+if (LEN(@t_xaddr2)!=0)
+begin
+	insert into @tmp1
+	select '0',0,0,case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,'',a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,sum(a.benifit),sum(a.tranadd),sum(a.weight),'',sum(a.total),a.memo,a.cartrips,
+		   b.ucolor,b.spec,b.product,b.memo,b.size,b.store2,b.lengthb,sum(b.mount),sum(b.weight),
+		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,'','','','',''
+	from view_vcc a
+	left join view_vccs b on a.noa = b. noa
+	where (a.noa between @t_bxnoa and @t_exnoa)
+	and (len(@t_xaddr2)!=0 and isnull(a.addr2,'')=@t_xaddr2)
+	group by a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.memo,a.cartrips,b.ucolor,b.spec,b.product,b.memo,b.size,b.store2,b.lengthb,a.trantype
+end
+else
+begin
+	insert into @tmp1
+	select '0',0,0,a.noa,b.noq,a.datea,a.custno,a.comp,a.addr2,a.zipname,a.apvmemo,a.benifit,a.tranadd,a.weight,'',a.total,a.memo,a.cartrips,
+		   b.ucolor,b.spec,b.product,b.memo,b.size,b.store2,b.lengthb,b.mount,b.weight,
+		   a.trantype,case when @t_xshowtaxname=1 then '稅金' else '' end,a.paydate,a.cardeal,b.store,a.carno,a.worker
+	from view_vcc a
+	left join view_vccs b on a.noa = b. noa
+	where (a.noa between @t_bxnoa and @t_exnoa)
+end
+
+update @tmp1 set tweight = case when tweight is null then 0 else tweight end,
+				 eweight = case when eweight is null then 0 else eweight end,
+				 nweight = case when nweight is null then 0 else nweight end			  					 
+where gno = '0'
+
+update @tmp1 set product = REPLACE(product,' ','') + (case when LEN(isnull(size,'')) = 0 then '' else size end)
+where gno = '0'
+
+--後面一張出貨單只會有一個合約號碼
+update @tmp1 set qno = dbo.split(dbo.split(qno,'##',0),'@',0)
+
+declare @t_pagelien int=9
+
+--變動頁數
+update a
+set idno=rr,page=ceiling((rr-1)/@t_pagelien)+1
+from (select page,idno,ROW_NUMBER()over (partition by noa order by noa,noq) rr from @tmp1)a
+
+update a
+set idno=rr
+from (select idno,ROW_NUMBER()over (partition by noa,page order by noa,noq) rr from @tmp1)a
+
+--補空白行數
+declare @noa nvarchar(30)
+declare @page int
+declare @count int
+
+declare cursor_table cursor for 
+select noa,page,count(*) from @tmp1 group by noa,page having count(*)!=@t_pagelien order by noa 
+open cursor_table 
+fetch next from cursor_table 
+into @noa,@page,@count 
+while(@@FETCH_STATUS <> -1) 
+begin 
+	while (@count<@t_pagelien)
+	begin
+		set @count=@count+1
+		
+		insert @tmp1
+		
+		select top 1 '0',page,@count,@noa,CHAR(255),datea,custno,comp,addr,conn,qno
+		,tweight,eweight,nweight,price,total,memo,cartrips
+		,'','','','','','',null,null,null,trantype,taxname,intime,cardeal,store,carno,worker
+		from @tmp1 where noa=@noa and page=@page
+		
+	end
+	fetch next from cursor_table 
+	into @noa,@page,@count 
+end 
+close cursor_table 
+deallocate cursor_table 
+
+update @tmp1
+set gno=case when product like '續接%' or product like '組接%' then '2' else '1' end
+
+insert @tmp1(gno,noa,page,idno,datea,custno,comp,addr,conn,qno,trantype,taxname,intime,cardeal,store,carno,memo,worker)
+select '3',noa,page,@t_pagelien+1,MAX(datea),MAX(custno),MAX(comp),MAX(addr),MAX(conn),MAX(qno),MAX(trantype),MAX(taxname),MAX(intime),MAX(cardeal),MAX(store),MAX(carno),MAX(memo),MAX(worker)
+from @tmp1 group by noa,page
+
+select 
+case when isnull(cartrips,0)!=0 then '應收運費:'+dbo.getComma(cartrips,0)+'　　' else '' end+'備註:'+memo  memo
+	,*,tweight twei,eweight ewei,nweight nwei
+	,case when product like '續接%' or product like '組接%' or product like '費%' or product like '水泥方塊%' then pmount else pweight end pwei
+	,case when lengthb=0 then null else cast(lengthb as nvarchar(50))+'M' end lena
+	,case when len(isnull(img,''))>0 then '<img src="'+img+'" style="width:60px'+char(59)+'height:20px'+char(59)+'"/>' else '<span style="display:none'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end imgs
+from @tmp1 order by noa,page,idno,gno;

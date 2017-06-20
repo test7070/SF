@@ -1,0 +1,349 @@
+z_cubp_sf01:--z_cubp_sf01
+SET QUOTED_IDENTIFIER OFF 
+declare @t_bdate nvarchar(30)
+declare @t_edate nvarchar(30)
+declare @t_bmechno nvarchar(30)
+declare @t_emechno nvarchar(30)
+declare @t_itype nvarchar(30)
+
+set @t_bdate = case when '#non'=[6] then '' else [6] end 
+set @t_edate = case when '#non'=[7] then char(255) else [7] end 
+set @t_bmechno = case when '#non'=[12] then '' else [12] end 
+set @t_emechno = case when '#non'=[13] then char(255) else [13] end 
+set @t_itype = case when '#non'=[17] then '' else [17] end
+ -----------------------------------------------------------------------------------
+declare @result table(
+	gno nvarchar(1),
+	datea nvarchar(20),
+	mechno nvarchar(10),
+	mech nvarchar(10),
+	comp  nvarchar(20),
+	products nvarchar(max),
+	lengthc float,
+	mount float,
+	weight float,
+	memo nvarchar(max),
+	storeno nvarchar(50),
+	store nvarchar(50),
+	uno nvarchar(50),
+	ordeno nvarchar(30),
+	no2 nvarchar(10),
+	datec nvarchar(20),
+	dno int,
+	qhrefa nvarchar(MAX),
+	qhrefb nvarchar(MAX)
+)
+insert @result
+select '0' gno,a.datea,a.mechno,a.mech,b.comp
+,isnull(b.product,'')+' '+isnull(b.spec,'')+' '+isnull(b.size,'')+' '+convert(nvarchar,b.lengthb)+' '+isnull(b.ucolor,'')+' '+isnull(b.class,'')
+,b.lengthc,b.mount,b.weight,b.memo,b.storeno,b.store,b.uno,b.ordeno,b.no2,b.datea
+,row_number()over(order by a.datea,a.kind) dno
+,'cuc_sf?noa=$ordeno?'+a.accy
+,"cub_sf?noa=\'"+a.noa+"\' -- noa=$uno?"+a.accy 
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where isnull(a.datea,'') between @t_bdate and @t_edate 
+and isnull(a.mechno,'') between @t_bmechno and @t_emechno
+and (len(@t_itype)=0 or isnull(a.itype,'')=@t_itype)
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+if((select count(*) from @result)>0)
+begin
+	insert @result(gno,lengthc,mount,weight,dno)
+	select '1' gno,SUM(lengthc),SUM(mount),SUM(weight),MAX(dno)
+	from @result
+end
+
+select dbo.getComma(lengthc,[2]) lengthc
+,dbo.getComma(mount,[2]) mount
+,dbo.getComma(weight,[3]) weight
+,*
+from @result order by gno,dno;
+---------------------------------------------------------------------------------------------------------------------------------
+z_cubp_sf02:--z_cubp_sf02
+SET QUOTED_IDENTIFIER OFF 
+declare @t_bdate nvarchar(30)
+declare @t_edate nvarchar(30)
+declare @t_bmechno nvarchar(30)
+declare @t_emechno nvarchar(30)
+declare @t_itype nvarchar(30)
+
+set @t_bdate = case when '#non'=[6] then '' else [6] end 
+set @t_edate = case when '#non'=[7] then char(255) else [7] end 
+set @t_bmechno = case when '#non'=[12] then '' else [12] end 
+set @t_emechno = case when '#non'=[13] then char(255) else [13] end 
+set @t_itype = case when '#non'=[17] then '' else [17] end
+ -----------------------------------------------------------------------------------
+declare @result table(
+	gno nvarchar(1),
+	datea nvarchar(20),
+	mechno nvarchar(10),
+	mech nvarchar(10),
+	comp  nvarchar(20),
+	products nvarchar(max),
+	lengthc float,
+	mount float,
+	weight float,
+	memo nvarchar(max),
+	storeno nvarchar(50),
+	store nvarchar(50),
+	uno nvarchar(50),
+	ordeno nvarchar(30),
+	no2 nvarchar(10),
+	datec nvarchar(20),
+	dno int,
+	qhrefa nvarchar(MAX),
+	qhrefb nvarchar(MAX)
+)
+insert @result
+select '0' gno,a.datea,a.mechno,a.mech,b.comp
+,isnull(b.product,'')+' '+isnull(b.spec,'')+' '+isnull(b.size,'')+' '+convert(nvarchar,b.lengthb)+' '+isnull(b.ucolor,'')+' '+isnull(b.class,'')
+,b.lengthc,b.mount,b.weight,b.memo,b.storeno,b.store,b.uno,b.ordeno,b.no2,b.datea
+,row_number()over(partition by a.mechno order by a.mechno,a.datea,a.kind) dno
+,'cuc_sf?noa=$ordeno?'+a.accy
+,"cub_sf?noa=\'"+a.noa+"\' -- noa=$uno?"+a.accy 
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where isnull(a.datea,'') between @t_bdate and @t_edate 
+and isnull(a.mechno,'') between @t_bmechno and @t_emechno
+and (len(@t_itype)=0 or isnull(a.itype,'')=@t_itype)
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+if((select count(*) from @result)>0)
+begin
+	insert @result(gno,mechno,mech,lengthc,mount,weight,dno)
+	select '1' gno,mechno,MAX(mech),SUM(lengthc),SUM(mount),SUM(weight),MAX(dno)
+	from @result group by mechno
+end
+
+select dbo.getComma(lengthc,[2]) lengthc
+,dbo.getComma(mount,[2]) mount
+,dbo.getComma(weight,[3]) weight
+,*
+from @result order by mechno,gno,dno;
+--------------------------------------------------------------------------------------------------------------------------
+z_cubp_sf03:--z_cubp_sf03
+SET QUOTED_IDENTIFIER OFF 
+declare @t_bdate nvarchar(30)
+declare @t_edate nvarchar(30)
+declare @t_bmechno nvarchar(30)
+declare @t_emechno nvarchar(30)
+declare @t_itype nvarchar(30)
+
+set @t_bdate = case when '#non'=[6] then '' else [6] end 
+set @t_edate = case when '#non'=[7] then char(255) else [7] end 
+set @t_bmechno = case when '#non'=[12] then '' else [12] end 
+set @t_emechno = case when '#non'=[13] then char(255) else [13] end 
+set @t_itype = case when '#non'=[17] then '' else [17] end
+-----------------------------------------------------------------------------------------------------
+declare @result table(
+	gno nvarchar(1),
+	mon nvarchar(10),
+	mechno nvarchar(10),
+	mech nvarchar(20),
+	lengthc float,
+	mount float,
+	weight float
+)
+
+insert @result 
+select '0',case when len(rtrim(ltrim(a.datea))) = 10 then left(a.datea,7) else left(a.datea,6) end ,a.mechno,a.mech
+,SUM(b.lengthc)
+,SUM(b.mount)
+,SUM(b.weight)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where isnull(a.datea,'') between @t_bdate and @t_edate 
+and isnull(a.mechno,'') between @t_bmechno and @t_emechno
+and (len(@t_itype)=0 or isnull(a.itype,'')=@t_itype)
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+group by case when len(rtrim(ltrim(a.datea))) = 10 then left(a.datea,7) else left(a.datea,6) end,a.mechno,a.mech
+
+if((select count(*) from @result)>0)
+begin
+	insert @result (gno,mon,mount,weight,lengthc)
+	select '1',mon,SUM(mount),sum(weight),sum(lengthc)
+	from @result
+	group by mon
+	
+	insert @result (gno,mon,mount,weight,lengthc)
+	select '2','9999/99',SUM(mount),sum(weight),sum(lengthc)
+	from @result
+	where gno='1'
+end
+
+select gno,mon,mechno,mech
+,dbo.getComma(mount,[2]) mount
+,dbo.getComma(weight,[3]) weight
+,dbo.getComma(lengthc,[2]) lengthc
+from @result
+order by mon,gno
+;
+--------------------------------------------------------------------------------------------------
+z_cubp_sf04:--z_cubp_sf04
+SET QUOTED_IDENTIFIER OFF 
+declare @t_bmon nvarchar(10) 
+declare @t_emon nvarchar(10)
+declare @t_type nvarchar(10) ----@t_type=0 未結案	@t_type=1 已結案
+declare @t_order nvarchar(10)
+
+set @t_bmon = case when '#non'=[10] then '' else [10] end 
+set @t_emon = case when '#non'=[11] then char(255) else [11] end 
+set @t_type = case when '#non'=[18] then '' else [18] end 
+set @t_order = case when '#non'=[19] then 'noa' else [19] end 
+
+declare @result table(
+	gno nvarchar(1),
+	comp nvarchar(max),
+	noa  nvarchar(40),
+	bdate nvarchar(20),
+	ordeno float ,
+	done float,
+	stand float,
+	undone float,
+	unfinal float,
+	memo nvarchar(MAX),
+	gen float,
+	qhrefa nvarchar(MAX),
+	qhrefb nvarchar(MAX)
+)
+
+insert @result
+select '0',left(a.cust,4),a.noa,a.bdate
+		,isnull(SUM(b.weight),0)
+		,isnull(SUM(c.bweight),0)+isnull(SUM(d.bweight),0)
+		,isnull(SUM(c.bweight),0)+isnull(SUM(d.bweight),0)-isnull(SUM(e.vweight),0) 
+		,case when isnull(sum(b.weight),0)-isnull(sum(c.bweight),0)-isnull(SUM(d.bweight),0)<0 then 0 else isnull(sum(b.weight),0)-isnull(sum(c.bweight),0)-isnull(SUM(d.bweight),0) end
+		,(isnull(SUM(c.bweight),0)+isnull(SUM(d.bweight),0) -isnull(SUM(e.vweight),0))
+		+(case when isnull(sum(b.weight),0)-isnull(sum(c.bweight),0)-isnull(SUM(d.bweight),0)<0 then 0 else isnull(sum(b.weight),0)-isnull(sum(c.bweight),0)-isnull(SUM(d.bweight),0) end)
+		,a.memo,a.gen
+		,"z_cucp_sf?report=\'z_cucp_sf02\' and noa=\'"+a.noa+"\' and "+a.noa+"=$noa"
+		,''
+from view_cuc a left join view_cucs b on a.noa=b.noa
+outer apply (select SUM(cb.weight) bweight from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='1' and cb.productno2=a.noa and cb.product2=b.noq and (b.picname='' or b.picname='直料' or b.picname='板料'))c --只需裁剪
+outer apply (select SUM(cb.weight) bweight from view_cub ca left join view_cubs cb on ca.noa=cb.noa where ca.itype='2' and cb.productno2=a.noa and cb.product2=b.noq and (b.picname!='' and b.picname!='直料' and b.picname!='板料'))d --加工
+outer apply (select SUM(weight) vweight from view_vcct where ordeno=b.ordeno and no2=b.no2)e
+where left(a.datea,7) between @t_bmon and @t_emon
+group by a.cust,a.noa,a.bdate,a.memo,a.gen
+
+update @result
+set qhrefb="z_cucp_sf?report=\'z_cucp_sf03\' and noa=\'"+noa+"\' and "+cast(unfinal as nvarchar(50))+"=$unfinal"
+
+update a
+set undone=0,unfinal=stand
+from @result a 
+outer apply(select sum(case when mins=0 then 1 else 0 end) mins from view_cucs where noa=a.noa) b 
+where b.mins=0
+
+--依cuc的gen
+--delete @result where len(@t_type)>0 and isnull(gen,0)!=cast(@t_type as float)
+
+if(@t_type='0')--未結案
+	delete @result where unfinal<=0
+if(@t_type='1')--已結案
+	delete @result where unfinal>0
+
+if((select count(*) from @result)>0)
+begin
+	insert @result(gno,comp,ordeno,done,stand,undone,unfinal)
+	select '1',char(255),sum(ordeno),sum(done),sum(stand),sum(undone),sum(unfinal)
+	from @result
+end
+
+select 
+dbo.getComma(ordeno,0) ordeno,
+dbo.getComma(done,0) done,
+dbo.getComma(stand,0) stand,
+dbo.getComma(undone,0) undone,
+dbo.getComma(unfinal,0) unfinal,
+ROW_NUMBER() over (order by gno,noa) recno,
+dbo.charbr(memo,20) memo,
+*
+from @result
+order by gno,case when @t_order='comp' then isnull(comp,'') when @t_order='bdate' then isnull(bdate,'') else noa end
+;
+--********************************************************************************************
+z_cubp_sf05:--z_cubp_sf05
+declare @t_bdate nvarchar(30)
+declare @t_edate nvarchar(30)
+declare @t_bmechno nvarchar(30)
+declare @t_emechno nvarchar(30)
+declare @t_pno nvarchar(50)
+declare @t_spec nvarchar(50)
+declare @t_size nvarchar(50)
+declare @t_itype nvarchar(30)
+
+set @t_bdate = case when '#non'=[6] then '' else [6] end 
+set @t_edate = case when '#non'=[7] then char(255) else [7] end 
+set @t_bmechno = case when '#non'=[12] then '' else [12] end 
+set @t_emechno = case when '#non'=[13] then char(255) else [13] end 
+set @t_pno = case when '#non'=[14] then '' else [14] end
+set @t_spec = case when '#non'=[15] then '' else [15] end
+set @t_size = case when '#non'=[16] then '' else [16] end
+set @t_itype = case when '#non'=[17] then '' else [17] end
+ -----------------------------------------------------------------------------------
+SET QUOTED_IDENTIFIER OFF
+declare @cmd nvarchar(max)
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+
+create table #tmp(
+	gno nvarchar(2),
+	datea nvarchar(50),
+	seq nvarchar(50),
+	noa nvarchar(50),
+	noq nvarchar(50),
+	mechno nvarchar(100),
+	mech nvarchar(100),
+	product nvarchar(100),
+	ucolor nvarchar(50),
+	spec nvarchar(50),
+	size nvarchar(50),
+	lengthb float,
+	class nvarchar(50),
+	lengthc float,
+	gmount float,
+	gweight float,
+	avgw decimal(20,2),
+	uno nvarchar(50),
+	memo nvarchar(MAX)
+)
+	
+insert #tmp
+select '0',a.kind,ROW_NUMBER() over (partition by a.mechno order by a.mechno,a.kind,a.noa,b.noq)
+,a.noa,b.noq,isnull(a.mechno,''),a.mech,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.lengthc,b.gmount,b.gweight
+,case when b.gmount=0 then 0 else round(b.gweight/b.gmount,2) end,b.uno,b.memo
+from view_cub a left join view_cubt b on a.noa=b.noa 
+where isnull(a.datea,'') between @t_bdate and @t_edate
+and isnull(a.mechno,'') between @t_bmechno and @t_emechno
+and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) 
+and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) 
+and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+and (len(@t_itype)=0 or isnull(a.itype,'')=@t_itype)
+
+if((select count(*) from #tmp)>0)
+begin
+	insert #tmp(gno,datea,seq,mechno,mech,lengthc,gmount,gweight)
+	select '1',char(255),count(*),mechno,MAX(mech),sum(lengthc),sum(gmount),sum(gweight)
+	from #tmp where gno='0'
+	group by mechno
+	
+	insert #tmp(gno,datea,seq,mechno,mech,lengthc,gmount,gweight)
+	select '2',char(255),count(*),char(255),char(255),sum(lengthc),sum(gmount),sum(gweight)
+	from #tmp where gno='0'
+end
+
+select 
+class,dbo.getComma(gmount,[2]) gmount
+,dbo.getComma(gweight,[3]) gweight
+,dbo.getComma(avgw,[3]) avgw
+,*
+from #tmp
+order by mechno,gno,datea 
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+;
