@@ -1370,9 +1370,9 @@ where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,
 and (isnull(b.product,'') like '水泥方塊%')
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
 
---成入
+--成出
 insert #tmp
-select '1','ucce',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
+select '1','uccet',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,-1*b.mount,0,0,0,0,0
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
