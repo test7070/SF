@@ -1,0 +1,133 @@
+﻿z_vcc_sf1:--z_vcc_sf1 
+declare @t_bdate nvarchar(20) 
+declare @t_edate nvarchar(20) 
+declare @t_bcustno nvarchar(20) 
+declare @t_ecustno nvarchar(20) 
+declare @t_product nvarchar(max) 
+declare @t_spec nvarchar(30) 
+declare @t_size nvarchar(10) 
+declare @t_class nvarchar(10) 
+declare @t_blengthb float 
+declare @t_elengthb float 
+declare @qhref_acomp nvarchar(10) ='' 
+declare @vcctypea nvarchar(10) ='' 
+declare @isspec nvarchar(10)='0' 
+declare @t_qno nvarchar(50) 
+declare @t_bstoreno nvarchar(20) 
+declare @t_estoreno nvarchar(20)
+declare @t_bxdate nvarchar(20) 
+declare @t_exdate nvarchar(20) 
+ 
+set @t_bdate = case when '#non'=[4] then '' else [4] end 
+set @t_edate = case when '#non'=[5] then char(255) else [5] end 
+set @t_bcustno = case when '#non'=[8] then '' else [8] end 
+set @t_ecustno = case when '#non'=[9] then char(255) else [9]  end
+set @vcctypea = case when '#non' = [10] then '' else [10] end  
+set @t_product = case when '#non'=[11] then '' else [11] end
+set @t_spec = case when '#non'=[12] then '' else [12] end
+set @t_size = case when '#non'=[13] then '' else [13] end
+set @t_class = case when '#non'=[14] then '' else [14] end
+set @t_blengthb = case when '#non'=[16] then 0 else [16] end
+set @t_elengthb = case when '#non'=[17] then 99 else [17] end
+set @t_qno = case when '#non'=[18] then '' else [18] end
+set @t_bstoreno = case when '#non'=[19] then '' else [19] end 
+set @t_estoreno = case when '#non'=[20] then char(255) else [20]  end
+set @t_bxdate = case when '#non'=[24] then '' else [24] end 
+set @t_exdate = case when '#non'=[25] then char(255) else [25] end 
+
+declare @tmp table(
+	gno nvarchar(1),
+	rr int,
+	datea nvarchar(10),
+	noa nvarchar(50),
+	custno nvarchar(50),
+	nick nvarchar(100),
+	addr2 nvarchar(100),
+	ordeno nvarchar(100),
+	transtyle nvarchar(50),
+	tranmoney float,
+	noq nvarchar(50),
+	productno nvarchar(50),
+	product nvarchar(max),
+	mount float,
+	price float,
+	total float,
+	tmount float,
+	ttotal float,
+	store2 nvarchar(max),
+	ghref nvarchar(max),
+	carno nvarchar(50)
+)
+insert @tmp
+select '9','',a.datea,a.noa,a.custno,nick,addr2
+,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
+,case  transtyle when 1 then '收費' when 2 then '自運'  when '3' then '含運' end
+,case when transtyle='1' then cartrips else 0 end,noq,productno
+,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size
+,b.mount,b.price,b.total
+,case when product='鋼筋' then b.mount else 0 end
+,b.total
+,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+,'vcc_sf?noa=$noa?'+a.accy,a.carno
+from view_vcc a left join view_vccs b on a.noa=b.noa
+where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
+	  (a.custno between @t_bcustno and @t_ecustno)  and
+	  (len(@vcctypea)=0 or @vcctypea=a.typea)and
+	  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
+	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
+	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
+	  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
+	  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
+	  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
+	  and (b.storeno between @t_bstoreno and @t_estoreno)
+	  
+
+insert @tmp
+select case when noq='001' then 1 else 2 end ,'',datea,noa,custno,nick,addr2,ordeno,transtyle
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno
+from @tmp
+where datea between @t_bdate and @t_edate
+	  
+update a
+set rr=rx
+from (select ROW_NUMBER()over(partition by gno order by noa)rx,rr from @tmp where gno='1')a
+
+insert @tmp(gno,noa,tranmoney,tmount,ttotal)
+select '8',noa,tranmoney,SUM(tmount),sum(total)
+from @tmp
+where gno='1' or gno='2'
+group by noa,tranmoney
+
+update @tmp
+set tmount=b.tmount,ttotal=b.ttotal
+from @tmp a 
+outer apply(select tmount,ttotal from @tmp where gno='8' and noa=a.noa)b
+
+insert @tmp(gno,noa,tranmoney,tmount,ttotal)
+select '7',noa,tranmoney,SUM(tmount),sum(total)
+from @tmp
+where gno='9'
+and(datea between @t_bxdate and @t_exdate)
+group by noa,tranmoney
+
+insert @tmp(gno,noa,tranmoney,tmount,ttotal)
+select '3',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
+from @tmp
+where gno='8'
+
+insert @tmp(gno,noa,tranmoney,tmount,ttotal)
+select '4',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
+from @tmp
+where gno='7'
+
+delete @tmp where gno='9' or gno='8' or gno='7'  
+	  
+select 
+@t_bxdate bxdate,@t_exdate exdate
+,dbo.getComma(total,0) total
+,dbo.getComma(ttotal,0) ttotal
+,dbo.getComma(price,3) price
+,dbo.getComma(mount,0) mount
+,dbo.getComma(tranmoney,0) tranmoney
+,* from @tmp order by noa,gno
+;
