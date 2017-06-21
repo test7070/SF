@@ -1854,6 +1854,10 @@
 			}
 
 			function btnModi() {
+				if (!emp($('#txtPart2').val())){
+					alert('由互換出貨轉來禁止直接修改!!');
+					return;
+				}
 				t_cont1=$('#textQno1').val();
 				t_cont2=$('#textQno2').val();
 				if (emp($('#txtNoa').val()))
@@ -2054,6 +2058,11 @@
 			}
 
 			function btnDele() {
+				if (!emp($('#txtPart2').val())){
+					alert('由互換出貨轉來禁止直接刪除!!');
+					return;
+				}
+				
 				t_cont1=$('#textQno1').val();
 				t_cont2=$('#textQno2').val();
 				if (q_chkClose())
@@ -2389,7 +2398,10 @@
 						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
 						<td colspan='2'><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
-						<td colspan='2'><input id="txtWorker2" type="text" class="txt c1"/></td>
+						<td colspan='2'>
+							<input id="txtWorker2" type="text" class="txt c1"/>
+							<input id="txtPart2" type="hidden"/><!--由GET轉來的單子-->
+						</td>
 						<td><span> </span><a id="lblCartrips_sf" class="lbl">應收運費</a></td>
 						<td><input id="txtCartrips" type="text" class="txt num c1"/></td>
 						<td style="display: none;"><span> </span><a id='lblAccc' class="lbl btn"> </a></td>

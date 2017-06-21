@@ -626,6 +626,34 @@
 				t_ordhno=$('#txtIdno').val();
 				if (emp($('#txtNoa').val()))
 					return;
+					
+				q_gt('view_get', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
+				var as = _q_appendData("view_get", "", true, true);
+				if (as[0] != undefined) {
+					$('#txtTranstartno').val(as[0].transtartno);
+					t_vccno=as[0].transtartno;
+				}
+				
+				//已產生出貨單 檢查是否已收款
+				if(t_vccno.length>0){
+					var t_where = " where=^^ vccno='" + t_vccno + "'^^";
+					q_gt('umms', t_where, 0, 0, 0, 'btnDele', r_accy,1);
+					
+					var as = _q_appendData("umms", "", true);
+					if (as[0] != undefined) {
+						var z_msg = "", t_paysale = 0;
+						for (var i = 0; i < as.length; i++) {
+							t_paysale = parseFloat(as[i].paysale.length == 0 ? "0" : as[i].paysale);
+							if (t_paysale != 0)
+								z_msg += String.fromCharCode(13) + '收款單號【' + as[i].noa + '】 ' + FormatNumber(t_paysale);
+						}
+						if (z_msg.length > 0) {
+							alert('已沖帳:' + z_msg +' 禁止修改!!');
+							return;
+						}
+					}
+				}
+					
 				_btnModi();
 			}
 
@@ -668,7 +696,7 @@
 					var today = new Date();
 					var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
 					if(q_cur==1){
-						q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+						q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
 					}else if(q_cur==2){
 						q_gt('view_get', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
 						var as = _q_appendData("view_get", "", true, true);
@@ -681,7 +709,7 @@
 						if(t_vccno.length>0)
 							q_func('vcc_post.post.get2vcc20', r_accy + ',' + t_vccno + ',0');
 						else{
-							q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+							q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
 						}
 					}
 				}
@@ -798,6 +826,27 @@
 					$('#txtTranstartno').val(as[0].transtartno);
 					t_vccno=as[0].transtartno;
 				}
+				
+				//已產生出貨單 檢查是否已收款
+				if(t_vccno.length>0){
+					var t_where = " where=^^ vccno='" + t_vccno + "'^^";
+					q_gt('umms', t_where, 0, 0, 0, 'btnDele', r_accy,1);
+					
+					var as = _q_appendData("umms", "", true);
+					if (as[0] != undefined) {
+						var z_msg = "", t_paysale = 0;
+						for (var i = 0; i < as.length; i++) {
+							t_paysale = parseFloat(as[i].paysale.length == 0 ? "0" : as[i].paysale);
+							if (t_paysale != 0)
+								z_msg += String.fromCharCode(13) + '收款單號【' + as[i].noa + '】 ' + FormatNumber(t_paysale);
+						}
+						if (z_msg.length > 0) {
+							alert('已沖帳:' + z_msg +' 禁止刪除!!');
+							return;
+						}
+					}
+				}
+				
 				_btnDele();
 			}
 
@@ -1038,6 +1087,9 @@
             }
 			
 			function q_funcPost(t_func, result) {
+				var today = new Date();
+				var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
+				
 				switch(t_func) {
 					case 'changeordhtgweight':
 						break;
@@ -1046,23 +1098,37 @@
 						if (as[0] != undefined) {
 							t_vccno=as[0].vccno;
 							//vcc.post內容
-							if(!emp(t_vccno)){
+							if(as[0].err.length>0){
+								alert('轉出貨單錯誤，請聯絡工程師!!');
+							}else if(!emp(t_vccno)){
 								$('#txtTranstartno').val(t_vccno);
 								q_func('vcc_post.post.get2vcc11', r_accy + ',' + t_vccno + ',1');
 							}
 						}
 						break;
 					case 'vcc_post.post.get2vcc20':
-						q_func('qtxt.query.get2vcc.2', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+						q_func('qtxt.query.get2vcc.21', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime) + ';' + encodeURI('0')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
 						break;
-					case 'qtxt.query.get2vcc.2':
+					case 'qtxt.query.get2vcc.21':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							if(as[0].err.length>0){
+								alert('轉出貨單錯誤，請聯絡工程師!!');
+							}else{
+								q_func('qtxt.query.get2vcc.22', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime) + ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
+							}
+						}
+						break;
+					case 'qtxt.query.get2vcc.22':
 						var as = _q_appendData("tmp0", "", true, true);
 						if (as[0] != undefined) {
 							t_vccno=as[0].vccno;
 							//vcc.post內容
-							if(!emp(t_vccno)){
+							if(as[0].err.length>0){
+								alert('轉出貨單錯誤，請聯絡工程師!!');
+							}else if(!emp(t_vccno)){
 								$('#txtTranstartno').val(t_vccno);
-								q_func('vcc_post.post.get2vcc21', r_accy + ',' + t_vccno + ',1');
+								q_func('vcc_post.post.get2vcc23', r_accy + ',' + t_vccno + ',1');
 							}
 						}
 						break;
@@ -1070,17 +1136,16 @@
 						if(t_deleno != '#non'){							
 							var today = new Date();
 							var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
-							q_func('qtxt.query.get2vcc.3', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_deleno)+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime));
+							q_func('qtxt.query.get2vcc.31', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_deleno)+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('2')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
 						}
 						t_deleno='#non';
 						break;
-					case 'qtxt.query.get2vcc.3':
+					case 'qtxt.query.get2vcc.31':
 						var as = _q_appendData("tmp0", "", true, true);
 						if (as[0] != undefined) {
 							t_vccno=as[0].vccno;
-							//vcc.post內容
-							if(!emp(t_vccno)){
-								q_func('vcc_post.post.get2vcc31', r_accy + ',' + t_vccno + ',1');
+							if(as[0].err.length>0){
+								alert('轉出貨單錯誤，請聯絡工程師!!');
 							}
 						}
 						break;
