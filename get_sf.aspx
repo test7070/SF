@@ -530,6 +530,7 @@
 				}
 				_bbsAssign();
 				bbssum();
+				refreshBbs();
 				
 				if(q_cur==1 || q_cur==2){
 					for (var j = 0; j < q_bbsCount; j++) {
@@ -738,6 +739,8 @@
                 		$('#combClass_'+i).removeAttr('disabled');
                 	}
                 }
+                
+                refreshBbs();
 			}
 
 			function btnMinus(id) {
@@ -838,6 +841,22 @@
                 return 0;
             }
             
+            function refreshBbs() {
+            	if(q_cur==1 || q_cur==2){
+	            	for (var i = 0; i < q_bbsCount; i++) {
+	            		if($('#txtNor_'+i).val()=='1'){
+	            			$('#txtStoreno_'+i).attr('disabled', 'disabled');
+	            			$('#btnStoreno_'+i).attr('disabled', 'disabled');
+	            			$('#txtStore_'+i).attr('disabled', 'disabled');
+	            		}else{
+	            			$('#txtStoreno_'+i).removeAttr('disabled');
+	            			$('#btnStoreno_'+i).removeAttr('disabled');
+	            			$('#txtStore_'+i).removeAttr('disabled');
+	            		}
+	            	}
+            	}
+            }
+            
             function bbtAssign() {
                 for (var i = 0; i < q_bbtCount; i++) {
                     $('#lblNo__' + i).text(i + 1);
@@ -907,7 +926,7 @@
                         });*/
                     }
                 }
-                $('#btnVccttoOrde').click(function() {
+                $('#btnGetttoOrde').click(function() {
                     if(q_cur==1 || q_cur==2){
                         /*var t_ordeno="";
                         for (var i = 0; i < q_bbtCount; i++) {
@@ -954,8 +973,6 @@
                                         class:$('#txtClass__'+i).val(),
                                         mount:$('#txtMount__'+i).val(),
                                         weight:$('#txtWeight__'+i).val(),
-                                        storeno:'7000A', //106/04/11
-                                        store:'智勝-成品', //106/04/11
                                         nor:'1'
                                     });
                                 }
@@ -966,8 +983,8 @@
                         
                         as.sort(bbssort);
                         
-                        q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtStoreno,txtStore,txtNor'
-                        , as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,storeno,store,nor','');
+                        q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtNor'
+                        , as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,nor','');
                         
                         refreshBbs();
                     }
@@ -1400,7 +1417,10 @@
 					<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtMweight.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtLengthc.*" type="text" class="txt num c1"/></td>
-					<td><input id="txtMemo.*" type="text" class="txt c1"/></td>
+					<td>
+						<input id="txtMemo.*" type="text" class="txt c1"/>
+						<input id="txtNor.*" type="hidden"/>
+					</td>
 				</tr>
 			</table>
 		</div>
@@ -1412,7 +1432,7 @@
                     <td style="width:20px;"> </td>
                     <td style="width:200px;">
                         1.<a id='lblUno_t'>領料批號</a>
-                        <input id="btnVccttoOrde" type="button" style="font-size: medium; font-weight: bold;" value="2.出貨明細產生"/>
+                        <input id="btnGetttoOrde" type="button" style="font-size: medium; font-weight: bold;" value="2.領料明細產生"/>
                     </td>
                     <!--<td style="width:150px;"><a id='lblProductno_t'> </a></td>-->
                     <td style="width:100px;"><a id='lblProduct_t'>品名</a></td>
