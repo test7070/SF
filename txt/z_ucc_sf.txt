@@ -1363,8 +1363,8 @@ delete #tmp
 --成入
 insert #tmp
 select '0','ucce',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
-,b.mount,0,case when b.mount=0 then 0 else b.total/b.price end
-,b.total,case when b.mount=0 then 0 else b.total/b.price end,b.total
+,b.mount,0,case when b.mount=0 then 0 else b.total/b.mount end
+,b.total,case when b.mount=0 then 0 else b.total/b.mount end,b.total
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (isnull(b.product,'') like '水泥方塊%')
@@ -1455,8 +1455,8 @@ and a.storeno between @t_bstoreno and @t_estoreno
 	insert #tmp
 	select '0','ucce',a.accy,a.noa,b.noq,a.datea
 	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,0,case when b.mount=0 then 0 else b.total/b.price end
-	,b.total,case when b.mount=0 then 0 else b.total/b.price end,b.total
+	,b.mount,0,case when b.mount=0 then 0 else b.total/b.mount end
+	,b.total,case when b.mount=0 then 0 else b.total/b.mount end,b.total
 	from view_ucce a left join view_ucces b on a.noa=b.noa
 	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 	and (isnull(b.product,'') like '續接器%') and ISNULL(b.spec,'')!=''
@@ -2048,8 +2048,8 @@ and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%
 	insert #tmp
 	select '0','ucce',a.accy,a.noa,b.noq,a.datea,''
 	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,case when b.mount=0 then 0 else b.total/b.price end
-	,b.total,b.storeno,case when b.mount=0 then 0 else b.total/b.price end,b.total,'ucce_sf?noa=$noa'
+	,b.mount,case when b.mount=0 then 0 else b.total/b.mount end
+	,b.total,b.storeno,case when b.mount=0 then 0 else b.total/b.mount end,b.total,'ucce_sf?noa=$noa'
 	from view_ucce a left join view_ucces b on a.noa=b.noa
 	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 	and isnull(b.product,'') like '續接器%' and ISNULL(b.spec,'')!='' and b.mount>0
@@ -2067,8 +2067,8 @@ and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%
 	insert #tmp
 	select '0','vcf','',a.noa,b.noq,a.datea,''
 	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,case when b.mount=0 then 0 else b.money/b.price end
-	,b.money,b.storeno,case when b.mount=0 then 0 else b.money/b.price end,b.money,'vcf_sf?noa=$noa'
+	,b.mount,case when b.mount=0 then 0 else b.money/b.mount end
+	,b.money,b.storeno,case when b.mount=0 then 0 else b.money/b.mount end,b.money,'vcf_sf?noa=$noa'
 	from vcf a left join vcfs b on a.noa=b.noa
 	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 	and isnull(b.product,'') like '續接器%' and ISNULL(b.spec,'')!='' and b.mount>0
