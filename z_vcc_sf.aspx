@@ -122,6 +122,10 @@
                     }, {
                         type : '1', //[24][25]
                         name : 'Xdate'
+                    }, {
+                        type : '8', //[26]
+                        name : 'xnoshowget',
+                        value : "1@不含互換出貨".split(',')
                     }]
                 });
                 q_popAssign();
@@ -166,7 +170,7 @@
                     if (isNaN($(this).val()))
                     	$(this).val(99);
                 });
-                
+                               
                 var tmp = document.getElementById("txtQno");
                 var selectbox = document.createElement("select");
                 selectbox.id="combQno";
@@ -232,6 +236,13 @@
 				$('#Xshowenda .label').css('width','0px');
 				$('#chkXshowenda').css('width', '220px').css('margin-top', '5px');
 				$('#chkXshowenda span').css('width','180px')
+				
+				$('#Xnoshowget').css('width', '300px').css('height', '30px');
+                $('#Xnoshowget .label').css('width','0px');
+                $('#chkXnoshowget').css('width', '220px').css('margin-top', '5px');
+                $('#chkXnoshowget span').css('width','180px')
+                $("input[type='checkbox'][value!='']").attr('checked', true);
+				
 
             }
 			function changeaddr2() {

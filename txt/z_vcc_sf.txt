@@ -16,7 +16,8 @@ declare @t_qno nvarchar(50)
 declare @t_bstoreno nvarchar(20) 
 declare @t_estoreno nvarchar(20)
 declare @t_bxdate nvarchar(20) 
-declare @t_exdate nvarchar(20) 
+declare @t_exdate nvarchar(20)
+declare @t_noshowget nvarchar(20)  
  
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -33,7 +34,8 @@ set @t_qno = case when '#non'=[18] then '' else [18] end
 set @t_bstoreno = case when '#non'=[19] then '' else [19] end 
 set @t_estoreno = case when '#non'=[20] then char(255) else [20]  end
 set @t_bxdate = case when '#non'=[24] then '' else [24] end 
-set @t_exdate = case when '#non'=[25] then char(255) else [25] end 
+set @t_exdate = case when '#non'=[25] then char(255) else [25] end
+set @t_noshowget = case when '#non'=[26] then '' else [26] end 
 
 declare @tmp table(
 	gno nvarchar(1),
@@ -57,27 +59,53 @@ declare @tmp table(
 	ghref nvarchar(max),
 	memo nvarchar(max)
 )
-insert @tmp
-select '9','',a.datea,a.noa,a.custno,nick,addr2
-,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
-,case when transtyle='1' then cartrips else 0 end
-,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
-,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
-,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-,'vcc_sf?noa=$noa?'+a.accy,a.memo
-from view_vcc a left join view_vccs b on a.noa=b.noa
-where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-	  (a.custno between @t_bcustno and @t_ecustno)  and
-	  (len(@vcctypea)=0 or @vcctypea=a.typea)and
-	  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
-	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
-	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
-	  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
-	  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
-	  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
-	  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-	  
+if(@t_noshowget='1')
+begin
+	insert @tmp
+	select '9','',a.datea,a.noa,a.custno,nick,addr2
+	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
+	,case when transtyle='1' then a.tranmoney else 0 end
+	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
+	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,'vcc_sf?noa=$noa?'+a.accy,a.memo
+	from view_vcc a left join view_vccs b on a.noa=b.noa
+	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
+		  (a.custno between @t_bcustno and @t_ecustno)  and
+		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
+		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
+		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
+		  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
+		  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
+		  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
+		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
+		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+		  and not exists(select noa from view_get where noa=a.noa)
+end
+else
+begin
+	insert @tmp
+	select '9','',a.datea,a.noa,a.custno,nick,addr2
+	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
+	,case when transtyle='1' then a.tranmoney else 0 end
+	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
+	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,'vcc_sf?noa=$noa?'+a.accy,a.memo
+	from view_vcc a left join view_vccs b on a.noa=b.noa
+	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
+		  (a.custno between @t_bcustno and @t_ecustno)  and
+		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
+		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
+		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
+		  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
+		  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
+		  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
+		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
+		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+end	  
 
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,custno,nick,addr2,ordeno
@@ -148,7 +176,8 @@ declare @t_qno nvarchar(50)
 declare @t_bstoreno nvarchar(20) 
 declare @t_estoreno nvarchar(20)
 declare @t_bxdate nvarchar(20) 
-declare @t_exdate nvarchar(20) 
+declare @t_exdate nvarchar(20)
+declare @t_noshowget nvarchar(20)  
  
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -165,7 +194,8 @@ set @t_qno = case when '#non'=[18] then '' else [18] end
 set @t_bstoreno = case when '#non'=[19] then '' else [19] end 
 set @t_estoreno = case when '#non'=[20] then char(255) else [20]  end
 set @t_bxdate = case when '#non'=[24] then '' else [24] end 
-set @t_exdate = case when '#non'=[25] then char(255) else [25] end 
+set @t_exdate = case when '#non'=[25] then char(255) else [25] end
+set @t_noshowget = case when '#non'=[26] then '' else [26] end 
 
 declare @tmp table(
 	gno nvarchar(1),
@@ -190,29 +220,56 @@ declare @tmp table(
 	ghref nvarchar(max),
 	carno nvarchar(50)
 )
-insert @tmp
-select '9','',a.datea,a.noa,a.custno,nick,addr2
-,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
-,case  transtyle when 1 then '收費' when 2 then '自運'  when '3' then '含運' end
-,case when transtyle='1' then cartrips else 0 end
-,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
-,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
-,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-,'vcc_sf?noa=$noa?'+a.accy,a.carno
-from view_vcc a left join view_vccs b on a.noa=b.noa
-where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-	  (a.custno between @t_bcustno and @t_ecustno)  and
-	  (len(@vcctypea)=0 or @vcctypea=a.typea)and
-	  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
-	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
-	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
-	  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
-	  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
-	  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
-	  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+if(@t_noshowget='1')
+begin
+	insert @tmp
+	select '9','',a.datea,a.noa,a.custno,nick,addr2
+	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
+	,case  transtyle when 1 then '收費' when 2 then '自運'  when '3' then '含運' end
+	,case when transtyle='1' then cartrips else 0 end
+	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
+	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,'vcc_sf?noa=$noa?'+a.accy,a.carno
+	from view_vcc a left join view_vccs b on a.noa=b.noa
+	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
+		  (a.custno between @t_bcustno and @t_ecustno)  and
+		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
+		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
+		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
+		  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
+		  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
+		  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
+		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
+		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+		  and not exists(select noa from view_get where noa=a.noa)
+end
+else
+begin
+	insert @tmp
+	select '9','',a.datea,a.noa,a.custno,nick,addr2
+	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
+	,case  transtyle when 1 then '收費' when 2 then '自運'  when '3' then '含運' end
+	,case when transtyle='1' then cartrips else 0 end
+	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
+	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,'vcc_sf?noa=$noa?'+a.accy,a.carno
+	from view_vcc a left join view_vccs b on a.noa=b.noa
+	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
+		  (a.custno between @t_bcustno and @t_ecustno)  and
+		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
+		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
+		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
+		  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
+		  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
+		  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
+		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
+		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+end 
 	  
-
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,custno,nick,addr2,ordeno,transtyle
 ,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno
@@ -279,7 +336,10 @@ declare @vcctypea nvarchar(10) =''
 declare @isspec nvarchar(10)='0' 
 declare @t_qno nvarchar(50) 
 declare @t_bstoreno nvarchar(20) 
-declare @t_estoreno nvarchar(20) 
+declare @t_estoreno nvarchar(20)
+declare @t_bxdate nvarchar(20) 
+declare @t_exdate nvarchar(20)
+declare @t_noshowget nvarchar(20)  
  
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -295,6 +355,9 @@ set @t_elengthb = case when '#non'=[17] then 99 else [17] end
 set @t_qno = case when '#non'=[18] then '' else [18] end
 set @t_bstoreno = case when '#non'=[19] then '' else [19] end 
 set @t_estoreno = case when '#non'=[20] then char(255) else [20]  end
+set @t_bxdate = case when '#non'=[24] then '' else [24] end 
+set @t_exdate = case when '#non'=[25] then char(255) else [25] end
+set @t_noshowget = case when '#non'=[26] then '' else [26] end 
 
 declare @tmp table(
 	gno nvarchar(1),
@@ -319,28 +382,57 @@ declare @tmp table(
 	store2 nvarchar(max),
 	ghref nvarchar(max)
 )
-insert @tmp
-select '9','',a.noa,a.datea,a.custno,comp,addr2
-,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
-,case when transtyle='1' then cartrips else 0 end,tax
-,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
-,b.mount,b.price,b.total
-,case when product='鋼筋' then b.mount else 0 end
-,b.total,0
-,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-,'vcc_sf?noa=$noa?'+a.accy
-from view_vcc a left join view_vccs b on a.noa=b.noa
-where (a.datea between @t_bdate and @t_edate) and 
-	  (a.custno between @t_bcustno and @t_ecustno)  and
-	  (len(@vcctypea)=0 or @vcctypea=a.typea)and
-	  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
-	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
-	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
-	  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
-	  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
-	  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
-	  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+if(@t_noshowget='1')
+begin
+	insert @tmp
+	select '9','',a.noa,a.datea,a.custno,comp,addr2
+	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
+	,case when transtyle='1' then cartrips else 0 end,tax
+	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+	,b.mount,b.price,b.total
+	,case when product='鋼筋' then b.mount else 0 end
+	,b.total,0
+	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,'vcc_sf?noa=$noa?'+a.accy
+	from view_vcc a left join view_vccs b on a.noa=b.noa
+	where (a.datea between @t_bdate and @t_edate) and 
+		  (a.custno between @t_bcustno and @t_ecustno)  and
+		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
+		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
+		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
+		  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
+		  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
+		  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
+		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
+		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+		  and not exists(select noa from view_get where noa=a.noa)
+end
+else
+begin
+	insert @tmp
+	select '9','',a.noa,a.datea,a.custno,comp,addr2
+	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
+	,case when transtyle='1' then cartrips else 0 end,tax
+	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+	,b.mount,b.price,b.total
+	,case when product='鋼筋' then b.mount else 0 end
+	,b.total,0
+	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,'vcc_sf?noa=$noa?'+a.accy
+	from view_vcc a left join view_vccs b on a.noa=b.noa
+	where (a.datea between @t_bdate and @t_edate) and 
+		  (a.custno between @t_bcustno and @t_ecustno)  and
+		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
+		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
+		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
+		  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
+		  (len(@t_class)=0 or @t_class like isnull(b.class,'')) and
+		  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
+		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
+		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+end	  
 	  
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',noa,datea,custno,comp,addr2,ordeno

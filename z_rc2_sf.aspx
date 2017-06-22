@@ -127,6 +127,10 @@
                     }, {
                         type : '1', //[22][23]
                         name : 'Xdate'
+                    }, {
+                        type : '8', //[24]
+                        name : 'xnoshowina',
+                        value : "1@不含互換進貨".split(',')
                     }]
 				});
 				q_popAssign();
@@ -210,6 +214,12 @@
 				$('#Xshowenda .label').css('width','0px');
 				$('#chkXshowenda').css('width', '220px').css('margin-top', '5px');
 				$('#chkXshowenda span').css('width','180px')
+				
+				$('#Xnoshowina').css('width', '300px').css('height', '30px');
+                $('#Xnoshowina .label').css('width','0px');
+                $('#chkXnoshowina').css('width', '220px').css('margin-top', '5px');
+                $('#chkXnoshowina span').css('width','180px')
+                $("input[type='checkbox'][value!='']").attr('checked', true);
 			}
 
 			function q_boxClose(s2) {

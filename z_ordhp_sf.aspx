@@ -60,8 +60,13 @@
                 q_getFormat();
                 q_langShow();
 
+                //戴先生 2017/06/22 訂約日要往前推一年
                 $('#txtXdate1').mask(r_picd);
-                $('#txtXdate1').val(q_date().substr(0, r_lenm)+'/01');
+                if(q_getPara('sys.project').toUpperCase()=='VU'){
+                    $('#txtXdate1').val(q_cdn(q_date().substr(0, r_lenm)+'/01',-365).substr(0,r_lenm)+'/01');
+                }else{
+                     $('#txtXdate1').val(q_date().substr(0, r_lenm)+'/01');
+                }
                 $('#txtXdate2').mask(r_picd);
                 $('#txtXdate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',35).substr(0,r_lenm)+'/01',-1));
             }
