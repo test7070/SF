@@ -65,12 +65,13 @@ create table #tmp(
 	ordeno nvarchar(50),
 )
 
+--106/06/13不使用盤點單 只使用調整單
 --盤點
-insert #tmp
-select '5',a.accy,'ucces' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
-from view_ucce a left join view_ucces b on a.noa = b.noa 
-where len(b.uno)>0 and a.datea<=@t_edate
+--insert #tmp
+--select '5',a.accy,'ucces' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+--,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
+--from view_ucce a left join view_ucces b on a.noa = b.noa 
+--where len(b.uno)>0 and a.datea<=@t_edate
 
 insert #tmp
 select '6',a.accy,'rc2s' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
@@ -142,9 +143,9 @@ order by datea,gno,noa,noq) b
 where a.gno='0'
 
 --刪除多次批號的資料 只保留最後一次批號(同一天依gno,noa順序)
-delete a
-from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+gno+'-'+noa+'-'+noq) maxnoa from #tmp where uno=a.uno and tablea='ucces' and gno!='0')b
-where a.tablea!='0' and isnull(b.datea,'') > a.datea and ISNULL(b.maxnoa,'')>a.datea+'-'+a.gno+'-'+a.noa+'-'+noq
+--delete a
+--from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+gno+'-'+noa+'-'+noq) maxnoa from #tmp where uno=a.uno and tablea='ucces' and gno!='0')b
+--where a.tablea!='0' and isnull(b.datea,'') > a.datea and ISNULL(b.maxnoa,'')>a.datea+'-'+a.gno+'-'+a.noa+'-'+noq
 
 update a
 set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)
@@ -267,12 +268,13 @@ create table #tmp(
 	ordeno nvarchar(50),
 )
 
+--106/06/13不使用盤點單 只使用調整單
 --盤點
-insert #tmp
-select '5',a.accy,'ucces' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
-from view_ucce a left join view_ucces b on a.noa = b.noa 
-where len(b.uno)>0 and a.datea<=@t_edate
+--insert #tmp
+--select '5',a.accy,'ucces' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+--,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,'','',''
+--from view_ucce a left join view_ucces b on a.noa = b.noa 
+--where len(b.uno)>0 and a.datea<=@t_edate
 
 insert #tmp
 select '6',a.accy,'rc2s' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
@@ -341,9 +343,9 @@ from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and gno!='0' o
 where a.gno='0'
 
 --刪除多次批號的資料 只保留最後一次批號(同一天依gno,noa順序)
-delete a
-from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+gno+'-'+noa+'-'+noq) maxnoa from #tmp where uno=a.uno and tablea='ucces' and gno!='0')b
-where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.gno+'-'+a.noa+'-'+noq< ISNULL(b.maxnoa,'')
+--delete a
+--from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+gno+'-'+noa+'-'+noq) maxnoa from #tmp where uno=a.uno and tablea='ucces' and gno!='0')b
+--where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.gno+'-'+a.noa+'-'+noq< ISNULL(b.maxnoa,'')
 
 update a
 set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)
@@ -454,313 +456,81 @@ create table #tmp(
 	idno int
 )
 
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '11','ucce',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno
-,b.mount,b.weight,0,b.uno
-from view_ucce a left join view_ucces b on a.noa=b.noa 
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product not like '續接器%'
-
---刪除多次盤點的資料 只保留最後一次盤點
-delete a
-from #tmp a outer apply (select MAX(datea) datea from #tmp 
-where product=a.product and ucolor=a.ucolor and spec=a.spec and size=a.size and lengthb =a.lengthb and class=a.class and storeno=a.storeno and uno=a.uno)b
-where a.datea!=b.datea
+--106/06/13不使用盤點單 只使用調整單 其他倉庫 基本上都是當天就會領用完 所以不會有庫存
 	
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '12','rc2s',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno
 ,case when a.typea='2' then -1 else 1 end*b.mount,case when a.typea='2' then -1 else 1 end*b.weight,0,b.uno
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
 where a.datea<=@t_edate 
 and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
 and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
 and isnull(b.productno,'')=''
 and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product not like '續接器%'
 	
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '13','cubs',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno,b.mount,b.weight,0,b.uno
 from view_cub a left join view_cubs b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
 where a.datea<=@t_edate 
 and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
 and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 and isnull(b.productno,'')=''
 and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product not like '續接器%'
 
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '14','inas',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,a.storeno,b.mount,b.weight,0,b.uno
 from view_ina a left join view_inas b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
 where a.datea<=@t_edate 
 and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
+and ((@t_blengthb='' and  @t_elengthb=char(255)) or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(a.storeno,'') between @t_bstoreno and @t_estoreno)
 and isnull(b.productno,'')=''
 and isnull(a.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product not like '續接器%'
 
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '15','vcct',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno,b.mount,b.weight,0,b.uno
-from view_vcc a left join view_vcct b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product not like '續接器%'
-		
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '15','vccs',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno,b.mount,b.weight,0,''
 from view_vcc a left join view_vccs b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno='' and tablea='ucce')c
 where a.datea<=@t_edate 
-and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
 and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
 and isnull(b.productno,'')=''
 and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product not like '續接器%'
 	
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
 select '16','cubt',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,d.storeno,b.gmount,b.gweight,0,b.uno
 from view_cub a left join view_cubt b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
 outer apply(select top 1 storeno from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea!='vccs' and tablea!='vcct' order by datea desc,gno desc)d
 where a.datea<=@t_edate 
 and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
 and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 and isnull(b.productno,'')=''
 and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product not like '續接器%'
 
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '17','gets',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,a.storeno,b.mount,b.weight,0,b.uno
+select '17','gets',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,a.storeno,b.mount,b.weight,0,''
 from view_get a left join view_gets b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
 where a.datea<=@t_edate 
 and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
 and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
 and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and (isnull(a.storeno,'') between @t_bstoreno and @t_estoreno)
 and isnull(b.productno,'')=''
 and isnull(a.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product not like '續接器%'
-------------------------------------------------------------------------------------------
---續接器處理 106/06/01
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '11','ucce',a.datea,a.noa,b.noq
-,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,b.storeno,b.mount,b.weight,0,b.uno
-from view_ucce a left join view_ucces b on a.noa=b.noa 
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.ucolor,'')!=''
-
---刪除多次盤點的資料 只保留最後一次盤點
-delete a
-from #tmp a outer apply (select MAX(datea) datea from #tmp 
-where product=a.product and ucolor=a.ucolor and spec=a.spec and size=a.size and lengthb =a.lengthb and class=a.class and storeno=a.storeno and uno=a.uno)b
-where a.datea!=b.datea and a.product like '續接器%'
-	
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '12','rc2s',a.datea,a.noa,b.noq
-,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,b.storeno
-,case when a.typea='2' then -1 else 1 end*b.mount,case when a.typea='2' then -1 else 1 end*b.weight,0,b.uno
-from view_rc2 a left join view_rc2s b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '13','cubs',a.datea,a.noa,b.noq
-,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,b.storeno,b.mount,b.weight,0,b.uno
-from view_cub a left join view_cubs b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '14','inas',a.datea,a.noa,b.noq
-,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,a.storeno,b.mount,b.weight,0,b.uno
-from view_ina a left join view_inas b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(a.storeno,'') between @t_bstoreno and @t_estoreno)
-and isnull(b.productno,'')=''
-and isnull(a.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '15','vcct',a.datea,a.noa,b.noq
-,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,b.storeno,b.mount,b.weight,0,b.uno
-from view_vcc a left join view_vcct b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '15','vcct',a.datea,a.noa,b.noq
-,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,b.storeno,b.mount,b.weight,0,b.uno
-from view_vcc a left join view_vcct b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.spec,'')!=''
-		
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '15','vccs',a.datea,a.noa,b.noq
-,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,b.storeno,b.mount,b.weight,0,''
-from view_vcc a left join view_vccs b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno='' and tablea='ucce')c
-where a.datea<=@t_edate 
-and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '15','vccs',a.datea,a.noa,b.noq
-,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,b.storeno,b.mount,b.weight,0,''
-from view_vcc a left join view_vccs b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno='' and tablea='ucce')c
-where a.datea<=@t_edate 
-and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.spec,'')!=''
-	
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '16','cubt',a.datea,a.noa,b.noq
-,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,d.storeno,b.gmount,b.gweight,0,b.uno
-from view_cub a left join view_cubt b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
-outer apply(select top 1 storeno from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea!='vccs' and tablea!='vcct' order by datea desc,gno desc)d
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-and isnull(b.productno,'')=''
-and isnull(b.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-
-insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '17','gets',a.datea,a.noa,b.noq
-,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-,a.storeno,b.mount,b.weight,0,b.uno
-from view_get a left join view_gets b on a.noa=b.noa
-outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and storeno=b.storeno and uno=b.uno and tablea='ucce')c
-where a.datea<=@t_edate 
-and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
-and a.datea>=isnull(c.datea,'')
-and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
-and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
-and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
-and (isnull(a.storeno,'') between @t_bstoreno and @t_estoreno)
-and isnull(b.productno,'')=''
-and isnull(a.storeno,'')!='A' --106/03/29不顯示三泰本倉
-and b.product like '續接器%' and ISNULL(b.ucolor,'')!=''
 
 ------------------------------------------------------------------------------------------
 declare @tablea nvarchar(100)
@@ -1367,7 +1137,7 @@ select '0','ucce',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.total,case when b.mount=0 then 0 else b.total/b.mount end,b.total
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (isnull(b.product,'') like '水泥方塊%')
+and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%')
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
 
 --成出
@@ -1376,7 +1146,7 @@ select '1','uccet',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,-1*b.mount,0,0,0,0,0
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (isnull(b.product,'') like '水泥方塊%')
+and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%')
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount<0
 
 --調入
@@ -1386,7 +1156,7 @@ select '0','vcf','',a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.money,case when b.mount=0 then 0 else b.money/b.mount end,b.money
 from vcf a left join vcfs b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (isnull(b.product,'') like '水泥方塊%')
+and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%')
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
 
 --調領
@@ -1395,7 +1165,7 @@ select '1','vcft','',a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,-1*b.mount,0,0,0,0,0
 from vcf a left join vcfs b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (isnull(b.product,'') like '水泥方塊%')
+and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%')
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount<0
 
 --進
@@ -1406,7 +1176,7 @@ select '2','rc2s',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,case when a.typea='2' then -1 else 1 end*b.total
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-and (isnull(b.product,'') like '水泥方塊%')
+and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --銷
@@ -1417,7 +1187,7 @@ select '4','vccs',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 from view_vcc a left join view_vccs b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 --and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and (isnull(b.product,'') like '水泥方塊%')
+and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --insert #tmp
@@ -1437,7 +1207,7 @@ select '3','inas',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.mount,0,b.mweight,b.mount*b.mweight,b.mweight,b.mount*b.mweight
 from view_ina a left join view_inas b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-and (isnull(b.product,'') like '水泥方塊%')
+and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%')
 and a.storeno between @t_bstoreno and @t_estoreno
 
 --出
@@ -1446,135 +1216,9 @@ select '6','gets',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.mount,0,b.mweight,b.mount*b.mweight,b.mweight,b.mount*b.mweight
 from view_get a left join view_gets b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-and (isnull(b.product,'') like '水泥方塊%')
+and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%')
 and a.storeno between @t_bstoreno and @t_estoreno
---------------------------------------------------------------------
---續接器處理 106/06/01
 
-	--成入
-	insert #tmp
-	select '0','ucce',a.accy,a.noa,b.noq,a.datea
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,0,case when b.mount=0 then 0 else b.total/b.mount end
-	,b.total,case when b.mount=0 then 0 else b.total/b.mount end,b.total
-	from view_ucce a left join view_ucces b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and (isnull(b.product,'') like '續接器%') and ISNULL(b.spec,'')!=''
-	and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
-	
-	--成領
-	insert #tmp
-	select '0','uccet',a.accy,a.noa,b.noq,a.datea
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,-1*b.mount,0,0,0,0,0
-	from view_ucce a left join view_ucces b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and (isnull(b.product,'') like '續接器%') and ISNULL(b.spec,'')!=''
-	and b.storeno between @t_bstoreno and @t_estoreno and b.mount<0
-	
-	--調入
-	insert #tmp
-	select '0','vcf','',a.noa,b.noq,a.datea
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,0,case when b.mount=0 then 0 else b.money/b.mount end
-	,b.money,case when b.mount=0 then 0 else b.money/b.mount end,b.money
-	from vcf a left join vcfs b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and (isnull(b.product,'') like '續接器%') and ISNULL(b.spec,'')!=''
-	and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
-
-	--調領
-	insert #tmp
-	select '1','vcft','',a.noa,b.noq,a.datea
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,-1*b.mount,0,0,0,0,0
-	from vcf a left join vcfs b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and (isnull(b.product,'') like '續接器%') and ISNULL(b.spec,'')!=''
-	and b.storeno between @t_bstoreno and @t_estoreno and b.mount<0
-	
-
---類別
-	--進
-	insert #tmp
-	select '1','rc2s',a.accy,a.noa,b.noq,a.datea
-	,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,case when a.typea='2' then -1 else 1 end*b.mount,0,b.price
-	,case when a.typea='2' then -1 else 1 end*b.total,b.price
-	,case when a.typea='2' then -1 else 1 end*b.total
-	from view_rc2 a left join view_rc2s b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-	and (isnull(b.product,'') like '續接器%') and ISNULL(b.ucolor,'')!=''
-	and b.storeno between @t_bstoreno and @t_estoreno
-
-	--銷
-	insert #tmp
-	select '5','vccs',a.accy,a.noa,b.noq,a.datea
-	,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,case when a.typea='2' then -1 else 1 end*b.mount,0,b.price
-	,case when a.typea='2' then -1 else 1 end*b.total,0,0
-	from view_vcc a left join view_vccs b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-	--and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-	and (isnull(b.product,'') like '續接器%') and ISNULL(b.ucolor,'')!=''
-	and b.storeno between @t_bstoreno and @t_estoreno
-
-	--insert #tmp
-	--select '5','vcct',a.accy,a.noa,b.noq,a.datea
-	--,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	--,case when a.typea='2' then -1 else 1 end*b.mount,0,c.price
-	--,case when a.typea='2' then -1 else 1 end*b.mount*c.price,0,0
-	--from view_vcc a left join view_vcct b on a.noa=b.noa
-	--outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
-	--where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-	--and (isnull(b.product,'') like '續接器%') and ISNULL(b.ucolor,'')!=''
-	--and b.storeno between @t_bstoreno and @t_estoreno
-
-	--互換
-	--入
-	insert #tmp
-	select '2','inas',a.accy,a.noa,b.noq,a.datea
-	,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,0,b.mweight,b.mount*b.mweight,b.mweight,b.mount*b.mweight
-	from view_ina a left join view_inas b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-	and (isnull(b.product,'') like '續接器%') and ISNULL(b.ucolor,'')!=''
-	and a.storeno between @t_bstoreno and @t_estoreno
-
-	--出
-	insert #tmp
-	select '6','gets',a.accy,a.noa,b.noq,a.datea
-	,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,0,b.mweight,b.mount*b.mweight,b.mweight,b.mount*b.mweight
-	from view_get a left join view_gets b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-	and (isnull(b.product,'') like '續接器%' ) and ISNULL(b.ucolor,'')!=''
-	and a.storeno between @t_bstoreno and @t_estoreno
-
---材質
-	--銷
-	insert #tmp
-	select '5','vccs',a.accy,a.noa,b.noq,a.datea
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,case when a.typea='2' then -1 else 1 end*b.mount,0,b.price
-	,case when a.typea='2' then -1 else 1 end*b.total,0,0
-	from view_vcc a left join view_vccs b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-	--and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-	and (isnull(b.product,'') like '續接器%') and ISNULL(b.spec,'')!=''
-	and b.storeno between @t_bstoreno and @t_estoreno
-
-	--insert #tmp
-	--select '5','vcct',a.accy,a.noa,b.noq,a.datea
-	--,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	--,case when a.typea='2' then -1 else 1 end*b.mount,0,c.price
-	--,case when a.typea='2' then -1 else 1 end*b.mount*c.price,0,0
-	--from view_vcc a left join view_vcct b on a.noa=b.noa
-	--outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
-	--where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-	--and (isnull(b.product,'') like '續接器%') and ISNULL(b.spec,'')!=''
-	--and b.storeno between @t_bstoreno and @t_estoreno
-	
 --------------------------------------------------------------------
 delete #tmpb
 
@@ -1936,70 +1580,70 @@ CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 --成入
 insert #tmp
 select '0','ucce',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
-,case when case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end=0 then 0
-else b.total/case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end end,b.total
-,b.storeno,case when case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end=0 then 0
-else b.total/case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end end,b.total
+,case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end
+,case when case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end=0 then 0
+else b.total/case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end end,b.total
+,b.storeno,case when case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end=0 then 0
+else b.total/case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end end,b.total
 ,'ucce_sf?noa=$noa'
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
-and case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end>0
+and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%'))
+and case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end>0
 
 --成領
 insert #tmp
 select '1','uccet',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,-1*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,-1*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end
 ,0,0,b.storeno,0,0,'ucce_sf?noa=$noa'
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
-and case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end<0
+and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%'))
+and case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end<0
 
 --調入
 insert #tmp
 select '0','vcf','',a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
-,case when case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end=0 then 0
-else b.money/case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end end,b.money
-,b.storeno,case when case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end=0 then 0
-else b.money/case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end end,b.money
+,case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end
+,case when case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end=0 then 0
+else b.money/case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end end,b.money
+,b.storeno,case when case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end=0 then 0
+else b.money/case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end end,b.money
 ,'vcf_sf?noa=$noa'
 from vcf a left join vcfs b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
-and case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end>0
+and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%'))
+and case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end>0
 
 --調領
 insert #tmp
 select '1','vcft','',a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,-1*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,-1*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end
 ,0,0,b.storeno,0,0,'vcf_sf?noa=$noa'
 from vcf a left join vcfs b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
-and case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end<0
+and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%'))
+and case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end<0
 
 --進
 insert #tmp
 select '2','rc2s',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,'rc2_sf?noa=$noa'
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
+and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%'))
 
 --銷
 insert #tmp
 select '4','vccs',a.accy,a.noa,b.noq,a.datea,'',b.product,'',b.spec,b.size,0,''
-,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
+,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,0,0,'vcc_sf?noa=$noa'
 from view_vcc a left join view_vccs b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 --and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
+and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%'))
 
 --insert #tmp
 --select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
@@ -2021,155 +1665,25 @@ and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%
 --入
 insert #tmp
 select '3','inas',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.mweight
-,b.mweight*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end,b.mweight
+,b.mweight*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end
 ,b.storeno,b.mweight
-,b.mweight*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,b.mweight*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end
 ,'ina_sf?noa=$noa'
 from view_ina a left join view_inas b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
+and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%'))
 
 --出
 insert #tmp
 select '5','gets',a.accy,a.noa,b.noq,a.datea,'',b.product,'',b.spec,b.size,0,''
-,case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.mweight
-,b.mweight*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+,case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end,b.mweight
+,b.mweight*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' then b.mount else b.weight end
 ,b.storeno,0,0,'get_sf?noa=$noa'
 from view_get a left join view_gets b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and not exists(select* from view_gett where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
-
----------------------------------------------------------
---處理續接器106/06/01
-
-	--成入
-	insert #tmp
-	select '0','ucce',a.accy,a.noa,b.noq,a.datea,''
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,case when b.mount=0 then 0 else b.total/b.mount end
-	,b.total,b.storeno,case when b.mount=0 then 0 else b.total/b.mount end,b.total,'ucce_sf?noa=$noa'
-	from view_ucce a left join view_ucces b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.spec,'')!='' and b.mount>0
-	
-	--成領
-	insert #tmp
-	select '1','uccet',a.accy,a.noa,b.noq,a.datea,''
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,-1*b.mount,0,0,b.storeno,0,0,'ucce_sf?noa=$noa'
-	from view_ucce a left join view_ucces b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.spec,'')!='' and b.mount<0
-	
-	--調入
-	insert #tmp
-	select '0','vcf','',a.noa,b.noq,a.datea,''
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,case when b.mount=0 then 0 else b.money/b.mount end
-	,b.money,b.storeno,case when b.mount=0 then 0 else b.money/b.mount end,b.money,'vcf_sf?noa=$noa'
-	from vcf a left join vcfs b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.spec,'')!='' and b.mount>0
-	
-	--調領
-	insert #tmp
-	select '1','vcft','',a.noa,b.noq,a.datea,''
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,-1*b.mount,0,0,b.storeno,0,0,'vcf_sf?noa=$noa'
-	from vcf a left join vcfs b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.spec,'')!='' and b.mount<0
-
-
---類別
-	--進
-	insert #tmp
-	select '2','rc2s',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,'')
-	,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,case when a.typea='2' then -1 else 1 end*b.mount,b.price
-	,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,b.price
-	,case when a.typea='2' then -1 else 1 end*b.total,'rc2_sf?noa=$noa'
-	from view_rc2 a left join view_rc2s b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-	--銷
-	insert #tmp
-	select '4','vccs',a.accy,a.noa,b.noq,a.datea,''
-	,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,case when a.typea='2' then -1 else 1 end*b.mount,b.price
-	,case when a.typea='2' then -1 else 1 end*b.mount*b.price,b.storeno,0,0,'vcc_sf?noa=$noa'
-	from view_vcc a left join view_vccs b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	--and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-	--insert #tmp
-	--select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,'')
-	--,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	--,case when a.typea='2' then -1 else 1 end*b.mount,c.price
-	--,case when a.typea='2' then -1 else 1 end*b.mount*c.price
-	--,'',0,0,'vcc_sf?noa=$noa'
-	--from view_vcc a left join view_vcct b on a.noa=b.noa
-	--outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
-	--where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	--and isnull(b.product,'') like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-	--update  a
-	--set storeno=isnull(b.storeno,'')
-	--from #tmp a outer apply (select top 1 storeno from #tmp where tablea not like 'vcc%' and uno=a.uno order by datea) b
-	--where tablea='vcct' and product like '續接器%'
-
-	--互換
-	--入
-	insert #tmp
-	select '3','inas',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,'')
-	,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,b.mweight,b.mweight*b.mount,b.storeno,b.mweight,b.mweight*b.mount,'ina_sf?noa=$noa'
-	from view_ina a left join view_inas b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.ucolor,'')!=''
-
-	--出
-	insert #tmp
-	select '6','gets',a.accy,a.noa,b.noq,a.datea,''
-	,b.product+' '+b.ucolor,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,b.mount,b.mweight,b.mweight*b.mount,b.storeno,0,0,'get_sf?noa=$noa'
-	from view_get a left join view_gets b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	--and not exists(select* from view_gett where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.ucolor,'')!=''
---材質
-	
-	--銷
-	insert #tmp
-	select '4','vccs',a.accy,a.noa,b.noq+'-',a.datea,''
-	,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	,case when a.typea='2' then -1 else 1 end*b.mount,b.tranmoney
-	,case when a.typea='2' then -1 else 1 end*b.mount*b.tranmoney,b.storeno,0,0,'vcc_sf?noa=$noa'
-	from view_vcc a left join view_vccs b on a.noa=b.noa
-	where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	--and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-	and isnull(b.product,'') like '續接器%' and ISNULL(b.spec,'')!=''
-
-	--insert #tmp
-	--select '5','vcct',a.accy,a.noa,b.noq+'-',a.datea,isnull(b.uno,'')
-	--,b.product+' '+b.spec,'' ucolor,'' spec,'' size,0 lengthb,'' class
-	--,case when a.typea='2' then -1 else 1 end*b.mount,c.tranmoney
-	--,case when a.typea='2' then -1 else 1 end*b.mount*c.tranmoney
-	--,'',0,0,'vcc_sf?noa=$noa'
-	--from view_vcc a left join view_vcct b on a.noa=b.noa
-	--outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
-	--where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-	--and isnull(b.product,'') like '續接器%' and ISNULL(b.spec,'')!=''
-
-	--update  a
-	--set storeno=isnull(b.storeno,'')
-	--from #tmp a outer apply (select top 1 storeno from #tmp where tablea not like 'vcc%' and uno=a.uno order by datea) b
-	--where tablea='vcct' and product like '續接器%'
-	
+and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%'))
 --------------------------------------------------------------------
 --月成本
 create table #tmpb(
@@ -2565,16 +2079,18 @@ create table #tmp(
 CREATE INDEX tmpindex on #tmp (product,spec,size,ucolor,lengthb,class,datea,typea,noa,noq)
 CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 
+--106/06/13不使用盤點單 只使用調整單 其他倉庫 基本上都是當天就會領用完 所以不會有庫存
+
 --盤
-insert #tmp
-select '0','ucce',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
-,b.price,b.total,b.storeno,b.price,b.total,'ucce_vu?noa=$noa'
-from view_ucce a left join view_ucces b on a.noa=b.noa
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
-and b.storeno='A' --106/04/05
-and len(isnull(b.uno,''))>0 --106/04/11
+--insert #tmp
+--select '0','ucce',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+--,case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
+--,b.price,b.total,b.storeno,b.price,b.total,'ucce_vu?noa=$noa'
+--from view_ucce a left join view_ucces b on a.noa=b.noa
+--where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+--and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
+--and b.storeno='A' --106/04/05
+--and len(isnull(b.uno,''))>0 --106/04/11
 
 --進
 insert #tmp

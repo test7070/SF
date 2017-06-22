@@ -116,10 +116,19 @@
 				$('#lblWeight').text('淨重');
 				
 				$('#btnUnoprint').click(function() {
-					if(!emp($('#txtNoa').val()) && !emp($('#combMechno').val())){
-						q_func( 'barvu.genBar','rc2,'+$('#txtNoa').val()+','+$('#combMechno').val())
-					}else{
-						alert('請選擇列印機台!!')
+					if(!emp($('#txtNoa').val()) && q_cur!=1  && q_cur!=2){
+						var t_seq='';
+						$('.isPrint:checked').each(function(index) {
+							var n=$(this).attr('id').split('_')[1];
+							t_seq=t_seq + (t_seq.length>0?'^':'')+$('#txtNoq_'+n).val();	
+						});
+						if(t_seq.length==0){
+							alert('請選擇要列印的標籤!!');
+						}else if (emp($('#combMechno').val())){
+							alert('請選擇列印機台!!');
+						}else{
+							q_func( 'barvu.genBar','rc2,'+$('#txtNoa').val()+','+$('#combMechno').val()+','+t_seq)
+						}
 					}
 				});
 				
@@ -1045,7 +1054,7 @@
 							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
 								//chgcombSpec(b_seq);
-								chgcombUcolor(b_seq);
+								//chgcombUcolor(b_seq);
 								//chgcombClass(b_seq);
 							}
 						});
@@ -1056,7 +1065,7 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								//chgcombSpec(b_seq);
-								chgcombUcolor(b_seq);
+								//chgcombUcolor(b_seq);
 								//chgcombClass(b_seq);
 							}
 						});
@@ -1221,7 +1230,7 @@
 				if(q_cur==1 || q_cur==2){
 					for (var j = 0; j < q_bbsCount; j++) {
 						//chgcombSpec(j);
-						chgcombUcolor(j);
+						//chgcombUcolor(j);
 						//chgcombClass(j);
 					}
 				}
@@ -1235,6 +1244,7 @@
 					q_cmbParse("combSpec_"+n, a_spec);
 			}
 			
+			//106/06/21關閉
 			function chgcombUcolor(n) {
 				$('#combUcolor_'+n).text('');
 				if($('#txtProduct_'+n).val().indexOf('續接')>-1 && $('#txtProduct_'+n).val().indexOf('加工費')>-1)
@@ -1293,7 +1303,7 @@
 				var thisVal = $('#txtCardealno').val();
 				var t_where = "where=^^ noa=N'" + thisVal + "' ^^";
 				q_gt('cardeal', t_where, 0, 0, 0, "getCardealCarno");
-				var t_where = " where=^^ rc2no='" + $('#txtNoa').val() + "'^^";
+				var t_where = " where=^^ rc2no='" + $('#txtNoa').val() + "' and paysale!=0 ^^";
 				q_gt('pays', t_where, 0, 0, 0, 'btnModi', r_accy);
 			}
 
@@ -1341,7 +1351,14 @@
 				
 				getnewuno=false;
 				check_uno=false;
+				
+				$('.isPrint').prop('checked',true);
+                $('.checkAll').prop('checked',true);
 			}
+			
+			function checkAll(){
+            	$('.isPrint').prop('checked',$('.checkAll').prop('checked'));
+            }
 
 			function readonly(t_para, empty) {
 				_readonly(t_para, empty);
@@ -1418,12 +1435,17 @@
 			}
 
 			function btnDele() {
+				if (!emp($('#txtPart2').val())){
+					alert('由互換進貨轉來禁止直接刪除!!');
+					return;
+				}
+				
 				t_cont1=$('#textQno1').val();
 				t_cont2=$('#textQno2').val();
 				Lock(1, {
 					opacity : 0
 				});
-				var t_where = " where=^^ rc2no='" + $('#txtNoa').val() + "'^^";
+				var t_where = " where=^^ rc2no='" + $('#txtNoa').val() + "' and paysale!=0 ^^";
 				q_gt('pays', t_where, 0, 0, 0, 'btnDele', r_accy);
 			}
 
@@ -1890,16 +1912,20 @@
 						<td><span> </span><a id='lblWorker' class="lbl"> </a></td>
 						<td colspan='2'><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id='lblWorker2' class="lbl"> </a></td>
-						<td colspan='2'><input id="txtWorker2" type="text" class="txt c1"/></td>
+						<td colspan='2'>
+							<input id="txtWorker2" type="text" class="txt c1"/>
+							<input id="txtPart2" type="hidden"/><!--由INA轉來的單子-->
+						</td>
 						<td colspan='2' style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
 					</tr>
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' style="width: 1700px;"><!--2100px-->
+		<div class='dbbs' style="width: 1735px;"><!--2100px-->
 			<table id="tbbs" class='tbbs' border="1" cellpadding='2' cellspacing='1' >
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:1%;"><input class="btn" id="btnPlus" type="button" value='＋' style="font-weight: bold;" /></td>
+					<td align="center" style="width:35px;">列印<input class="checkAll" type="checkbox" onclick="checkAll()"/></td>
 					<td align="center" style="width:50px;"><a id='lblNoq_s'> </a></td>
 					<td align="center" style="width:160px;"><a id='lblUno_s'> </a></td>
 					<!--<td align="center" style="width:150px;"><a id='lblProductno_s'> </a></td>-->
@@ -1947,6 +1973,7 @@
 				</tr>
 				<tr style='background:#cad3ff;'>
 					<td><input class="btn" id="btnMinus.*" type="button" value='－' style=" font-weight: bold;" /></td>
+					<td align="center"><input id="checkIsprint.*" class="isPrint" type="checkbox"/></td>
 					<td><input id="txtNoq.*" type="text" class="txt c1"/></td>
 					<td>
 						<input id="txtUno.*" type="text" class="txt c1"/>

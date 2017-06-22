@@ -354,6 +354,7 @@
 					q_cmbParse("combSpec_"+n, a_spec);
 			}
 			
+			//106/06/21關閉
 			function chgcombUcolor(n) {
 				$('#combUcolor_'+n).text('');
 				if($('#txtProduct_'+n).val().indexOf('續接')>-1 && $('#txtProduct_'+n).val().indexOf('加工費')>-1)
@@ -583,10 +584,10 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
-								chgcombSpec(b_seq);
-								chgcombUcolor(b_seq);
-								chgcombClass(b_seq);
-								chgimg(b_seq);
+								//chgcombSpec(b_seq);
+								//chgcombUcolor(b_seq);
+								//chgcombClass(b_seq);
+								//chgimg(b_seq);
 							}
 						});
 						$('#txtProduct_' + j).change(function() {
@@ -594,10 +595,10 @@
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
-								chgcombSpec(b_seq);
-								chgcombUcolor(b_seq);
-								chgcombClass(b_seq);
-								chgimg(b_seq);
+								//chgcombSpec(b_seq);
+								//chgcombUcolor(b_seq);
+								//chgcombClass(b_seq);
+								//chgimg(b_seq);
 							}
 						});
 					}
@@ -618,14 +619,14 @@
 				$('#lblMount_s').text('數量(件)');
 				$('#lblWeight_s').text('重量(KG)');
 				
-				if(q_cur==1 || q_cur==2){
+				/*if(q_cur==1 || q_cur==2){
 					for (var j = 0; j < q_bbsCount; j++) {
 						chgcombSpec(j);
 						chgcombUcolor(j);
 						chgcombClass(j);
 						chgimg(j);
 					}
-				}
+				}*/
 			}
 
 			function btnIns() {
@@ -1067,7 +1068,7 @@
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' style="width: 1590px;"><!--2000px-->
+		<div class='dbbs' style="width: 1380px;"><!--2000px-->
 			<table id="tbbs" class='tbbs' border="1" cellpadding='2' cellspacing='1'>
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:45px;"><input class="btn" id="btnPlus" type="button" value='＋' style="font-weight: bold;" /></td>
@@ -1078,8 +1079,8 @@
 					<td align="center" style="width:100px;"><a id='lblSpec_s'> </a></td>
 					<td align="center" style="width:70px;"><a id='lblSize_s'> </a></td>
 					<td align="center" style="width:70px;"><a id='lblLengthb_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblClass_s'> </a></td>
-					<td align="center" style="width:200px;" class="img"><a id='lblImg_s'> </a></td>
+					<td align="center" style="width:90px;"><a id='lblClass_s'> </a></td>
+					<td align="center" style="width:200px;display: none;" class="img"><a id='lblImg_s'> </a></td>
 					<!--<td align="center" style="width:55px;"><a id='lblUnit'> </a></td>-->
 					<td align="center" style="width:60px;"><a id='lblMount_s'> </a></td>
 					<td align="center" style="width:85px;"><a id='lblWeight_s'> </a></td>
@@ -1118,7 +1119,7 @@
 						<input id="txtClass.*" type="text" class="txt c1" style="width: 70%;"/>
 						<select id="combClass.*" class="txt" style="width: 20px;"> </select>
 					</td>
-					<td align="center" class="img">
+					<td align="center" class="img" style="display: none;">
 						<canvas id="canvas.*" width="150" height="50"> </canvas>
 						<img id="imgPic.*" src="" style="display:none;"/>
 					</td>

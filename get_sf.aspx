@@ -122,7 +122,7 @@
 					var t_where1="1=0^^";//cont
 					var t_where2="where[1]=^^1=0^^";//ordhs
 					var t_where3="where[2]=^^1=0^^";//quat
-					var t_where4="where[3]=^^tggno='"+$('#txtCustno').val()+"' and f9>0 and isnull(enda,0)=0 order by datea,noa ^^";//ordbht
+					var t_where4="where[3]=^^custno='"+$('#txtCustno').val()+"' and f9>0 and isnull(enda,0)=0 order by datea,noa ^^";//ordbht
 					
 					q_box("cont_sf_b.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";" + t_where1+t_where2+t_where3+t_where4, 'ordh_b', "600px", "700px", '互換合約');					
 				});
@@ -263,7 +263,7 @@
 							}else if(dec(as[0].f9)<=0){
 								alert($('#txtIdno').val()+'互換合約已互換出貨完畢!');
 							}else if(!emp($('#txtCustno').val()) && $('#txtCustno').val()!=as[0].custno){
-								alert('互換合約廠商與互換出貨廠商不同!!');
+								alert('互換合約客戶與互換出貨客戶不同!!');
 							}else{
 								$('#txtAddr').val(as[0].addr);
 								if(as[0].atax=="true"){
@@ -283,7 +283,7 @@
 						if (as[0] != undefined) {
 							ordh_weight=dec(as[0].f7);
 							if(as[0].custno!=$('#txtCustno').val()){
-								alert('互換合約廠商與互換出貨廠商不同!!');
+								alert('互換合約客戶與互換出貨客戶不同!!');
 							}else{
 								var t_where = "where=^^ idno='"+$('#txtIdno').val()+"' ^^"; //and noa!='"+$('#txtNoa').val()+"'
 								q_gt('view_get', t_where, 0, 0, 0, "ordh_view_get", r_accy);	
@@ -444,7 +444,7 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
-								chgcombUcolor(b_seq);
+								//chgcombUcolor(b_seq);
 							}
 						});
 						
@@ -453,7 +453,7 @@
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
-								chgcombUcolor(b_seq);
+								//chgcombUcolor(b_seq);
 							}
 						});
 						
@@ -543,13 +543,14 @@
 				bbssum();
 				refreshBbs();
 				
-				if(q_cur==1 || q_cur==2){
+				/*if(q_cur==1 || q_cur==2){
 					for (var j = 0; j < q_bbsCount; j++) {
 						chgcombUcolor(j);
 					}
-				}
+				}*/
 			}
 			
+			//106/06/21 關閉
 			function chgcombUcolor(n) {
 				$('#combUcolor_'+n).text('');
 				if($('#txtProduct_'+n).val().indexOf('續接')>-1 && $('#txtProduct_'+n).val().indexOf('加工費')>-1)
@@ -678,7 +679,7 @@
 				_btnOk(key_value, bbmKey[0], bbsKey[1], '', 2);
 			}
 			
-			var t_deleno='',t_vccno='';
+			var t_deleno='',t_vccno='',t_nordhno='';
 			function q_stPost() {
 				t_ordhno=t_ordhno.length==0?'#non':t_ordhno;
 				t_deleno=t_deleno.length==0?'#non':t_deleno;
@@ -707,7 +708,7 @@
 					var today = new Date();
 					var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
 					if(q_cur==1){
-						q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
+						q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_vu,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
 					}else if(q_cur==2){
 						q_gt('view_get', "where=^^noa='"+$('#txtNoa').val()+"'^^ ", 0, 0, 0, "gettranstartno",r_accy,1);
 						var as = _q_appendData("view_get", "", true, true);
@@ -720,7 +721,7 @@
 						if(t_vccno.length>0)
 							q_func('vcc_post.post.get2vcc20', r_accy + ',' + t_vccno + ',0');
 						else{
-							q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
+							q_func('qtxt.query.get2vcc.1', 'get.txt,get2vcc_vu,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
 						}
 					}
 				}
@@ -1118,7 +1119,7 @@
 						}
 						break;
 					case 'vcc_post.post.get2vcc20':
-						q_func('qtxt.query.get2vcc.21', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime) + ';' + encodeURI('0')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
+						q_func('qtxt.query.get2vcc.21', 'get.txt,get2vcc_vu,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime) + ';' + encodeURI('0')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
 						break;
 					case 'qtxt.query.get2vcc.21':
 						var as = _q_appendData("tmp0", "", true, true);
@@ -1126,7 +1127,7 @@
 							if(as[0].err.length>0){
 								alert('轉出貨單錯誤，請聯絡工程師!!');
 							}else{
-								q_func('qtxt.query.get2vcc.22', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime) + ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
+								q_func('qtxt.query.get2vcc.22', 'get.txt,get2vcc_vu,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime) + ';' + encodeURI('1')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
 							}
 						}
 						break;
@@ -1147,7 +1148,7 @@
 						if(t_deleno != '#non'){							
 							var today = new Date();
 							var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
-							q_func('qtxt.query.get2vcc.31', 'get.txt,get2vcc_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_deleno)+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('2')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_vccno));
+							q_func('qtxt.query.get2vcc.31', 'get.txt,get2vcc_vu,' + encodeURI(r_accy) + ';' + encodeURI(t_vccno)+ ';' + encodeURI(q_getPara('sys.key_vcc'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime)+ ';' + encodeURI('2')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_deleno));
 						}
 						t_deleno='#non';
 						break;
