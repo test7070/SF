@@ -67,7 +67,12 @@
 				}
 				if($('#chkAtax').prop('checked')){
 					var t_taxrate = q_div(parseFloat(q_getPara('sys.taxrate')), 100);
-					t_tax = round(q_mul(t1, t_taxrate), 0);
+					var t_tranmoney=round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0);
+					if($('#cmbKind').val()=='1'){
+                        t_tax = round(q_mul(q_add(t1,t_tranmoney), t_taxrate), 0);
+                    }else{
+                        t_tax = round(q_mul(t1, t_taxrate), 0);
+                    }
 					t_total = q_add(t1, t_tax);
 				}else{
 					t_tax = q_float('txtTax');
@@ -101,6 +106,10 @@
                 q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
 				q_gt('adpro', '1=1 ', 0, 0, 0, "bbspro");
+				
+				q_cmbParse("cmbKind",'1@收費,2@含運,3@自運');
+				
+				$('#lblKind').text('運費類型');
 				
 				$('#combAccount').change(function() {
 					if(q_cur==1 || q_cur==2){
@@ -152,11 +161,13 @@
 					if(q_cur==1 || q_cur==2){
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
 					}
+					sum();
 				});
 				$('#txtPrice').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
 					}
+					sum();
 				});
 				$('#chkAtax').click(function() {
 					refreshBbm();
@@ -1390,11 +1401,15 @@
 							<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
 							<select id="combCarno" style="width: 20px;"> </select>
 						</td>
-						<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
-						<td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>
-						<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
-						<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
 					</tr>
+					<tr>
+					    <td style="width: 108px;"><span> </span><a id='lblKind' class="lbl">運費種類</a></td>
+                        <td><select id="cmbKind" style="width: 108px;"> </select></td>
+					    <td><span> </span><a id="lblPrice_sf" class="lbl" >運費單價</a></td>
+                        <td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>
+                        <td><span> </span><a id="lblTranmoney_sf" class="lbl" >應收運費</a></td>
+                        <td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
+                    </tr>
 					<tr>
 						<td><span> </span><a id="lblMoney_sf" class="lbl">應收</a></td>
 						<td><input id="txtMoney" type="text" class="txt num c1"/></td>

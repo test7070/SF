@@ -79,7 +79,12 @@
 				}
 				if($('#chkAtax').prop('checked')){
 					var t_taxrate = q_div(parseFloat(q_getPara('sys.taxrate')), 100);
-					t_tax = round(q_mul(t_money, t_taxrate), 0);
+					var t_tranmoney = round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0);
+					if($('#cmbTranstyle').val()=='1'){
+					    t_tax = round(q_mul(q_add(t_money,t_tranmoney), t_taxrate), 0);
+					}else{
+					    t_tax = round(q_mul(t_money, t_taxrate), 0);
+					}
 					t_total = q_add(t_money, t_tax);
 				}else{
 					t_tax = q_float('txtTax');
@@ -101,10 +106,10 @@
 				bbmNum = [['txtTranmoney', 11, 0, 1], ['txtMoney', 15, 0, 1], ['txtTax', 15, 0, 1],['txtTotal', 15, 0, 1]
 				,['txtTranadd', 15, q_getPara('vcc.weightPrecision'), 1],['txtBenifit', 15, q_getPara('vcc.weightPrecision'), 1],['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]
 				,['textQweight1', 15, q_getPara('vcc.weightPrecision'), 1],['textQweight2', 15, q_getPara('vcc.weightPrecision'), 1]
-				,['txtPrice', 12, 3, 1],['txtCartrips', 11, 0, 1]];
+				,['txtPrice', 12, 3, 1],/*['txtCartrips', 11, 0, 1]*/];
 				bbsNum = [['txtPrice', 12, q_getPara('vcc.pricePrecision'), 1],['txtTranmoney', 12, q_getPara('vcc.pricePrecision'), 1],  ['txtMount', 9, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]];
 				bbtNum = [['txtMount', 10, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1]];
-				//q_cmbParse("cmbTranstyle", q_getPara('sys.transtyle'));
+				q_cmbParse("cmbTranstyle",'1@收費,2@含運,3@自運');
 				q_cmbParse("cmbTypea", q_getPara('vcc.typea'));
 				q_cmbParse("cmbStype", q_getPara('vcc.stype'));
 				//q_cmbParse("cmbTaxtype", q_getPara('sys.taxtype'));
@@ -122,7 +127,7 @@
 				$('#lblTranadd').text('車空重');
 				$('#lblBenifit').text('車總重');
 				$('#lblWeight').text('淨重');
-				$('#lblTranmoney').text('應付運費');
+				$('#lblTranmoney').text('應收運費');
 				
 				$('#txtTranadd').change(function() {
 					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')))
@@ -314,11 +319,14 @@
 					if(q_cur==1 || q_cur==2){
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
 					}
+					sum();
 				});
+				
 				$('#txtPrice').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
 					}
+					sum();
 				});
 				
 				$('#txtCartrips').change(function() {
@@ -2357,11 +2365,11 @@
 							<input id="txtCarno"  type="text" class="txt" style="width:60px;float: left;"/>
 							<select id="combCarno" style="width: 20px;float: left;"> </select>
 						</td>
-						<td><span> </span><a id="lblPrice_sf" class="lbl">應付運費單價</a></td>
-						<td><input id="txtPrice"  type="text" class="txt num c1"/></td>
-						<td>/KG</td>
-						<td><span> </span><a id='lblTranmoney' class="lbl"> </a></td>
-						<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id="lblPrice_sf" class="lbl">運費單價</a></td>
+                        <td><input id="txtPrice"  type="text" class="txt num c1"/></td>
+                        <td>/KG</td>
+                        <td><span> </span><a id='lblTranmoney' class="lbl"> </a></td>
+                        <td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMoney" class="lbl"> </a></td>
@@ -2387,6 +2395,8 @@
 						<td colspan='2'><input id="textQno1" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblQweight1" class="lbl">合約重量</a></td>
 						<td colspan='2'><input id="textQweight1" type="text" class="txt num c1"/></td>
+						<td style="width: 108px;"><span> </span><a id='lblTranStyle' class="lbl">運費種類</a></td>
+                        <td><select id="cmbTranstyle" style="width: 108px;"> </select></td>
 					</tr>
 					<tr style="display: none;">
 						<td><span> </span><a id="lblQno2" class="lbl btn">合約2號碼</a></td>
@@ -2402,8 +2412,8 @@
 							<input id="txtWorker2" type="text" class="txt c1"/>
 							<input id="txtPart2" type="hidden"/><!--由GET轉來的單子-->
 						</td>
-						<td><span> </span><a id="lblCartrips_sf" class="lbl">應收運費</a></td>
-						<td><input id="txtCartrips" type="text" class="txt num c1"/></td>
+						<!--<td><span> </span><a id="lblCartrips_sf" class="lbl">應收運費</a></td>
+						<td><input id="txtCartrips" type="text" class="txt num c1"/></td>-->
 						<td style="display: none;"><span> </span><a id='lblAccc' class="lbl btn"> </a></td>
 						<td style="display: none;"><input id="txtAccno" type="text" class="txt c1"/></td>
 					</tr>
