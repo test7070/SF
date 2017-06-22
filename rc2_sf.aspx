@@ -117,7 +117,7 @@
 				
 				$('#btnUnoprint').click(function() {
 					if(!emp($('#txtNoa').val()) && !emp($('#combMechno').val())){
-						q_func( 'barvu.genBar','rc2,'+$('#txtNoa').val()+','+$('#combMechno').val())
+						q_func( 'barvu.genBar','rc2,'+$('#txtNoa').val()+','+$('#combMechno').val()+',')
 					}else{
 						alert('請選擇列印機台!!')
 					}
@@ -1045,7 +1045,7 @@
 							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
 								//chgcombSpec(b_seq);
-								chgcombUcolor(b_seq);
+								//chgcombUcolor(b_seq);
 								//chgcombClass(b_seq);
 							}
 						});
@@ -1056,7 +1056,7 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								//chgcombSpec(b_seq);
-								chgcombUcolor(b_seq);
+								//chgcombUcolor(b_seq);
 								//chgcombClass(b_seq);
 							}
 						});
@@ -1221,7 +1221,7 @@
 				if(q_cur==1 || q_cur==2){
 					for (var j = 0; j < q_bbsCount; j++) {
 						//chgcombSpec(j);
-						chgcombUcolor(j);
+						//chgcombUcolor(j);
 						//chgcombClass(j);
 					}
 				}
@@ -1235,6 +1235,7 @@
 					q_cmbParse("combSpec_"+n, a_spec);
 			}
 			
+			//106/06/21關閉
 			function chgcombUcolor(n) {
 				$('#combUcolor_'+n).text('');
 				if($('#txtProduct_'+n).val().indexOf('續接')>-1 && $('#txtProduct_'+n).val().indexOf('加工費')>-1)
@@ -1293,7 +1294,7 @@
 				var thisVal = $('#txtCardealno').val();
 				var t_where = "where=^^ noa=N'" + thisVal + "' ^^";
 				q_gt('cardeal', t_where, 0, 0, 0, "getCardealCarno");
-				var t_where = " where=^^ rc2no='" + $('#txtNoa').val() + "'^^";
+				var t_where = " where=^^ rc2no='" + $('#txtNoa').val() + "' and paysale!=0 ^^";
 				q_gt('pays', t_where, 0, 0, 0, 'btnModi', r_accy);
 			}
 
@@ -1418,12 +1419,17 @@
 			}
 
 			function btnDele() {
+				if (!emp($('#txtPart2').val())){
+					alert('由互換進貨轉來禁止直接刪除!!');
+					return;
+				}
+				
 				t_cont1=$('#textQno1').val();
 				t_cont2=$('#textQno2').val();
 				Lock(1, {
 					opacity : 0
 				});
-				var t_where = " where=^^ rc2no='" + $('#txtNoa').val() + "'^^";
+				var t_where = " where=^^ rc2no='" + $('#txtNoa').val() + "' and paysale!=0 ^^";
 				q_gt('pays', t_where, 0, 0, 0, 'btnDele', r_accy);
 			}
 
@@ -1890,7 +1896,10 @@
 						<td><span> </span><a id='lblWorker' class="lbl"> </a></td>
 						<td colspan='2'><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id='lblWorker2' class="lbl"> </a></td>
-						<td colspan='2'><input id="txtWorker2" type="text" class="txt c1"/></td>
+						<td colspan='2'>
+							<input id="txtWorker2" type="text" class="txt c1"/>
+							<input id="txtPart2" type="hidden"/><!--由INA轉來的單子-->
+						</td>
 						<td colspan='2' style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
 					</tr>
 				</table>
