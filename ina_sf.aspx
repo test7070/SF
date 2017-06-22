@@ -737,7 +737,7 @@
                 _btnOk(key_value, bbmKey[0], bbsKey[1], '', 2);
             }
             
-            var t_deleno='',t_rc2no='';
+            var t_deleno='',t_rc2no='',t_nordhno='';
             function q_stPost() {
 				t_ordhno=t_ordhno.length==0?'#non':t_ordhno;
 				t_deleno=t_deleno.length==0?'#non':t_deleno;
@@ -1051,7 +1051,7 @@
 						if(t_deleno != '#non'){							
 							var today = new Date();
 							var ttime = padL(today.getHours(), '0', 2)+':'+padL(today.getMinutes(),'0',2);
-							q_func('qtxt.query.ina2rc2.31', 'ina.txt,ina2rc2_vu,' + encodeURI(r_accy) + ';' + encodeURI(t_deleno)+ ';' + encodeURI(q_getPara('sys.key_rc2'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime) + ';' + encodeURI('2')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_rc2no));
+							q_func('qtxt.query.ina2rc2.31', 'ina.txt,ina2rc2_vu,' + encodeURI(r_accy) + ';' + encodeURI(t_rc2no)+ ';' + encodeURI(q_getPara('sys.key_rc2'))+ ';' + encodeURI(q_date())+ ';' + encodeURI(ttime) + ';' + encodeURI('2')+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_deleno));
 						}
 						t_deleno='#non';
 						Unlock(1);

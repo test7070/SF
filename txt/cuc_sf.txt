@@ -71,7 +71,7 @@ where len(a.uno)>0  and a.noa!=@noa group by a.uno
 
 --互換出
 insert #tmp
-select a.uno from view_gets a left join view_get b on a.noa=b.noa
+select a.uno from view_gett a left join view_get b on a.noa=b.noa
 where len(a.uno)>0  and a.noa!=@noa group by a.uno
 
 if(@tablea='rc2')
@@ -200,7 +200,7 @@ where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
 insert #tmp
 select a.accy,'gets' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,-1*a.mount,-1*a.weight,0,b.storeno,b.store,a.memo,'','','7'
-from view_gets a left join view_get b on a.noa=b.noa
+from view_gett a left join view_get b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
 
 --退貨
@@ -658,7 +658,7 @@ where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 insert #unotable
 select a.accy,'gets' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,-1*a.mount,-1*a.weight,0,b.storeno,b.store,'7',a.memo
-from view_gets a left join view_get b on a.noa=b.noa
+from view_gett a left join view_get b on a.noa=b.noa
 where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
 --退貨
@@ -866,7 +866,7 @@ cucutocubs:--cucutocubs
 		--bbs
 		exec("
 			insert cubs"+@accy+" (noa,noq,product,ucolor,spec,size,lengthb,class,mount,lengthc,weight,memo,uno,date2,storeno,store)
-			select '"+@cubno+"',*,'"+@datea+"','01','板料倉' from #tmpa 
+			select '"+@cubno+"',*,'"+@datea+"','A','三泰本倉' from #tmpa 
 		")
 	
 		insert dno (tablea,noa,usera)
@@ -934,7 +934,7 @@ begin
 	select a.uno from view_cubt a left join view_cub b on a.noa=b.noa where len(a.uno)>0 group by a.uno
 	--互換出
 	insert #tmp
-	select a.uno from view_gets a left join view_get b on a.noa=b.noa where len(a.uno)>0 group by a.uno
+	select a.uno from view_gett a left join view_get b on a.noa=b.noa where len(a.uno)>0 group by a.uno
 end
 ----------------------------------------------------------------------------------
 
