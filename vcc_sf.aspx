@@ -1004,6 +1004,7 @@
 					q_cmbParse("combSpec_"+n, a_spec);
 			}
 			
+			//106/06/21 關閉
 			function chgcombUcolor(n) {
 				$('#combUcolor_'+n).text('');
 				if($('#txtProduct_'+n).val().indexOf('續接')>-1 && $('#txtProduct_'+n).val().indexOf('加工費')>-1)
@@ -1489,10 +1490,10 @@
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
 								$('#txtProduct_'+b_seq).val($('#combProduct_'+b_seq).find("option:selected").text());
-								chgcombSpec(b_seq);
-								chgcombUcolor(b_seq);
-								chgcombClass(b_seq);
-								chgimg(b_seq);
+								//chgcombSpec(b_seq);
+								//chgcombUcolor(b_seq);
+								//chgcombClass(b_seq);
+								//chgimg(b_seq);
 								
 								var tproduct=$('#txtProduct_'+b_seq).val();
 								
@@ -1516,10 +1517,10 @@
 							q_bodyId($(this).attr('id'));
 							b_seq = t_IdSeq;
 							if(q_cur==1 || q_cur==2){
-								chgcombSpec(b_seq);
-								chgcombUcolor(b_seq);
-								chgcombClass(b_seq);
-								chgimg(b_seq);
+								//chgcombSpec(b_seq);
+								//chgcombUcolor(b_seq);
+								//chgcombClass(b_seq);
+								//chgimg(b_seq);
 								
 								var tproduct=$('#txtProduct_'+b_seq).val();
 								
@@ -1590,10 +1591,10 @@
 				
 				if(q_cur==1 || q_cur==2){
 					for (var j = 0; j < q_bbsCount; j++) {
-						chgcombSpec(j);
-						chgcombUcolor(j);
-						chgcombClass(j);
-						chgimg(j);
+						//chgcombSpec(j);
+						//chgcombUcolor(j);
+						//chgcombClass(j);
+						//chgimg(j);
 					}
 				}
 			}
@@ -1862,10 +1863,10 @@
 			}
 
 			function btnModi() {
-				if (!emp($('#txtPart2').val())){
+				/*if (!emp($('#txtPart2').val())){
 					alert('由互換出貨轉來禁止直接修改!!');
 					return;
-				}
+				}*/
 				t_cont1=$('#textQno1').val();
 				t_cont2=$('#textQno2').val();
 				if (emp($('#txtNoa').val()))
@@ -2420,7 +2421,7 @@
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' style="width: 1680px;"><!--1900px-->
+		<div class='dbbs' style="width: 1260px;"><!--1900px-->
 			<table id="tbbs" class='tbbs'>
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:40px;"><input class="btn"  id="btnPlus" type="button" value='＋' style="font-weight: bold;width:" /></td>
@@ -2432,8 +2433,8 @@
 					<td align="center" style="width:100px;"><a id='lblSpec_s'> </a></td>
 					<td align="center" style="width:70px;"><a id='lblSize_s'> </a></td>
 					<td align="center" style="width:70px;"><a id='lblLengthb_s'> </a></td>
-					<td align="center" style="width:100px;"><a id='lblClass_s'> </a></td>
-					<td align="center" style="width:200px;" class="img"><a id='lblImg_s'> </a></td>
+					<td align="center" style="width:80px;"><a id='lblClass_s'> </a></td>
+					<td align="center" style="width:200px;display: none;" class="img" ><a id='lblImg_s'> </a></td>
 					<!--<td align="center" style="width:55px;"><a id='lblUnit_s'> </a></td>-->
 					<td align="center" style="width:85px;">
 						<a id='lblMount_s'> </a>
@@ -2443,11 +2444,11 @@
 						<a id='lblWeight_s'> </a>
 						<BR><a id='lblSot_weight'> </a>
 					</td>
-					<td align="center" style="width:85px;"><a id='lblPrice_s'> </a></td>
-					<td align="center" style="width:85px;"><a id='lblTranmoney_s'> </a></td>
+					<td align="center" style="width:75px;"><a id='lblPrice_s'> </a></td>
+					<td align="center" style="width:85px;display: none;"><a id='lblTranmoney_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblTotal_s'> </a></td>
-					<td align="center" style="width:150px;"><a id='lblStore_s'> </a><input class="btn"  id="btnStoreCopy" type="button" value='≡' style="font-weight: bold;"  /></td>
-					<td align="center" style="width:200px;"><a id='lblMemo_s'> </a></td>
+					<td align="center" style="width:100px;"><a id='lblStore_s'> </a><input class="btn"  id="btnStoreCopy" type="button" value='≡' style="font-weight: bold;"  /></td>
+					<td align="center" style="width:150px;"><a id='lblMemo_s'> </a></td>
 				</tr>
 				<tr style='background:#cad3ff;'>
 					<td align="center"><input class="btn"  id="btnMinus.*" type="button" value='－' style=" font-weight: bold;" /></td>
@@ -2475,7 +2476,7 @@
 						<input id="txtClass.*" type="text" class="txt c1" style="width: 60%;"/>
 						<select id="combClass.*" class="txt" style="width: 20px;"> </select>
 					</td>
-					<td class="img" align="center">
+					<td class="img" align="center" style="display: none;">
 						<canvas id="canvas.*" width="150" height="50"> </canvas>
 						<img id="imgPic.*" src="" style="display:none;"/>
 						<input id="txtStore2.*" type="hidden" class="txt c1"/>
@@ -2484,7 +2485,7 @@
 					<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtPrice.*" type="text" class="txt num c1"/></td>
-					<td><input id="txtTranmoney.*" type="text" class="txt num c1"/></td>
+					<td style="display: none;"><input id="txtTranmoney.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtTotal.*" type="text" class="txt num c1"/></td>
 					<td>
 						<input id="txtStoreno.*" type="text" class="txt c1" style="width: 65%"/>
@@ -2494,13 +2495,13 @@
 					<td>
 						<input id="txtMemo.*" type="text" class="txt c1"/>
 						<input id="txtOrdeno.*" type="text"  class="txt" style="width:65%;"/>
-						<input id="txtNo2.*" type="text" class="txt" style="width:20%;"/>
+						<input id="txtNo2.*" type="text" class="txt" style="width:25%;"/>
 					</td>
 				</tr>
 			</table>
 		</div>
 		<input id="q_sys" type="hidden" />
-		<div id="dbbt" class='dbbt'>
+		<div id="dbbt" class='dbbt' style="width: 1260px;">
 			<table id="tbbt" class="tbbt">
 				<tr class="head" style="color:white; background:#003366;">
 					<td style="width:20px;"><input id="btnPlut" type="button" style="font-size: medium; font-weight: bold;" value="＋"/></td>
