@@ -112,6 +112,9 @@
                     },{
                         type : '6', //[20] 
                         name : 'xaddr2'
+                    }, {
+                        type : '1', //[21][22]//1
+                        name : 'xdate'
                     }]
                 });
                 q_popAssign();
@@ -121,9 +124,13 @@
 				if(r_len==4){//西元年
 					$('#txtDate1').datepicker({dateFormat : 'yy/mm/dd'});
 					$('#txtDate2').datepicker({dateFormat : 'yy/mm/dd'});
+					$('#txtXdate1').datepicker({dateFormat : 'yy/mm/dd'});
+                    $('#txtXdate2').datepicker({dateFormat : 'yy/mm/dd'});
 				}else{
 					$('#txtDate1').datepicker();
 					$('#txtDate2').datepicker();
+					$('#txtXdate1').datepicker();
+                    $('#txtXdate2').datepicker();
 				}
 				
 				$('#txtMon1').mask(r_picm);
@@ -131,11 +138,15 @@
           
                 $('#txtDate1').mask(r_picd);
 				$('#txtDate2').mask(r_picd);
+				$('#txtXdate1').mask(r_picd);
+                $('#txtXdate2').mask(r_picd);
 				
                 $('#txtDate1').val(q_date().substr(0,r_lenm)+'/01');
                 $('#txtMon1').val(q_date().substr(0,r_lenm));                
                 $('#txtDate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',35).substr(0,r_lenm)+'/01',-1));
                 $('#txtMon2').val(q_date().substr(0,r_lenm));
+                $('#txtXdate1').val(q_date().substr(0,r_lenm)+'/01');
+                $('#txtXdate2').val(q_date());
                 
 				//$('.c3').css('display : none');
                  $('#txtXlengthb1').addClass('num').val(0).change(function() {

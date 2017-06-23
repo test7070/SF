@@ -57,7 +57,8 @@ declare @tmp table(
 	ttotal float,
 	store2 nvarchar(max),
 	ghref nvarchar(max),
-	memo nvarchar(max)
+	memo nvarchar(max),
+	ucolor nvarchar(50)
 )
 if(@t_noshowget='1')
 begin
@@ -69,7 +70,7 @@ begin
 	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
 	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-	,'vcc_sf?noa=$noa?'+a.accy,a.memo
+	,'vcc_sf?noa=$noa?'+a.accy,a.memo,ucolor
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 		  (a.custno between @t_bcustno and @t_ecustno)  and
@@ -93,7 +94,7 @@ begin
 	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
 	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-	,'vcc_sf?noa=$noa?'+a.accy,a.memo
+	,'vcc_sf?noa=$noa?'+a.accy,a.memo,ucolor
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 		  (a.custno between @t_bcustno and @t_ecustno)  and
@@ -109,7 +110,7 @@ end
 
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,custno,nick,addr2,ordeno
-,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,store2,ghref,memo
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,store2,ghref,memo,ucolor
 from @tmp
 where datea between @t_bdate and @t_edate
 	  
@@ -128,20 +129,26 @@ set tmount=b.tmount,ttotal=b.ttotal
 from @tmp a 
 outer apply(select tmount,ttotal from @tmp where gno='8' and noa=a.noa)b
 
-insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '7',noa,tranmoney,SUM(tmount),sum(total)
+insert @tmp(gno,noa,ucolor,tranmoney,tmount,ttotal)
+select '7',noa,ucolor,tranmoney,SUM(tmount),sum(total)
 from @tmp
 where gno='9'
 and(datea between @t_bxdate and @t_exdate)
-group by noa,tranmoney
+group by noa,tranmoney,ucolor
 
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '3',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp
 where gno='8'
 
+insert @tmp(gno,rr,ucolor,noa,tranmoney,tmount,ttotal)
+select '4',ROW_NUMBER()over(partition by rr order by rr),ucolor,CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
+from @tmp
+where gno='7' and ucolor!=''
+group by ucolor,rr
+
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '4',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
+select '5',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp
 where gno='7'
 
@@ -149,6 +156,7 @@ delete @tmp where gno='9' or gno='8' or gno='7'
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
+,case when gno='4' and rr='1' then '統計自 '+@t_bxdate+' 至 '+@t_exdate else '' end tm
 ,dbo.getComma(total,0) total
 ,dbo.getComma(ttotal,0) ttotal
 ,dbo.getComma(price,3) price
@@ -156,7 +164,6 @@ select
 ,dbo.getComma(tranmoney,0) tranmoney
 ,* from @tmp order by noa,gno
 ;
-
 ---------------------------------------------------------------------------------------------------------------
 z_vcc_sf2:--z_vcc_sf2 
 declare @t_bdate nvarchar(20) 
@@ -218,7 +225,8 @@ declare @tmp table(
 	ttotal float,
 	store2 nvarchar(max),
 	ghref nvarchar(max),
-	carno nvarchar(50)
+	carno nvarchar(50),
+	ucolor nvarchar(50)
 )
 if(@t_noshowget='1')
 begin
@@ -226,12 +234,12 @@ begin
 	select '9','',a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
 	,case  transtyle when 1 then '收費' when 2 then '自運'  when '3' then '含運' end
-	,case when transtyle='1' then cartrips else 0 end
+	,case when transtyle='1' then a.tranmoney else 0 end
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
 	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-	,'vcc_sf?noa=$noa?'+a.accy,a.carno
+	,'vcc_sf?noa=$noa?'+a.accy,a.carno,b.ucolor
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 		  (a.custno between @t_bcustno and @t_ecustno)  and
@@ -251,12 +259,12 @@ begin
 	select '9','',a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo))
 	,case  transtyle when 1 then '收費' when 2 then '自運'  when '3' then '含運' end
-	,case when transtyle='1' then cartrips else 0 end
+	,case when transtyle='1' then a.tranmoney else 0 end
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
 	,case when product like '%續接器%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-	,'vcc_sf?noa=$noa?'+a.accy,a.carno
+	,'vcc_sf?noa=$noa?'+a.accy,a.carno,b.ucolor
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 		  (a.custno between @t_bcustno and @t_ecustno)  and
@@ -272,7 +280,7 @@ end
 	  
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,custno,nick,addr2,ordeno,transtyle
-,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno,ucolor
 from @tmp
 where datea between @t_bdate and @t_edate
 	  
@@ -291,20 +299,26 @@ set tmount=b.tmount,ttotal=b.ttotal
 from @tmp a 
 outer apply(select tmount,ttotal from @tmp where gno='8' and noa=a.noa)b
 
-insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '7',noa,tranmoney,SUM(tmount),sum(total)
+insert @tmp(gno,noa,ucolor,tranmoney,tmount,ttotal)
+select '7',noa,ucolor,tranmoney,SUM(tmount),sum(total)
 from @tmp
 where gno='9'
 and(datea between @t_bxdate and @t_exdate)
-group by noa,tranmoney
+group by noa,tranmoney,ucolor
 
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '3',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp
 where gno='8'
 
+insert @tmp(gno,rr,noa,ucolor,tranmoney,tmount,ttotal)
+select '4',ROW_NUMBER()over(partition by rr order by ucolor),CHAR(255),ucolor,sum(tranmoney),SUM(tmount),sum(ttotal)
+from @tmp
+where gno='7' and ucolor!=''
+group by ucolor,rr
+
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '4',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
+select '5',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp
 where gno='7'
 
@@ -312,6 +326,7 @@ delete @tmp where gno='9' or gno='8' or gno='7'
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
+,case when gno=4 and rr='1' then '統計自 '+@t_bxdate+' 至 '+@t_exdate else '' end tm
 ,dbo.getComma(total,0) total
 ,dbo.getComma(ttotal,0) ttotal
 ,dbo.getComma(price,3) price
@@ -387,7 +402,7 @@ begin
 	insert @tmp
 	select '9','',a.noa,a.datea,a.custno,comp,addr2
 	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
-	,case when transtyle='1' then cartrips else 0 end,tax
+	,case when transtyle='1' then a.tranmoney else 0 end,tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 	,b.mount,b.price,b.total
@@ -413,7 +428,7 @@ begin
 	insert @tmp
 	select '9','',a.noa,a.datea,a.custno,comp,addr2
 	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
-	,case when transtyle='1' then cartrips else 0 end,tax
+	,case when transtyle='1' then a.tranmoney else 0 end,tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 	,b.mount,b.price,b.total

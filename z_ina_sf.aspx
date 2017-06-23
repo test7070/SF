@@ -114,9 +114,12 @@
 						index : 'noa,store',
 						src : 'store_b.aspx'
 					}, {
-                        type : '0', 
+                        type : '0',//[18]
                         name : 'xworker',
                         value : r_name
+                    }, {
+                        type : '1',//[19][20]
+                        name : 'xdate'
                     }]
 				});
 				q_popAssign();
@@ -128,18 +131,26 @@
 					r_1911=0;
 					$('#txtDate1').datepicker({dateFormat : 'yy/mm/dd'});
 					$('#txtDate2').datepicker({dateFormat : 'yy/mm/dd'});
+					$('#txtXdate1').datepicker({dateFormat : 'yy/mm/dd'});
+                    $('#txtXdate2').datepicker({dateFormat : 'yy/mm/dd'});
 				}else{
 					$('#txtDate1').datepicker();
 					$('#txtDate2').datepicker();
+					$('#txtXdate1').datepicker();
+                    $('#txtXdate2').datepicker();
 				}
 				
 				$('#lblQno').css('font-size','12px');
 				
                 $('#txtDate1').mask(r_picd);
                 $('#txtDate2').mask(r_picd);
+                $('#txtXdate1').mask(r_picd);
+                $('#txtXdate2').mask(r_picd);
 				
 				$('#txtDate1').val(q_date().substr(0,r_lenm)+'/01');
                 $('#txtDate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',35).substr(0,r_lenm)+'/01',-1));
+                $('#txtXdate1').val(q_date().substr(0,r_lenm)+'/01');
+                $('#txtXdate2').val(q_date());
                 
                 $('#txtXlengthb1').addClass('num').val(0).change(function() {
                     $(this).val(dec($(this).val()));
