@@ -1402,6 +1402,10 @@
 							<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
 							<select id="combCarno" style="width: 20px;"> </select>
 						</td>
+						<!--SF不使用，先佔用欄位--->
+						<td style="display: none;"><span> </span><a id="lblVno_sf" class="lbl">發票號碼</a></td>
+						<td style="display: none;"><input id="txtVno" type="text" class="txt num c1"/></td>
+						<!--SF不使用，先佔用欄位--->
 					</tr>
 					<tr>
 					    <td style="width: 108px;"><span> </span><a id='lblKind' class="lbl">運費種類</a></td>

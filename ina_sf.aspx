@@ -1318,6 +1318,10 @@
 					<td><input id="txtTweight" type="text" class="txt num c1"/></td>
 					<td><span> </span><a id="lblMount_sf" class="lbl" >淨重</a></td>
 					<td><input id="txtMount" type="text" class="txt num c1"/></td>
+					<!--SF不使用，先佔用欄位--->
+					<td style="display: none;"><span> </span><a id="lblPlace_sf" class="lbl">發票號碼</a></td>
+					<td style="display: none;"><input id="txtPlace" type="text" class="txt num c1"/></td>
+					<!--SF不使用，先佔用欄位--->
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
