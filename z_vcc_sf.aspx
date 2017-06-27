@@ -241,9 +241,7 @@
                 $('#Xnoshowget .label').css('width','0px');
                 $('#chkXnoshowget').css('width', '220px').css('margin-top', '5px');
                 $('#chkXnoshowget span').css('width','180px')
-                $("input[type='checkbox'][value!='']").attr('checked', true);
-				
-
+                $('#chkXnoshowget').children('input').attr('checked', 'checked');
             }
 			function changeaddr2() {
 				if(q_getPara('sys.project').toUpperCase()=='SF' && !emp($('#txtQno').val())
