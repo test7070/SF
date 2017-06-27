@@ -554,9 +554,9 @@
 							var t_mount=dec($('#txtMount_' + b_seq).val());
 							var t_price=dec($('#txtMweight_' + b_seq).val());
 							
-							if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val()=='水泥方塊' || $('#txtProduct_'+b_seq).val()=='組裝工資')
+							if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
 								$('#txtLengthc_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
-							else if($('#txtProduct_'+b_seq).val()=='運費'  || $('#txtProduct_'+b_seq).val()=='加工費用'){
+							else if($('#txtProduct_'+b_seq).val()=='運費' || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
 								var sot_weight=0;
                                 for (var i = 0; i < q_bbsCount; i++) {
                                     sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
@@ -576,9 +576,9 @@
 							var t_mount=dec($('#txtMount_' + b_seq).val());
 							var t_price=dec($('#txtMweight_' + b_seq).val());
 							
-							if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val()=='水泥方塊' || $('#txtProduct_'+b_seq).val()=='組裝工資')
+							if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
 								$('#txtLengthc_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
-							else if($('#txtProduct_'+b_seq).val()=='運費'  || $('#txtProduct_'+b_seq).val()=='加工費用'){
+							else if($('#txtProduct_'+b_seq).val()=='運費' || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
 								var sot_weight=0;
                                 for (var i = 0; i < q_bbsCount; i++) {
                                     sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
@@ -598,9 +598,9 @@
 							var t_mount=dec($('#txtMount_' + b_seq).val());
 							var t_price=dec($('#txtMweight_' + b_seq).val());
 							
-							if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val()=='水泥方塊' || $('#txtProduct_'+b_seq).val()=='組裝工資')
+							if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
 								$('#txtLengthc_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
-							else if($('#txtProduct_'+b_seq).val()=='運費'  || $('#txtProduct_'+b_seq).val()=='加工費用'){
+							else if($('#txtProduct_'+b_seq).val()=='運費' || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
 								var sot_weight=0;
                                 for (var i = 0; i < q_bbsCount; i++) {
                                     sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
