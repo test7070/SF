@@ -219,7 +219,7 @@
                 $('#Xnoshowina .label').css('width','0px');
                 $('#chkXnoshowina').css('width', '220px').css('margin-top', '5px');
                 $('#chkXnoshowina span').css('width','180px')
-                $("input[type='checkbox'][value!='']").attr('checked', true);
+                $('#chkXnoshowina').children('input').attr('checked', 'checked');
 			}
 
 			function q_boxClose(s2) {
