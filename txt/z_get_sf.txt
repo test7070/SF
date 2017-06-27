@@ -939,7 +939,8 @@ declare @t_qno nvarchar(50)
 declare @t_bstoreno nvarchar(20) 
 declare @t_estoreno nvarchar(20)
 declare @t_bxdate nvarchar(20) 
-declare @t_exdate nvarchar(20) 
+declare @t_exdate nvarchar(20)
+declare @t_addr2 nvarchar(100) 
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -956,6 +957,7 @@ set @t_bstoreno = case when '#non'=[16] then '' else [16] end
 set @t_estoreno = case when '#non'=[17] then char(255) else [17]  end
 set @t_bxdate = case when '#non'=[21] then '' else [21] end 
 set @t_exdate = case when '#non'=[22] then char(255) else [22] end 
+set @t_addr2 = case when '#non'=[20] then '' else [20]  end
  
  declare @tmp table(
 	gno nvarchar(1),
@@ -996,7 +998,7 @@ where (a.datea between @t_bdate and @t_edate) and
 	  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
 	  and (len(@t_qno)=0 or a.idno like @t_qno+'%')
 	  and (b.storeno between @t_bstoreno and @t_estoreno)
-
+	  and (len(@t_addr2)=0 or a.addr like '%'+@t_addr2+'%')
 	  
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',noa,datea,custno,comp,addr2,ordeno
