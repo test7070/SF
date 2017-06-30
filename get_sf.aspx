@@ -107,7 +107,7 @@
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
 				q_gt('adpro', '1=1 ', 0, 0, 0, "bbspro");
 				
-				q_cmbParse("cmbKind",'1@收費,2@含運,3@自運');
+				q_cmbParse("cmbKind",',收費,含運,自運');
 				
 				$('#lblKind').text('運費類型');
 				
