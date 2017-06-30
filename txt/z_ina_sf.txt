@@ -55,20 +55,21 @@ declare @tmp table(
 	ttotal float,
 	ghref nvarchar(max),
 	carno nvarchar(50),
-	ucolor nvarchar(50)
+	ucolor nvarchar(50),
+	memo nvarchar(max)
 )
 insert @tmp
 select '9','',a.datea,a.noa,a.tggno,c.nick
 ,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 ,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+,CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 ,b.mount,b.price,b.total,case when b.product='鋼筋' then b.mount else 0 end,b.total
-,'ina_sf?noa=$noa?'+a.accy,a.carno,b.ucolor
+,'ina_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo
 from view_ina a left join view_inas b on a.noa=b.noa 
 left join tgg c on a.tggno=c.noa 
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-(a.tggno between @t_btggno and @t_etggno)  and
+(isnull(a.tggno,'') between @t_btggno and @t_etggno)  and
 (b.storeno between @t_bstoreno and @t_estoreno) and
 (len(@t_product)=0 or @t_product=b.product)and
 (len(@t_spec)=0 or @t_spec=b.spec) and
@@ -79,7 +80,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,tggno,nick,ordeno,transtyle
-,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo
 from @tmp
 where datea between @t_bdate and @t_edate
 	  
@@ -97,6 +98,7 @@ update @tmp
 set tmount=b.tmount,ttotal=b.ttotal
 from @tmp a 
 outer apply(select tmount,ttotal from @tmp where gno='8' and noa=a.noa)b
+where rr='1'
 
 insert @tmp(gno,noa,ucolor,tranmoney,tmount,ttotal)
 select '7',noa,ucolor,tranmoney,SUM(tmount),sum(total)
@@ -110,18 +112,20 @@ select '3',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp
 where gno='8'
 
+insert @tmp(gno,noa,tranmoney,tmount,ttotal)
+select '4',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
+from @tmp
+where gno='7'
+
 insert @tmp(gno,rr,noa,ucolor,tranmoney,tmount,ttotal)
-select '4',ROW_NUMBER()over(partition by rr order by ucolor),CHAR(255),ucolor,sum(tranmoney),SUM(tmount),sum(ttotal)
+select '5',ROW_NUMBER()over(partition by rr order by ucolor),CHAR(255),ucolor,sum(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp
 where gno='7' and ucolor!=''
 group by ucolor,rr
 
-insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '5',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
-from @tmp
-where gno='7'
+delete @tmp where gno='9' or gno='8' or gno='7' 
 
-delete @tmp where gno='9' or gno='8' or gno='7'  
+insert into @tmp(gno,noa) select '6',CHAR(255) 
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
@@ -634,7 +638,7 @@ insert @tmp
 select '9','',a.datea,a.noa,a.tggno,a.comp
 ,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+,CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 ,b.mount,b.price,b.total,case when b.product='鋼筋' then b.mount else 0 end,b.total,0
 ,'rc2_sf?noa=$noa?'+a.accy,a.memo
 from view_ina a left join view_inas b on a.noa=b.noa 
@@ -742,19 +746,20 @@ declare @tmp table(
 	ttotal float,
 	ghref nvarchar(max),
 	memo nvarchar(max),
-	ucolor nvarchar(50)
+	ucolor nvarchar(50),
+	transtyle nvarchar(50)
 )
 insert @tmp
 select '9','',a.datea,a.noa,a.tggno,c.nick
 ,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tranmoney
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+,CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 ,b.mount,b.price,b.total,case when b.product='鋼筋' then b.mount else 0 end,b.total
-,'ina_sf?noa=$noa?'+a.accy,a.memo,ucolor
+,'ina_sf?noa=$noa?'+a.accy,a.memo,ucolor,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end
 from view_ina a left join view_inas b on a.noa=b.noa 
 left join tgg c on a.tggno=c.noa 
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-(a.tggno between @t_btggno and @t_etggno)  and
+(isnull(a.tggno,'') between @t_btggno and @t_etggno)  and
 (b.storeno between @t_bstoreno and @t_estoreno) and
 (len(@t_product)=0 or @t_product=b.product)and
 (len(@t_spec)=0 or @t_spec=b.spec) and
@@ -765,7 +770,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,tggno,nick,ordeno
-,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,memo,ucolor
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,memo,ucolor,transtyle
 from @tmp
 where datea between @t_bdate and @t_edate
 	  
@@ -811,7 +816,6 @@ delete @tmp where gno='9' or gno='8' or gno='7'
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
-,case when gno='4' and rr='1' then '統計自 '+@t_bxdate+' 至 '+@t_exdate else '' end tm
 ,dbo.getComma(total,0) total
 ,dbo.getComma(ttotal,0) ttotal
 ,dbo.getComma(price,3) price

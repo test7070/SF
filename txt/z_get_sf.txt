@@ -53,17 +53,17 @@ declare @tmp table(
 	ttotal float,
 	ghref nvarchar(max),
 	carno nvarchar(50),
-	ucolor nvarchar(50)
+	ucolor nvarchar(50),
+	memo nvarchar(max)
 )
 insert @tmp
 select '9','',a.datea,a.noa,a.custno,nick,addr
-,SUBSTRING(idno,0,CHARINDEX('@',idno))
-,case  kind when 1 then '收費' when 2 then '自運'  when '3' then '含運' end
-,case when kind='1' then a.tranmoney else 0 end
+,SUBSTRING(idno,0,CHARINDEX('@',idno)),kind
+,case when kind='收費' then a.tranmoney else 0 end
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+,CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 ,b.mount,b.price,b.lengthc,case when b.product='鋼筋' then b.mount else 0 end,b.lengthc
-,'get_sf?noa=$noa?'+a.accy,a.carno,b.ucolor
+,'get_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo
 from view_get a left join view_gets b on a.noa=b.noa
 left join cust c on a.custno=c.noa
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
@@ -78,7 +78,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 	  
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,custno,nick,addr2,ordeno,transtyle
-,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo
 from @tmp
 where datea between @t_bdate and @t_edate
 	  
@@ -96,6 +96,7 @@ update @tmp
 set tmount=b.tmount,ttotal=b.ttotal
 from @tmp a 
 outer apply(select tmount,ttotal from @tmp where gno='8' and noa=a.noa)b
+where rr='1'
 
 insert @tmp(gno,noa,ucolor,tranmoney,tmount,ttotal)
 select '7',noa,ucolor,tranmoney,SUM(tmount),sum(total)
@@ -109,26 +110,30 @@ select '3',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp
 where gno='8'
 
+
+insert @tmp(gno,noa,tranmoney,tmount,ttotal)
+select '4',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
+from @tmp
+where gno='7'
+
 insert @tmp(gno,rr,noa,ucolor,tranmoney,tmount,ttotal)
-select '4',ROW_NUMBER()over(partition by rr order by ucolor),CHAR(255),ucolor,sum(tranmoney),SUM(tmount),sum(ttotal)
+select '5',ROW_NUMBER()over(partition by rr order by ucolor),CHAR(255),ucolor,sum(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp
 where gno='7' and ucolor!=''
 group by ucolor,rr
 
-insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '5',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
-from @tmp
-where gno='7'
-
 delete @tmp where gno='9' or gno='8' or gno='7'  
+
+insert into @tmp(gno,noa) select '6',CHAR(255)
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
-,case when gno=4 and rr='1' then '統計自 '+@t_bxdate+' 至 '+@t_exdate else '' end tm
+,case when @t_bdate=@t_edate then '互換出貨日報表' else '互換出貨月報表' end title
 ,dbo.getComma(total,0) total
 ,dbo.getComma(ttotal,0) ttotal
 ,dbo.getComma(price,3) price
 ,dbo.getComma(mount,0) mount
+,dbo.getComma(tmount,0) tmount
 ,dbo.getComma(tranmoney,0) tranmoney
 ,* from @tmp order by noa,gno
 ;
@@ -984,9 +989,9 @@ set @t_addr2 = case when '#non'=[20] then '' else [20]  end
 insert @tmp
 select '9','',a.noa,a.datea,a.custno,comp,addr
 ,SUBSTRING(isnull(idno,''),0,CHARINDEX('@',isnull(idno,''))) 
-,case when kind='1' then a.tranmoney else 0 end,tax
+,case when kind='收費' then a.tranmoney else 0 end,tax
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+,CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 ,b.mount,b.price,b.lengthc,case when b.product='鋼筋' then b.mount else 0 end,b.lengthc,0,'get_sf?noa=$noa?'+a.accy
 from view_get a left join view_gets b on a.noa=b.noa
 where (a.datea between @t_bdate and @t_edate) and 
@@ -1039,6 +1044,7 @@ dbo.getComma(total,0) total
 ,dbo.getComma(ttotal,0) ttotal
 ,dbo.getComma(price,3) price
 ,dbo.getComma(mount,0) mount
+,dbo.getComma(tmount,0) tmount
 ,dbo.getComma(tranmoney,0) tranmoney
 ,dbo.getComma(tax,0) tax
 ,dbo.getComma(money,0) money
@@ -1105,6 +1111,10 @@ select '0',custno,MAX(nick),price,sum(mount),sum(weight) from @tmp group by cust
 
 delete @tmp where gno='9'
 
+insert @tmp(gno,custno,mount,weight)
+select '1',char(255),sum(mount),sum(weight)
+from @tmp
+
 select  
 dbo.getComma(price,-1)price 
 ,dbo.getComma(mount,0)mount
@@ -1167,17 +1177,18 @@ declare @tmp table(
 	ttotal float,
 	ghref nvarchar(max),
 	memo nvarchar(max),
-	ucolor nvarchar(50)
+	ucolor nvarchar(50),
+	transtyle nvarchar(50)
 )
 
 insert @tmp
 select '9','',a.datea,a.noa,a.custno,nick,addr
 ,SUBSTRING(idno,0,CHARINDEX('@',idno))
-,case when kind='1' then a.tranmoney else 0 end
+,case when kind='收費' then a.tranmoney else 0 end
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
-,case when isnull(ucolor,'')!='' then ucolor+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+,case when isnull(ucolor,'')!='' then CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 ,b.mount,b.price,b.lengthc,case when b.product='鋼筋' then b.mount else 0 end,b.lengthc
-,'get_sf?noa=$noa?'+a.accy,a.memo,ucolor
+,'get_sf?noa=$noa?'+a.accy,a.memo,ucolor,kind
 from view_get a left join view_gets b on a.noa=b.noa
 left join cust c on a.custno=c.noa
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
@@ -1193,7 +1204,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,custno,nick,addr2,ordeno
-,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,memo,ucolor
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,memo,ucolor,transtyle
 from @tmp
 where datea between @t_bdate and @t_edate
 	  
@@ -1239,11 +1250,11 @@ delete @tmp where gno='9' or gno='8' or gno='7'
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
-,case when gno='4' and rr='1' then '統計自 '+@t_bxdate+' 至 '+@t_exdate else '' end tm
 ,dbo.getComma(total,0) total
 ,dbo.getComma(ttotal,0) ttotal
 ,dbo.getComma(price,3) price
 ,dbo.getComma(mount,0) mount
+,dbo.getComma(tmount,0) tmount
 ,dbo.getComma(tranmoney,0) tranmoney
 ,* from @tmp order by noa,gno
 ;

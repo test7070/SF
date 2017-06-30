@@ -194,18 +194,36 @@
                  });
                  
                  $('#combQno').click(function() {
-                 	var t_where="where=^^datea between '"+$('#txtDate1').val()+"' and '"+$('#txtDate2').val()+
-								"' and custno between '"+$('#txtCust1a').val()+"' and case when isnull('"+$('#txtCust2a').val()+"','')='' then char(255) else '"+$('#txtCust2a').val()+"' end order by datea desc,noa desc  --^^ stop=999 "
-					q_gt('view_quat',t_where, 0, 0, 0, "view_quat");
+                    if(!emp($('#txtCust1a').val())&& !emp($('#txtCust2a').val())){
+                        var t_where="where=^^ custno between '"+$('#txtCust1a').val()+"' and case when isnull('"+$('#txtCust2a').val()+"','')='' then char(255) else '"+$('#txtCust2a').val()+"' end order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat',t_where, 0, 0, 0, "view_quat");
+                    }else{
+                        var t_where="where=^^datea between '"+$('#txtDate1').val()+"' and '"+$('#txtDate2').val()+
+                                "' and custno between '"+$('#txtCust1a').val()+"' and case when isnull('"+$('#txtCust2a').val()+"','')='' then char(255) else '"+$('#txtCust2a').val()+"' end order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat',t_where, 0, 0, 0, "view_quat");
+                    }
                  });
                  
+                 $('#combXaddr2').click(function() {
+                    changeaddr2();
+                 });
+               
+                 $('#txtCust1a').change(function() {
+                        changeaddr2();
+                 });   
+                 
+                 $('#txtCust2a').change(function() {
+                        changeaddr2();
+                 }); 
+
                  $('#txtQno').change(function() {
 					changeaddr2();
                  });
                  
                 $('#combQno').change(function() {
 					$('#txtQno').val($('#combQno').find("option:selected").text());
-					changeaddr2();
+					$('#combXaddr2').text('');
+					changeaddr2();					
 				});
 				
 				if(window.parent.q_name=="z_quatp_vu"){
@@ -227,6 +245,8 @@
 	                
 	            $('#combXaddr2').change(function() {
 					$('#txtXaddr2').val($('#combXaddr2').find("option:selected").text());
+					$('#combXaddr2').text('');
+                    changeaddr2();
 				});
 				
 				$('#q_report .report').css('width','400px');
@@ -244,11 +264,14 @@
                 $('#chkXnoshowget').children('input').attr('checked', 'checked');
             }
 			function changeaddr2() {
-				if(q_getPara('sys.project').toUpperCase()=='SF' && !emp($('#txtQno').val())
-				){
-					var t_where="where=^^ apvmemo like '%"+$('#txtQno').val()+"@%' ^^ "
-					q_gt('view_vcc',t_where, 0, 0, 0, "view_vcc");
-				}
+			        if(!emp($('#txtCust1a').val())&& !emp($('#txtCust2a').val()) && !emp($('#txtQno').val())
+                    ){
+                        var t_where="where=^^ apvmemo like '%"+$('#txtQno').val()+"@%' ^^ "
+                        q_gt('view_vcc',t_where, 0, 0, 0, "view_vcc");
+                    }else{
+                        var t_where="where=^^ (custno between '"+$('#txtCust1a').val()+"' and case when isnull('"+$('#txtCust2a').val()+"','')='' then '"+$('#txtCust1a').val()+"' else '"+$('#txtCust2a').val()+"' end) and isnull(addr2,'')!='' ^^ stop=999"
+                        q_gt('view_vcc',t_where, 0, 0, 0, "view_vcc");
+                    }
 			}
             function q_boxClose(s2) {
             }
@@ -304,7 +327,16 @@
                 		if(as != undefined){
                 			var t_addr2='';
 							for ( i = 0; i < as.length; i++) {
-								t_addr2+=","+as[i].addr2;
+    							var tt_addr2=t_addr2.split(',');
+                                var t_exists=false;
+                                for (var j=0;j<tt_addr2.length;j++){
+                                    if(as[i].addr2==tt_addr2[j]){
+                                        t_exists=true;
+                                        break;
+                                    }
+                                }
+                                if(!t_exists)
+                                    t_addr2+=","+as[i].addr2;
 							}
 							if(t_addr2.length != 0){							
 								$('#combXaddr2').empty();
