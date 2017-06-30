@@ -1092,7 +1092,7 @@
 						<td colspan="5"><input id="txtMemo" type="text" class="txt c1" /></td>
 					</tr>
 					<tr>
-						<td><span> </span><a id='lblAtax_sf' class="lbl">含稅</a></td>
+						<td><span> </span><a id='lblAtax_sf' class="lbl">稅外加</a></td>
 						<td colspan="4">
 							<input id="chkAtax" type="checkbox"/>
 							<span> </span><a id='lblTrans_sf' class="lbl" style="float: none;">含運</a>
