@@ -719,7 +719,7 @@ begin
 end
 ;
 -----------------------------------------------------------------------------------------------------------------------------
-z_rc2_sf6:--z_rc2_sf6
+z_rc2_sf7:--z_rc2_sf7
 declare @t_bdate nvarchar(20)
 declare @t_edate nvarchar(20)
 declare @t_btggno nvarchar(20) 
@@ -804,7 +804,7 @@ dbo.getComma(totax,0) totax ,
 dbo.getComma(total,0) total
 from @tmp order by tggno,mon,gno ;
 ------------------------------------------------------------------------------------------------------------
-z_rc2_sf7:--z_rc2_sf7
+z_rc2_sf6:--z_rc2_sf6
 SET QUOTED_IDENTIFIER OFF
 declare @t_bdate nvarchar(20)
 declare @t_edate nvarchar(20)
