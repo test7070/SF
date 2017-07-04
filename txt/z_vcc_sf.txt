@@ -1232,7 +1232,9 @@ declare @tmp table(
 	nick nvarchar(90), 
 	price float,
 	mount float, 
-	weight float
+	weight float,
+	mprice float, 
+	wprice float
 ) 
 
 insert into @tmp 
@@ -1240,6 +1242,8 @@ select '9',a.custno,(case when isnull(c.nick,'') = '' then c.comp else c.nick en
 		,b.price 
 		,(case when a.typea='1' then 1 else -1 end)*b.mount
 		,(case when a.typea='1' then 1 else -1 end)*b.weight
+		,(case when a.typea='1' then 1 else -1 end)*b.mount*b.price
+		,(case when a.typea='1' then 1 else -1 end)*b.weight*b.price
 from view_vcc a left join view_vccs b on a.noa = b.noa and a.accy = b.accy left join cust c on a.custno = c.noa 
 where (a.datea between @t_bdate and @t_edate) and 
 	  (a.custno between @t_bcustno and @t_ecustno)  and
@@ -1253,18 +1257,20 @@ where (a.datea between @t_bdate and @t_edate) and
 	  and (b.storeno between @t_bstoreno and @t_estoreno)
 	  
 insert into @tmp 
-select '0',custno,MAX(nick),price,sum(mount),sum(weight) from @tmp group by custno,price
+select '0',custno,MAX(nick),price,sum(mount),sum(weight),sum(mprice),sum(wprice) from @tmp group by custno,price
 
 delete @tmp where gno='9'
 
-insert @tmp(gno,custno,mount,weight)
-select '1',char(255),sum(mount),sum(weight)
+insert @tmp(gno,custno,mount,weight,mprice,wprice)
+select '1',char(255),sum(mount),sum(weight),sum(mprice),sum(wprice)
 from @tmp
 
 select  
 dbo.getComma(price,-1)price 
 ,dbo.getComma(mount,0)mount
-,dbo.getComma(weight,0)weight  
+,dbo.getComma(weight,0)weight
+,dbo.getComma(mprice,0)mprice
+,dbo.getComma(wprice,0)wprice   
 ,*
-from @tmp order by custno,price
+from @tmp a order by custno,a.price
 ;

@@ -79,6 +79,7 @@
 					t_tax = q_float('txtTax');
 					t_total = q_add(t_money, t_tax);
 				}
+				$('#txtTranmoney').val(q_mul($('#txtWeight').val(), $('#txtPrice').val()));
 				$('#textQweight1').val(FormatNumber(t_weight));
 				$('#txtMoney').val(FormatNumber(t_money));
 				$('#txtTax').val(FormatNumber(t_tax));
@@ -91,7 +92,7 @@
 				q_getFormat();
 				bbmMask = [['txtDatea', r_picd], ['txtMon', r_picm]];
 				q_mask(bbmMask);
-				bbmNum = [['txtMoney', 15, 0, 1], ['txtTax', 10, 0, 1], ['txtTotal', 15, 0, 1],['txtTranmoney',15,0,1]
+				bbmNum = [['txtMoney', 15, 0, 1], ['txtTax', 10, 0, 1], ['txtTotal', 15, 0, 1], ['txtTotal', 15, 3, 1],['txtTranmoney',15,0,1]
 								,['txtTranadd', 15, q_getPara('rc2.weightPrecision'), 1],['txtBenifit', 15, q_getPara('rc2.weightPrecision'), 1],['txtWeight', 15, q_getPara('rc2.weightPrecision'), 1]
 								,['textQweight1', 15, q_getPara('rc2.weightPrecision'), 1],['textQweight2', 15, q_getPara('rc2.weightPrecision'), 1]];
 				bbsNum = [['txtMount', 15, q_getPara('rc2.mountPrecision'), 1],['txtWeight', 15, q_getPara('rc2.weightPrecision'), 1], ['txtPrice', 15, q_getPara('rc2.pricePrecision'), 1]
@@ -114,6 +115,7 @@
 				$('#lblTranadd').text('車空重');
 				$('#lblBenifit').text('車總重');
 				$('#lblWeight').text('淨重');
+				$('#lblPrice').text('運費單價');
 				
 				$('#btnUnoprint').click(function() {
 					if(!emp($('#txtNoa').val()) && q_cur!=1  && q_cur!=2){
@@ -1891,6 +1893,8 @@
 						<td colspan="2"><select id="cmbTrantype" class="txt c1"> </select></td>
 						<td style="display: none;"><span> </span><a id='lblAccc' class="lbl btn"> </a></td>
 						<td style="display: none;"><input id="txtAccno" type="text" class="txt c1"/></td>
+						<td><span> </span><a id='lblPrice' class="lbl"> </a></td>
+                        <td><input id="txtPrice" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id='lblCardeal' class="lbl btn"> </a></td>
