@@ -989,10 +989,10 @@ select '9','',a.noa,a.datea,a.custno,comp,addr
 ,SUBSTRING(isnull(idno,''),0,CHARINDEX('@',isnull(idno,''))) 
 ,case when kind='收費' then a.tranmoney else 0 end,tax
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
-,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%' or b.product like '%加工費%' then ''
 else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 +b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
-,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then b.mount else b.weight end
+,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%' or b.product like '%加工費%' then b.mount else b.weight end
 ,b.mweight,b.lengthc
 ,0,0,0
 ,'get_sf?noa=$noa?'+a.accy
