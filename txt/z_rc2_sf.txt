@@ -229,6 +229,7 @@ declare @tmp table(
 	ucolor nvarchar(50),
 	memo nvarchar(max)
 )
+
 if(@t_noshowina='1')
 begin
 	insert @tmp
@@ -236,8 +237,11 @@ begin
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 	,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
-	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
+	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then b.mount else b.weight end
+	,b.price,b.total,null,null
 	,'rc2_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	left join tgg c on a.tggno=c.noa 
@@ -260,8 +264,11 @@ begin
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 	,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
-	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
+	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then b.mount else b.weight end
+	,b.price,b.total,null,null
 	,'rc2_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	left join tgg c on a.tggno=c.noa 
@@ -287,44 +294,32 @@ update a
 set rr=rx
 from (select ROW_NUMBER()over(partition by gno order by noa)rx,rr from @tmp where gno='1')a
 
-insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '8',noa,tranmoney,SUM(tmount),sum(total)
-from @tmp
-where gno='1' or gno='2'
-group by noa,tranmoney
-
 update @tmp
 set tmount=b.tmount,ttotal=b.ttotal
 from @tmp a 
-outer apply(select tmount,ttotal from @tmp where gno='8' and noa=a.noa)b
-where rr='1'
-
-insert @tmp(gno,noa,ucolor,tranmoney,tmount,ttotal)
-select '7',noa,ucolor,tranmoney,SUM(tmount),sum(total)
-from @tmp
-where gno='9'
-and(datea between @t_bxdate and @t_exdate)
-group by noa,tranmoney,ucolor
+outer apply(select sum(mount)tmount,sum(total)ttotal from @tmp where gno='9' and noa=a.noa)b
+where gno='1'
 
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '3',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
-from @tmp
-where gno='8'
+select '3',CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal)
+from @tmp where gno='1'
 
-insert @tmp(gno,noa,tranmoney,tmount,ttotal) 
-select '4',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal) 
-from @tmp 
-where gno='7'  
+insert @tmp(gno,noa,tranmoney,tmount,ttotal)
+select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
+	select noa,tranmoney,SUM(mount)tmount,sum(total)ttotal
+	from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
+	group by noa,tranmoney
+)tmpz
 
-insert @tmp(gno,rr,noa,ucolor,tranmoney,tmount,ttotal) 
-select '5',ROW_NUMBER()over(partition by rr order by ucolor),CHAR(255),ucolor,sum(tranmoney),SUM(tmount),sum(ttotal) 
-from @tmp 
-where gno='7' and ucolor!='' 
-group by ucolor,rr 
-
-delete @tmp where gno='9' or gno='8' or gno='7' 
+insert @tmp(gno,noa,ucolor,tmount,ttotal)
+select '5',CHAR(255),ucolor,SUM(mount),sum(total)
+from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
+and ucolor!=''
+group by ucolor
 
 insert into @tmp(gno,noa) select '6',CHAR(255)
+
+delete @tmp where gno='9'
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
