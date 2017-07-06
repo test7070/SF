@@ -60,9 +60,8 @@
                         type : '6',
                         name : 'xspec' //[9]
                     }, {
-                        type : '5',
+                        type : '6',
                         name : 'xsize', //[10]
-                        value:(',#2,#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16').split(',')
                     }, {
                         type : '1',
                         name : 'xlengthb' //[11][12]
@@ -157,6 +156,17 @@
 					$('#txtXclass').val($('#combClass').find("option:selected").text());
 				});
 				
+				var tmp = document.getElementById("txtXsize");
+                var selectbox = document.createElement("select");
+                selectbox.id="combSize";
+                selectbox.style.cssText ="width:20px;font-size: medium;";
+                tmp.parentNode.appendChild(selectbox,tmp);
+                q_cmbParse("combSize", ',#2,#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16');
+                
+                $('#combSize').change(function() {
+                    $('#txtXsize').val($('#combSize').find("option:selected").text());
+                }); 
+
 				//類別暫時不放入
 				var tmp = document.getElementById("txtXucolor");
                 var selectbox = document.createElement("select");
