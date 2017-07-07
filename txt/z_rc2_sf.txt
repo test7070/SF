@@ -230,19 +230,22 @@ declare @tmp table(
 	memo nvarchar(max)
 )
 
+--明細
 if(@t_noshowina='1')
 begin
 	insert @tmp
-	select '9','',a.datea,a.noa,a.tggno,c.nick
+	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),a.datea,a.noa,a.tggno,c.nick
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 	,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
-	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,b.noq,productno
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then b.mount else b.weight end
 	,b.price,b.total,null,null
-	,'rc2_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo
+	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then a.memo else a.carno end
+	,case when b.product like '%續接%' or b.product like '%水泥方塊%' or b.product like '%組裝%' or b.product like '%運費%' or b.product like '%加工費%' then '其他' else b.ucolor end
+	,b.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	left join tgg c on a.tggno=c.noa 
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
@@ -260,16 +263,18 @@ end
 else
 begin
 	insert @tmp
-	select '9','',a.datea,a.noa,a.tggno,c.nick
+	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),a.datea,a.noa,a.tggno,c.nick
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
-	,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
-	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,case when ISNULL(a.tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
+	,b.noq,productno
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then b.mount else b.weight end
 	,b.price,b.total,null,null
-	,'rc2_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo
+	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then a.memo else a.carno end
+	,case when b.product like '%續接%' or b.product like '%水泥方塊%' or b.product like '%組裝%' or b.product like '%運費%' or b.product like '%加工費%' then '其他' else b.ucolor end
+	,b.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	left join tgg c on a.tggno=c.noa 
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
@@ -284,26 +289,33 @@ begin
 	(len(@t_qno)=0 or dbo.split(dbo.split(a.transtart,'##',0),'@',0) = @t_qno or dbo.split(dbo.split(a.transtart,'##',1),'@',0) = @t_qno)
 end
 
+--小計
 insert @tmp
-select case when noq='1' then 1 else 2 end ,'',datea,noa,tggno,nick,ordeno,transtyle
-,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo
+select '1',0,MAX(datea),noa,tggno,MAX(nick),ordeno,MAX(transtyle)
+,MAX(tranmoney),'','','',null,null,null,SUM(mount),SUM(total),MAX(ghref),MAX(carno),'',''
 from @tmp
-where datea between @t_bdate and @t_edate
-	  
+where datea between @t_bdate and @t_edate and gno ='9'
+group by noa,tggno,ordeno
+
+--顯示明細
+insert @tmp
+select '2',rr,datea,noa,tggno,nick,ordeno,transtyle
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo
+from @tmp where datea between @t_bdate and @t_edate and gno ='9'
+
+update @tmp set ordeno='' where gno='2' and rr>1
+
+--項次
 update a
 set rr=rx
 from (select ROW_NUMBER()over(partition by gno order by noa)rx,rr from @tmp where gno='1')a
 
-update @tmp
-set tmount=b.tmount,ttotal=b.ttotal
-from @tmp a 
-outer apply(select sum(mount)tmount,sum(total)ttotal from @tmp where gno='9' and noa=a.noa)b
-where gno='1'
-
+--合計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '3',CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal)
 from @tmp where gno='1'
 
+--統計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
 	select noa,tranmoney,SUM(mount)tmount,sum(total)ttotal
@@ -311,13 +323,21 @@ select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
 	group by noa,tranmoney
 )tmpz
 
+--插空白行
+insert @tmp(gno,noa)
+select '5',CHAR(255)
+
+insert @tmp(gno,noa)
+select '5',CHAR(255)
+
+--類別小計
 insert @tmp(gno,noa,ucolor,tmount,ttotal)
-select '5',CHAR(255),ucolor,SUM(mount),sum(total)
+select '6',CHAR(255),ucolor,SUM(mount),sum(total)
 from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
 and ucolor!=''
 group by ucolor
 
-insert into @tmp(gno,noa) select '6',CHAR(255)
+insert into @tmp(gno,noa) select '7',CHAR(255)
 
 delete @tmp where gno='9'
 	  
@@ -330,7 +350,7 @@ select
 ,dbo.getComma(mount,0) mount
 ,dbo.getComma(tmount,0) tmount
 ,dbo.getComma(tranmoney,0) tranmoney
-,* from @tmp order by noa,gno
+,* from @tmp order by noa,gno,rr,case when ucolor='其他' then 9 else 0 end
 ;
 ------------------------------------------------------------------------------------------------------------
 z_rc2_sf3:--z_rc2_vsf3
@@ -862,12 +882,13 @@ declare @tmp table(
 	ghref nvarchar(max),
 	memo nvarchar(max)
 )
+--明細
 if(@t_noshowina='1')
 begin
 	insert @tmp
-	select '9','',a.datea,a.noa,a.tggno,a.tgg
+	select '2','',a.datea,a.noa,a.tggno,a.tgg
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney
-	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
@@ -890,9 +911,9 @@ end
 else
 begin		
 	insert @tmp
-	select '9','',a.datea,a.noa,a.tggno,a.tgg
+	select '2','',a.datea,a.noa,a.tggno,a.tgg
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney
-	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
+	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
@@ -912,30 +933,26 @@ begin
 	(len(@t_qno)=0 or dbo.split(dbo.split(a.transtart,'##',0),'@',0) = @t_qno or dbo.split(dbo.split(a.transtart,'##',1),'@',0) = @t_qno)
 end
 
+--小計
 insert @tmp
-select case when noq='1' then 1 else 2 end ,'',datea,noa,tggno,comp,ordeno
-,tax,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,0,ghref,memo
+select '1' ,0,MAX(datea),noa,tggno,MAX(comp),ordeno
+,MAX(tax),MAX(tranmoney),'','','',null,null,null,SUM(mount),SUM(total),0,MAX(ghref),''
 from @tmp
+where datea between @t_bdate and @t_edate and gno ='2'
+group by noa,tggno,ordeno
 
+--項次
 update a
 set rr=rx
 from (select ROW_NUMBER()over(partition by gno,tggno order by noa)rx,rr from @tmp where gno='1')a
 
-update @tmp
-set tmount=b.tmount,ttotal=b.ttotal
-from @tmp a 
-outer apply(select sum(mount)tmount,sum(total)ttotal from @tmp where gno='9' and noa=a.noa)b
-where gno='1'
-
+--合計
 insert @tmp(gno,tggno,ordeno,noa,tranmoney,tmount,ttotal,money)
-select '3',tggno,ordeno,CHAR(255),SUM(tranmoney),SUM(tmount),SUM(ttotal),SUM(tmoney)
-from (
-	select tggno,ordeno,noa,MAX(tranmoney)tranmoney,SUM(mount)tmount,sum(total)ttotal
-	,MAX(tranmoney)+MAX(tax)+SUM(total)tmoney
-	from @tmp where gno='9' group by tggno,ordeno,noa
-)tmpx
+select '3',tggno,ordeno,CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal),SUM(tranmoney)+SUM(tax)+SUM(ttotal)
+from @tmp where gno='1'
 group by tggno,ordeno
 
+--分頁
 insert @tmp(gno,tggno,ordeno,noa)
 select '4',tggno,ordeno,CHAR(255)
 from @tmp 

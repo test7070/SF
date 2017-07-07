@@ -55,7 +55,16 @@
 				bbsKey = ['noa', 'noq'];
 				bbtKey = ['noa', 'noq'];
 				q_brwCount();
+				
+				if(window.parent.q_name=='vcc'){
+					if(q_content.length>0)
+						q_content="where=^^ isnull(part2,'')='' and "+q_content.substr(q_content.indexOf('^^')+2);
+					else
+						q_content = "where=^^isnull(part2,'')='' ^^";
+				}
+				
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
+				
 				q_gt('acomp', 'stop=1 ', 0, 0, 0, "cno_acomp");
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
 				q_gt('color', '1=1 ', 0, 0, 0, "bbscolor");
@@ -114,7 +123,8 @@
 				q_cmbParse("cmbStype", q_getPara('vcc.stype'));
 				//q_cmbParse("cmbTaxtype", q_getPara('sys.taxtype'));
 				q_cmbParse("combPay", q_getPara('vcc.paytype'));
-				q_cmbParse("cmbTrantype", q_getPara('sys.tran'));
+				//q_cmbParse("cmbTrantype", q_getPara('sys.tran'));
+				q_cmbParse("cmbTrantype", ',收費,含運,自運'); //106/07/07
 				//q_cmbParse("combUcolor", q_getPara('vccs_sf.typea'),'s');
 				//q_cmbParse("combProduct", q_getPara('vccs_sf.product'),'s');
 				//q_cmbParse("combProduct", q_getPara('vccs_sf.product'),'t');

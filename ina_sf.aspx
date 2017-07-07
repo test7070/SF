@@ -66,7 +66,12 @@
 				}
 				if($('#chkAtax').prop('checked')){
 					var t_taxrate = q_div(parseFloat(q_getPara('sys.taxrate')), 100);
-					t_tax = round(q_mul(t1, t_taxrate), 0);
+					var t_tranmoney=round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0);
+					if($('#cmbKind').val()=='1'){
+                        t_tax = round(q_mul(q_add(t1,t_tranmoney), t_taxrate), 0);
+                    }else{
+                        t_tax = round(q_mul(t1, t_taxrate), 0);
+                    }
 					t_total = q_add(t1, t_tax);
 				}else{
 					t_tax = q_float('txtTax');
@@ -102,6 +107,8 @@
 				q_gt('class', '1=1 ', 0, 0, 0, "bbsclass");
 				q_gt('adpro', '1=1 ', 0, 0, 0, "bbspro");
 				q_gt('mech', "where=^^mech='辦公室'^^", 0, 0, 0, "");
+				
+				q_cmbParse("cmbKind",',收費,含運,自運');
 				
 				$('#btnUnoprint').click(function() {
 					if(!emp($('#txtNoa').val()) && q_cur!=1  && q_cur!=2){
@@ -1374,6 +1381,10 @@
 						<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
 						<select id="combCarno" style="width: 20px;"> </select>
 					</td>
+				</tr>
+				<tr>
+					<td style="width: 108px;"><span> </span><a id='lblKind_sf' class="lbl">運費種類</a></td>
+                    <td><select id="cmbKind" style="width: 108px;"> </select></td>
 					<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
 					<td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>
 					<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
@@ -1405,8 +1416,6 @@
 						<input id="txtStoreno"  type="text"  class="txt c2"/>
 						<input id="txtStore"  type="text" class="txt c3"/>
 					</td>
-					<td><span> </span><a id="lblMechno_sf" class="lbl">列印機台</a></td>
-					<td><select id="combMechno" class="txt c1"> </select></td>
 				</tr>
 				<tr>
 					<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
@@ -1415,6 +1424,10 @@
 					<td><input id="txtWorker2" type="text" class="txt c1"/></td>
 					<td><span> </span><a id="lblTranstartno_sf" class="lbl btn">立帳單號</a></td>
 					<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
+				</tr>
+				<tr>
+					<td><span> </span><a id="lblMechno_sf" class="lbl">列印機台</a></td>
+					<td><select id="combMechno" class="txt c1"> </select></td>
 					<td colspan="2" style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
 				</tr>
 			</table>

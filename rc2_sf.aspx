@@ -47,6 +47,14 @@
 				bbmKey = ['noa'];
 				bbsKey = ['noa', 'noq'];
 				q_brwCount();
+				
+				if(window.parent.q_name=='rc2'){
+					if(q_content.length>0)
+						q_content="where=^^ isnull(part2,'')='' and "+q_content.substr(q_content.indexOf('^^')+2);
+					else
+						q_content = "where=^^isnull(part2,'')='' ^^";
+				}
+				
 				q_gt(q_name, q_content, q_sqlCount, 1, 0, '', r_accy);
 				q_gt('acomp', 'stop=1 ', 0, 0, 0, "cno_acomp");
 				q_gt('spec', '1=1 ', 0, 0, 0, "bbsspec");
@@ -102,7 +110,8 @@
 				q_cmbParse("cmbTypea", q_getPara('rc2.typea'));
 				q_cmbParse("cmbStype", q_getPara('rc2.stype'));
 				q_cmbParse("combPaytype", q_getPara('rc2.paytype'));
-				q_cmbParse("cmbTrantype", q_getPara('sys.tran'));
+				//q_cmbParse("cmbTrantype", q_getPara('sys.tran'));
+				q_cmbParse("cmbTrantype", ',收費,含運,自運'); //106/07/07
 				//q_cmbParse("combUcolor", q_getPara('rc2s_sf.typea'),'s');
 				//q_cmbParse("cmbTaxtype", q_getPara('sys.taxtype'));
 				//q_cmbParse("combProduct", q_getPara('rc2s_sf.product'),'s');
@@ -1342,7 +1351,7 @@
 			}
 
 			function btnPrint() {
-				q_box("z_rc2p_sf.aspx?;;;noa=" + trim($('#txtNoa').val()) + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
+				q_box("z_rc2p_vu.aspx?;;;noa=" + trim($('#txtNoa').val()) + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
 			}
 
 			function wrServer(key_value) {
