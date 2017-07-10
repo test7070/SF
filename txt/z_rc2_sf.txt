@@ -209,6 +209,7 @@ set @t_noshowina = case when '#non'=[24] then '' else [24] end
 declare @tmp table(
 	gno nvarchar(1),
 	rr int,
+	recno int,
 	datea nvarchar(10),
 	noa nvarchar(50),
 	tggno nvarchar(50),
@@ -234,7 +235,7 @@ declare @tmp table(
 if(@t_noshowina='1')
 begin
 	insert @tmp
-	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),a.datea,a.noa,a.tggno,c.nick
+	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.tggno,c.nick
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 	,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,b.noq,productno
@@ -263,7 +264,7 @@ end
 else
 begin
 	insert @tmp
-	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),a.datea,a.noa,a.tggno,c.nick
+	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.tggno,c.nick
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 	,case when ISNULL(a.tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,b.noq,productno
@@ -291,7 +292,7 @@ end
 
 --小計
 insert @tmp
-select '1',0,MAX(datea),noa,tggno,MAX(nick),ordeno,MAX(transtyle)
+select '1',0,0,MAX(datea),noa,tggno,MAX(nick),ordeno,MAX(transtyle)
 ,MAX(tranmoney),'','','',null,null,null,SUM(mount),SUM(total),MAX(ghref),MAX(carno),'',''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
@@ -299,7 +300,7 @@ group by noa,tggno,ordeno
 
 --顯示明細
 insert @tmp
-select '2',rr,datea,noa,tggno,nick,ordeno,transtyle
+select '2',rr,0,datea,noa,tggno,nick,ordeno,transtyle
 ,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo
 from @tmp where datea between @t_bdate and @t_edate and gno ='9'
 
@@ -343,18 +344,18 @@ delete @tmp where gno='9'
 
 --重新排序
 update a
-set rr=recno
-from (select rr,ROW_NUMBER()over (order by noa,gno,rr,case when ucolor='其他' then 9 else 0 end)recno from @tmp)a
+set recno=recno2
+from (select recno,ROW_NUMBER()over (order by noa,gno,rr,case when ucolor='其他' then 9 else 0 end)recno2 from @tmp)a
 
 --插入換頁
-declare @pageline float=35
+declare @pageline float=37
 declare @page int=ceiling(cast((select count(*) from @tmp) as float)/@pageline)
 declare @tpage int=0
 
 while(@page>@tpage)
 begin
 	set @tpage=@tpage+1
-	insert @tmp(gno,rr)
+	insert @tmp(gno,recno)
 	select '8',@tpage*@pageline
 end
 	  
@@ -367,7 +368,7 @@ select
 ,dbo.getComma(mount,0) mount
 ,dbo.getComma(tmount,0) tmount
 ,dbo.getComma(tranmoney,0) tranmoney
-,* from @tmp order by rr,gno
+,* from @tmp order by recno,gno
 ;
 ------------------------------------------------------------------------------------------------------------
 z_rc2_sf3:--z_rc2_vsf3
