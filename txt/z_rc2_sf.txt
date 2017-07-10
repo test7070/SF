@@ -340,6 +340,23 @@ group by ucolor
 insert into @tmp(gno,noa) select '7',CHAR(255)
 
 delete @tmp where gno='9'
+
+--重新排序
+update a
+set rr=recno
+from (select rr,ROW_NUMBER()over (order by noa,gno,rr,case when ucolor='其他' then 9 else 0 end)recno from @tmp)a
+
+--插入換頁
+declare @pageline float=35
+declare @page int=ceiling(cast((select count(*) from @tmp) as float)/@pageline)
+declare @tpage int=0
+
+while(@page>@tpage)
+begin
+	set @tpage=@tpage+1
+	insert @tmp(gno,rr)
+	select '8',@tpage*@pageline
+end
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
@@ -350,7 +367,7 @@ select
 ,dbo.getComma(mount,0) mount
 ,dbo.getComma(tmount,0) tmount
 ,dbo.getComma(tranmoney,0) tranmoney
-,* from @tmp order by noa,gno,rr,case when ucolor='其他' then 9 else 0 end
+,* from @tmp order by rr,gno
 ;
 ------------------------------------------------------------------------------------------------------------
 z_rc2_sf3:--z_rc2_vsf3
