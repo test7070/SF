@@ -123,8 +123,8 @@
 				q_cmbParse("cmbStype", q_getPara('vcc.stype'));
 				//q_cmbParse("cmbTaxtype", q_getPara('sys.taxtype'));
 				q_cmbParse("combPay", q_getPara('vcc.paytype'));
-				//q_cmbParse("cmbTrantype", q_getPara('sys.tran'));
-				q_cmbParse("cmbTrantype", ',收費,含運,自運'); //106/07/07
+				q_cmbParse("cmbTrantype", q_getPara('sys.tran'));//2017/07/10  交運一律還是照舊 運輸種類變成紅色字體
+				//q_cmbParse("cmbTrantype", ',收費,含運,自運'); //106/07/07
 				//q_cmbParse("combUcolor", q_getPara('vccs_sf.typea'),'s');
 				//q_cmbParse("combProduct", q_getPara('vccs_sf.product'),'s');
 				//q_cmbParse("combProduct", q_getPara('vccs_sf.product'),'t');
@@ -2280,14 +2280,15 @@
 						<td><input id="txtWeight" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
-						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
+					    <td><span> </span><a id='lblCarno' class="lbl btn"> </a><span style="float: left;"> </span>
+                        </td>
+						<td>
+						    <input id="txtCarno"  type="text" class="txt" style="width:50px;float: left;"/>
+                            <select id="combCarno" style="width: 20px;float: left;"> </select>
+                            <span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
 						<td>
 							<input id="txtCardealno" type="text" class="txt c1" style="width: 49%;"/>
 							<input id="txtCardeal" type="text" class="txt c1"  style="width: 49%;"/>
-						</td>
-						<td><a id='lblCarno' class="lbl btn" style="float: left;"> </a><span style="float: left;"> </span>
-							<input id="txtCarno"  type="text" class="txt" style="width:60px;float: left;"/>
-							<select id="combCarno" style="width: 20px;float: left;"> </select>
 						</td>
 						<td><span> </span><a id="lblPrice_sf" class="lbl">運費單價</a></td>
                         <td><input id="txtPrice"  type="text" class="txt num c1"/></td>
@@ -2319,7 +2320,7 @@
 						<td colspan='2'><input id="textQno1" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblQweight1" class="lbl">合約重量</a></td>
 						<td colspan='2'><input id="textQweight1" type="text" class="txt num c1"/></td>
-						<td style="width: 108px;"><span> </span><a id='lblTranStyle' class="lbl">運費種類</a></td>
+						<td style="width: 108px;"><span> </span><a id='lblTranStyle' class="lbl" style="color:red;">運費種類</a></td>
                         <td><select id="cmbTranstyle" style="width: 108px;"> </select></td>
 					</tr>
 					<tr style="display: none;">

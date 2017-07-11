@@ -109,7 +109,7 @@
 				
 				q_cmbParse("cmbKind",',收費,含運,自運');
 				
-				$('#lblKind').text('運費類型');
+				$('#lblKind').text('運費種類');
 				
 				$('#combAccount').change(function() {
 					if(q_cur==1 || q_cur==2){
@@ -519,10 +519,11 @@
 				check_ordh=false;
 				t_nordhno=$('#txtIdno').val();
 				
-				if (q_cur == 1)
-					$('#txtWorker').val(r_name);
-				else
-					$('#txtWorker2').val(r_name);
+				
+                if (q_cur == 1){
+                    $('#txtWorker').val(r_name);
+                }else
+                    $('#txtWorker2').val(r_name);
 					
 				var s1 = $('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val();
 				if (s1.length == 0 || s1 == "AUTO")
@@ -770,6 +771,10 @@
 				$('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val('AUTO');
 				$('#txtDatea').val(q_date());
 				$('#txtDatea').focus();
+				var RightNow = new Date();
+                var dd = ('0'+ RightNow.getHours()).substr(-2);
+                var h= ('0'+RightNow.getMinutes()).substr(-2);
+                $('#txtTranstart').val((dd+":"+h));
 				//105/12/08空白倉庫預設A
 				$('#txtStoreno').val('A').change();
 			}
@@ -1480,13 +1485,14 @@
 						<td align="center" style="width:1%"><a id='vewChk'> </a></td>
 						<td align="center" style="width:25%"><a id='vewDatea'> </a></td>
 						<td align="center" style="width:25%"><a id='vewCust'>客戶</a></td>
-						<td align="center" style="width:48%"><a id='vewIdno_sf'>合約號碼</a></td>
+						<!--2017/07/10  楊小姐互換進出貨view合約號碼改互換單號 -->
+						<td align="center" style="width:48%"><a id='vewNoa_sf'>互換出貨單號</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox" style=' '/></td>
 						<td align="center" id='datea'>~datea</td>
 						<td align="center" id='comp,4'>~comp,4</td>
-						<td align="center" id='idno'>~idno</td>
+						<td align="center" id='noa'>~noa</td>
 					</tr>
 				</table>
 			</div>
@@ -1532,15 +1538,15 @@
 						<td><input id="txtMount" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
+					    <td><span> </span><a id="lblCarno" class="lbl"> </a></td>
+					    <td>
+                            <input id="txtCarno" type="text" class="txt" style="width:75%;"/>
+                            <select id="combCarno" style="width: 20px;"> </select>
+                        </td>
 						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
 						<td>
 							<input id="txtCardealno" type="text" class="txt c2"/>
 							<input id="txtCardeal" type="text" class="txt c3"/>
-						</td>
-						<td><span> </span><a id="lblCarno" class="lbl"> </a></td>
-						<td>
-							<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
-							<select id="combCarno" style="width: 20px;"> </select>
 						</td>
 						<!--SF不使用，先佔用欄位--->
 						<td style="display: none;"><span> </span><a id="lblVno_sf" class="lbl">發票號碼</a></td>
@@ -1548,7 +1554,7 @@
 						<!--SF不使用，先佔用欄位--->
 					</tr>
 					<tr>
-					    <td style="width: 108px;"><span> </span><a id='lblKind' class="lbl">運費種類</a></td>
+					    <td style="width: 108px;"><span> </span><a id='lblKind' class="lbl" style="color:red;">運費種類</a></td>
                         <td><select id="cmbKind" style="width: 108px;"> </select></td>
 					    <td><span> </span><a id="lblPrice_sf" class="lbl" >運費單價</a></td>
                         <td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>

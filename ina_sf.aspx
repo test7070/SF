@@ -1324,13 +1324,13 @@
 					<td align="center" style="width:1%"><a id='vewChk'> </a></td>
 					<td align="center" style="width:25%"><a id='vewDatea'> </a></td>
 					<td align="center" style="width:35%"><a id='vewTgg'> </a></td>
-					<td align="center" style="width:35%"><a id='vewOrdeno_sf'>合約號碼</a></td>
+					<td align="center" style="width:35%"><a id='vewNoa_sf'>互換進貨單號</a></td>
 				</tr>
 				<tr>
 					<td><input id="chkBrow.*" type="checkbox" style=' '/></td>
 					<td align="center" id='datea'>~datea</td>
 					<td align="center" id='comp,8'>~comp,8</td>
-					<td align="center" id='ordeno'>~ordeno</td>
+					<td align="center" id='noa'>~noa</td>
 				</tr>
 			</table>
 		</div>
@@ -1371,19 +1371,19 @@
 					<!--SF不使用，先佔用欄位--->
 				</tr>
 				<tr>
+				    <td><span> </span><a id="lblCarno" class="lbl"> </a></td>
+                    <td>
+                        <input id="txtCarno" type="text" class="txt" style="width:75%;"/>
+                        <select id="combCarno" style="width: 20px;"> </select>
+                    </td>
 					<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
 					<td>
 						<input id="txtCardealno" type="text" class="txt c2"/>
 						<input id="txtCardeal" type="text" class="txt c3"/>
 					</td>
-					<td><span> </span><a id="lblCarno" class="lbl"> </a></td>
-					<td>
-						<input id="txtCarno" type="text" class="txt" style="width:75%;"/>
-						<select id="combCarno" style="width: 20px;"> </select>
-					</td>
 				</tr>
 				<tr>
-					<td style="width: 108px;"><span> </span><a id='lblKind_sf' class="lbl">運費種類</a></td>
+					<td style="width: 108px;"><span> </span><a id='lblKind_sf' class="lbl" style="color:red;">運費種類</a></td>
                     <td><select id="cmbKind" style="width: 108px;"> </select></td>
 					<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
 					<td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>

@@ -242,7 +242,7 @@ begin
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then b.mount else b.weight end
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
 	,b.price,b.total,null,null
 	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then a.memo else a.carno end
 	,case when b.product like '%續接%' or b.product like '%水泥方塊%' or b.product like '%組裝%' or b.product like '%運費%' or b.product like '%加工費%' then '其他' else b.ucolor end
@@ -271,7 +271,7 @@ begin
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then b.mount else b.weight end
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
 	,b.price,b.total,null,null
 	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then a.memo else a.carno end
 	,case when b.product like '%續接%' or b.product like '%水泥方塊%' or b.product like '%組裝%' or b.product like '%運費%' or b.product like '%加工費%' then '其他' else b.ucolor end
@@ -910,7 +910,7 @@ begin
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%' or b.product like '%加工費%' then b.mount else b.weight end
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
 	,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total,0
 	,'rc2_sf?noa=$noa?'+a.accy,a.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
@@ -935,7 +935,7 @@ begin
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%' or b.product like '%加工費%' then b.mount else b.weight end
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
 	,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total,0
 	,'rc2_sf?noa=$noa?'+a.accy,a.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
