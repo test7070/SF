@@ -268,7 +268,7 @@ begin
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 	,case when ISNULL(a.tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,b.noq,productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%' or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
@@ -290,10 +290,16 @@ begin
 	(len(@t_qno)=0 or dbo.split(dbo.split(a.transtart,'##',0),'@',0) = @t_qno or dbo.split(dbo.split(a.transtart,'##',1),'@',0) = @t_qno)
 end
 
+--106/07/11 楊小姐 小計 合計 總計 類別小計
+--數量-只計算鋼筋重量
+--金額-全部都要(鋼筋 續接 加工費等)
+
 --小計
 insert @tmp
 select '1',0,0,MAX(datea),noa,tggno,MAX(nick),ordeno,MAX(transtyle)
-,MAX(tranmoney),'','','',null,null,null,SUM(mount),SUM(total),MAX(ghref),MAX(carno),'',''
+,MAX(tranmoney),'','','',null,null,null
+,SUM(case when product like '%續接器%' or product like '%水泥方塊%' or product like '%組裝工資%'  or product like '%運費%' or product like '%加工費%' then 0 else mount end)
+,SUM(total),MAX(ghref),MAX(carno),'',''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
 group by noa,tggno,ordeno
@@ -319,7 +325,11 @@ from @tmp where gno='1'
 --統計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
-	select noa,tranmoney,SUM(mount)tmount,sum(total)ttotal
+	select noa,tranmoney
+	,SUM(case when product like '%續接器%' or product like '%水泥方塊%' 
+	or product like '%組裝工資%' or product like '%運費%' 
+	or product like '%加工費%' then 0 else mount end)tmount
+	,sum(total)ttotal
 	from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
 	group by noa,tranmoney
 )tmpz
@@ -333,7 +343,11 @@ select '5',CHAR(255)
 
 --類別小計
 insert @tmp(gno,noa,ucolor,tmount,ttotal)
-select '6',CHAR(255),ucolor,SUM(mount),sum(total)
+select '6',CHAR(255),ucolor
+,SUM(case when product like '%續接器%' or product like '%水泥方塊%' 
+or product like '%組裝工資%' or product like '%運費%' 
+or product like '%加工費%' then null else mount end)
+,sum(total)
 from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
 and ucolor!=''
 group by ucolor
