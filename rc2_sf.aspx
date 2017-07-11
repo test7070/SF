@@ -490,7 +490,7 @@
 						break;
 					case 'mech':
 						var as = _q_appendData("mech", "", true);
-						t_mech='';
+						t_mech='@';
 						for (var i = 0; i < as.length; i++) {
 							t_mech=as[i].noa+"@"+as[i].mech;
 						}
@@ -1351,7 +1351,7 @@
 			}
 
 			function btnPrint() {
-				q_box("z_rc2p_vu.aspx?;;;noa=" + trim($('#txtNoa').val()) + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
+				q_box("z_rc2p_sf.aspx?;;;noa=" + trim($('#txtNoa').val()) + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
 			}
 
 			function wrServer(key_value) {
