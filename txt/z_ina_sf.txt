@@ -34,108 +34,144 @@ set @t_bstoreno = case when '#non'=[16] then '' else [16] end
 set @t_estoreno = case when '#non'=[17] then char(255) else [17]  end
 set @t_bxdate = case when '#non'=[19] then '' else [19] end 
 set @t_exdate = case when '#non'=[20] then char(255) else [20] end 
- 
-declare @tmp table(
-	gno nvarchar(1),
+
+declare @tmp table( 
+	gno nvarchar(1), 
 	rr int,
-	datea nvarchar(10),
-	noa nvarchar(50),
-	tggno nvarchar(50),
-	nick nvarchar(100),
-	ordeno nvarchar(100),
-	transtyle nvarchar(50),
-	tranmoney float,
-	noq nvarchar(50),
-	productno nvarchar(50),
-	product nvarchar(max),
-	mount float,
-	price float,
-	total float,
-	tmount float,
-	ttotal float,
-	ghref nvarchar(max),
-	carno nvarchar(50),
-	ucolor nvarchar(50),
-	memo nvarchar(max)
-)
-insert @tmp
-select '9','',a.datea,a.noa,a.tggno,c.nick
-,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
-,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
-,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
-,CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
-,b.mount,b.price,b.total,case when b.product='鋼筋' then b.mount else 0 end,b.total
-,'ina_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo
+	recno int,
+	page int,
+	datea nvarchar(10), 
+	noa nvarchar(50), 
+	tggno nvarchar(50), 
+	nick nvarchar(100), 
+	ordeno nvarchar(100), 
+	transtyle nvarchar(50), 
+	tranmoney float, 
+	noq nvarchar(50), 
+	productno nvarchar(50), 
+	product nvarchar(max), 
+	mount float, 
+	price float, 
+	total float, 
+	tmount float, 
+	ttotal float, 
+	ghref nvarchar(max), 
+	carno nvarchar(50), 
+	ucolor nvarchar(50), 
+	memo nvarchar(max) 
+) 
+--明細
+insert @tmp 
+select '9','','','',a.datea,a.noa,a.tggno,c.nick 
+,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)) 
+,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney 
+,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno 
+,case when len(b.ucolor)=0 then ''
+else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
++b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
+,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
+,b.price,b.total,null,null
+,'ina_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo 
 from view_ina a left join view_inas b on a.noa=b.noa 
 left join tgg c on a.tggno=c.noa 
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-(isnull(a.tggno,'') between @t_btggno and @t_etggno)  and
-(b.storeno between @t_bstoreno and @t_estoreno) and
-(len(@t_product)=0 or @t_product=b.product)and
-(len(@t_spec)=0 or @t_spec=b.spec) and
-(len(@t_size)=0 or @t_size=b.size) and
-(len(@t_class)=0 or @t_class=b.class) and
+(isnull(a.tggno,'') between @t_btggno and @t_etggno) and 
+(b.storeno between @t_bstoreno and @t_estoreno) and 
+(len(@t_product)=0 or @t_product=b.product)and 
+(len(@t_spec)=0 or @t_spec=b.spec) and 
+(len(@t_size)=0 or @t_size=b.size) and 
+(len(@t_class)=0 or @t_class=b.class) and 
 (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb) and 
-(len(@t_qno)=0 or a.ordeno = @t_qno)
+(len(@t_qno)=0 or a.ordeno = @t_qno) 
+
+--小計
+insert @tmp 
+select '1',0,0,0,max(datea),noa,tggno,max(nick),ordeno,max(transtyle) 
+,max(tranmoney),'','','',null,null,null
+,SUM(case when product like '%續接器%' or product like '%水泥方塊%' or product like '%組裝工資%'  or product like '%運費%' or product like '%加工費%' then 0 else mount end)
+,SUM(total),max(ghref),max(carno),'','' 
+from @tmp 
+where datea between @t_bdate and @t_edate and gno='9'
+group by noa,tggno,ordeno
 
 insert @tmp
-select case when noq='1' then 1 else 2 end ,'',datea,noa,tggno,nick,ordeno,transtyle
+select 2,0,'','',datea,noa,tggno,nick,ordeno,transtyle
 ,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo
 from @tmp
-where datea between @t_bdate and @t_edate
-	  
+where datea between @t_bdate and @t_edate and gno='9'
+
+--項次
 update a
 set rr=rx
 from (select ROW_NUMBER()over(partition by gno order by noa)rx,rr from @tmp where gno='1')a
 
+--合計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '8',noa,tranmoney,SUM(tmount),sum(total)
-from @tmp
-where gno='1' or gno='2'
-group by noa,tranmoney
+select '3',CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal)
+from @tmp where gno='1'
 
-update @tmp
-set tmount=b.tmount,ttotal=b.ttotal
-from @tmp a 
-outer apply(select tmount,ttotal from @tmp where gno='8' and noa=a.noa)b
-where rr='1'
-
-insert @tmp(gno,noa,ucolor,tranmoney,tmount,ttotal)
-select '7',noa,ucolor,tranmoney,SUM(tmount),sum(total)
-from @tmp
-where gno='9'
-and(datea between @t_bxdate and @t_exdate)
-group by noa,tranmoney,ucolor
-
+--統計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '3',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
-from @tmp
-where gno='8'
+select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
+	select noa,tranmoney,SUM(mount)tmount,sum(total)ttotal
+	from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
+	group by noa,tranmoney
+)tmpz
 
-insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '4',CHAR(255),sum(tranmoney),SUM(tmount),sum(ttotal)
-from @tmp
-where gno='7'
+--插空白行
+insert @tmp(gno,noa)
+select '5',CHAR(255)
 
-insert @tmp(gno,rr,noa,ucolor,tranmoney,tmount,ttotal)
-select '5',ROW_NUMBER()over(partition by rr order by ucolor),CHAR(255),ucolor,sum(tranmoney),SUM(tmount),sum(ttotal)
-from @tmp
-where gno='7' and ucolor!=''
-group by ucolor,rr
+insert @tmp(gno,noa)
+select '5',CHAR(255)
 
-delete @tmp where gno='9' or gno='8' or gno='7' 
+--類別小計
+insert @tmp(gno,noa,ucolor,tmount,ttotal)
+select '6',CHAR(255),ucolor,SUM(mount),sum(total)
+from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
+and ucolor!=''
+group by ucolor
 
-insert into @tmp(gno,noa) select '6',CHAR(255) 
-	  
+insert into @tmp(gno,noa) select '7',CHAR(255)
+
+delete @tmp where gno='9'
+
+--重新排序
+update a
+set recno=recno2
+from (select recno,ROW_NUMBER()over (order by noa,gno,rr,case when ucolor='其他' then 9 else 0 end)recno2 from @tmp)a
+
+--插入換頁
+declare @pageline float=37
+declare @page int=ceiling(cast((select count(*) from @tmp) as float)/@pageline)
+declare @tpage int=0
+
+while(@page>@tpage)
+begin
+	set @tpage=@tpage+1
+	insert @tmp(gno,recno)
+	select '8',@tpage*@pageline
+end
+
+--更新頁數
+update a
+set page=ceiling(cast(recno as float)/@pageline)
+from (select page,recno from @tmp)a
+
+--更新頁數
+update a
+set page=ceiling(cast(recno as float)/@pageline)
+from (select page,recno from @tmp)a
+
 select 
 @t_bxdate bxdate,@t_exdate exdate
-,case when gno='4' and rr='1' then '統計自 '+@t_bxdate+' 至 '+@t_exdate else '' end tm
-,dbo.getComma(total,0) total
-,dbo.getComma(ttotal,0) ttotal
-,dbo.getComma(price,3) price
-,dbo.getComma(mount,0) mount
-,dbo.getComma(tranmoney,0) tranmoney
-,* from @tmp order by noa,gno
+,case when @t_bdate=@t_edate then '互換進貨日報表' else '互換進貨月報表' end title  
+,dbo.getComma(total,0) total 
+,dbo.getComma(ttotal,0) ttotal 
+,dbo.getComma(price,3) price 
+,dbo.getComma(mount,0) mount 
+,dbo.getComma(tranmoney,0) tranmoney 
+,* from @tmp order by recno,gno
 ;
 ------------------------------------------------------------------------------------------------
 z_ina_sf02:--z_ina_sf02

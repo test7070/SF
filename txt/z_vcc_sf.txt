@@ -69,7 +69,7 @@ begin
 	insert @tmp
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' then a.tranmoney else 0 end,productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+	,case when len(b.ucolor)=0  then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
@@ -96,7 +96,7 @@ begin
 	insert @tmp
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='1' then a.tranmoney else 0 end,productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
@@ -122,7 +122,9 @@ end
 --小計	  
 insert @tmp
 select '1',0,0,max(datea),noa,custno,max(nick),addr2,ordeno,max(transtyle)
-,max(tranmoney),'','',null,null,sum(total),SUM(case when product like '%續接器%' or product like '%水泥方塊%' or product like '%組裝工資%'  or product like '%運費%' or product like '%加工費%' then 0 else mount end),sum(ttotal),'',MAX(ghref),MAX(carno),'',''
+,max(tranmoney),'','',null,null,null
+,SUM(case when product like '%續接器%' or product like '%水泥方塊%' or product like '%組裝工資%'  or product like '%運費%' or product like '%加工費%' then 0 else mount end)
+,sum(total),'',MAX(ghref),MAX(carno),'',''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
 group by noa,custno,addr2,ordeno
@@ -1135,8 +1137,7 @@ begin
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end,b.price,b.total
-	,case when product='鋼筋' then b.mount else 0 end
-	,b.total,0
+	,null,null,0
 	,case when product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy
 	from view_vcc a left join view_vccs b on a.noa=b.noa
@@ -1160,12 +1161,11 @@ begin
 	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
 	,case when transtyle='收費' then a.tranmoney else 0 end,tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end,b.price,b.total
-	,case when product='鋼筋' then b.mount else 0 end
-	,b.total,0
+	,null,null,0
 	,case when product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy
 	from view_vcc a left join view_vccs b on a.noa=b.noa
@@ -1193,7 +1193,9 @@ end
 
 insert @tmp
 select '1',0,0,0,noa,MAX(datea),custno,MAX(comp),MAX(addr2),ordeno
-,MAX(tranmoney),MAX(tax),'','','',null,null,null,sum(tmount),sum(ttotal),0,'',MAX(ghref)
+,MAX(tranmoney),MAX(tax),'','','',null,null,null
+,SUM(case when product like '%續接器%' or product like '%水泥方塊%' or product like '%組裝工資%'  or product like '%運費%' or product like '%加工費%' then 0 else mount end)
+,sum(total),0,'',MAX(ghref)
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='2'
 group by noa,custno,ordeno

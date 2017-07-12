@@ -240,7 +240,7 @@ begin
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 	,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,b.noq,productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
@@ -269,7 +269,7 @@ begin
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart))
 	,case when ISNULL(a.tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,b.noq,productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%' or b.product like '%加工費%' then ''
+	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
@@ -929,7 +929,7 @@ begin
 	select '2','','','',a.datea,a.noa,a.tggno,a.tgg
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
+	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
