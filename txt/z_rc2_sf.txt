@@ -968,9 +968,12 @@ end
 --小計
 insert @tmp
 select '1' ,0,MAX(datea),noa,tggno,MAX(comp),ordeno
-,MAX(tax),MAX(tranmoney),'','','',null,null,null,SUM(mount),SUM(total),0,MAX(ghref),''
-from @tmp
-where datea between @t_bdate and @t_edate and gno ='2'
+,MAX(tax),MAX(tranmoney),'','','',null,null,null
+,SUM(case when product like '%續接器%' or product like '%水泥方塊%' 
+or product like '%組裝工資%' or product like '%運費%' 
+or product like '%加工費%' then 0 else mount end)
+,SUM(total),0,MAX(ghref),''
+from @tmp where datea between @t_bdate and @t_edate and gno ='2'
 group by noa,tggno,ordeno
 
 --項次
