@@ -48,7 +48,7 @@ declare @tmp1 table(
 insert into @tmp1
 select '0',a.typea,a.noa,a.datea,a.custno,a.comp,a.addr2,c.namea,a.transtart,a.benifit,a.tranadd,a.weight,null,null,
 	   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
-	   a.trantype,'',a.cardeal,b.store,a.carno,a.memo
+	   a.trantype,a.paydate,a.cardeal,b.store,a.carno,a.memo
 from view_vcc a
 left join view_vccs b on a.noa = b. noa
 outer apply (select top 1 * from conn where noa=a.comp and typea='2' order by noq) c

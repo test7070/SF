@@ -1816,7 +1816,7 @@
 			}
 
 			function btnPrint() {
-				q_box('z_vccp_sf.aspx' + "?;;;noa=" + trim($('#txtNoa').val()) + ";addr2="+ trim($('#txtAddr2').val()) +";"+ r_accy, '', "95%", "95%", q_getMsg("popPrint"));
+				q_box('z_vccp_sf.aspx' + "?;;;noa=" + trim($('#txtNoa').val()) + " and addr2="+ trim($('#txtAddr2').val()) +";"+ r_accy, '', "95%", "95%", q_getMsg("popPrint"));
 			}
 
 			function wrServer(key_value) {
