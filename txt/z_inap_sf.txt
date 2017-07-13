@@ -13,6 +13,7 @@ set @t_exnoa = case when '#non' = [3] then CHAR(255) else [3] end
 		custno nvarchar(30),
 		cust nvarchar(100),
 		addr nvarchar(max),
+		conn nvarchar(50),
 		qno nvarchar(max),
 		tweight float,
 		eweight float,
@@ -34,15 +35,19 @@ set @t_exnoa = case when '#non' = [3] then CHAR(255) else [3] end
 		intime nvarchar(10),
 		cardeal nvarchar(20),
 		store nvarchar(50),
-		carno nvarchar(20)
+		carno nvarchar(20),
+		memo nvarchar(max)
 	)
 	insert into @tmp1
-	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.ordeno,a.tweight,cast(a.transtyle as float),a.mount,'','',
+	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,'',a.ordeno,a.tweight,cast(a.transtyle as float),a.mount,'','',
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
-		   a.trantype,a.transtart,a.cardeal,b.store,a.carno
+		   a.trantype,a.transtart,a.cardeal,b.store,a.carno,a.memo
 	from view_ina a
 	left join view_inas b on a.noa = b. noa
 	where (a.noa between @t_bxnoa and @t_exnoa)
+	
+	update @tmp1 set product = REPLACE(product,' ','') + (case when LEN(isnull(size,'')) = 0 then '' else size end)+(case when LEN(isnull(pmemo,''))= 0 then '' else +' '+pmemo end) 
+	where gno = '0'
 	
 	update @tmp1 set qno = dbo.split(dbo.split(qno,'##',0),'@',0)
 	
@@ -54,6 +59,7 @@ set @t_exnoa = case when '#non' = [3] then CHAR(255) else [3] end
 		custno nvarchar(30),
 		cust nvarchar(100),
 		addr nvarchar(max),
+		conn nvarchar(50),
 		qno nvarchar(max),
 		tweight float,
 		eweight float,
@@ -71,7 +77,8 @@ set @t_exnoa = case when '#non' = [3] then CHAR(255) else [3] end
 		intime nvarchar(10),
 		cardeal nvarchar(20),
 		store nvarchar(50),
-		carno nvarchar(20)
+		carno nvarchar(20),
+		memo nvarchar(max)
 	)
 
 	declare @noa1 nvarchar(20) 
@@ -95,8 +102,8 @@ set @t_exnoa = case when '#non' = [3] then CHAR(255) else [3] end
 		begin 
 			set @recno = 1
 			begin 
-				insert into @tmp2(gno,noa,datea,custno,cust,addr,qno,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,intime,cardeal,store,carno) 
-				select gno,noa,datea,custno,cust,addr,qno,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,intime,cardeal,store,carno
+				insert into @tmp2(gno,noa,datea,custno,cust,addr,conn,qno,tweight,eweight,nweight,price,total,class1,spec1,product1,pmount1,pweight1,trantype,intime,cardeal,store,carno,memo) 
+				select gno,noa,datea,custno,cust,addr,'',qno,tweight,eweight,nweight,price,total,class,spec,product,pmount,pweight,trantype,intime,cardeal,store,carno,memo
 				from @tmp1 where idno = @idno1
 			end
 			set @noa2 = @noa1 

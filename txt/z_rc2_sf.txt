@@ -933,7 +933,7 @@ begin
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
-	,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total,0
+	,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total,a.total
 	,'rc2_sf?noa=$noa?'+a.accy,a.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	where (a.datea between @t_bdate and @t_edate) and 
@@ -958,7 +958,7 @@ begin
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
-	,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total,0
+	,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total,a.total
 	,'rc2_sf?noa=$noa?'+a.accy,a.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	where (a.datea between @t_bdate and @t_edate) and 
@@ -980,9 +980,14 @@ select '1' ,0,0,0,MAX(datea),noa,tggno,MAX(comp),ordeno
 ,SUM(case when product like '%續接器%' or product like '%水泥方塊%' 
 or product like '%組裝工資%' or product like '%運費%' 
 or product like '%加工費%' then 0 else mount end)
-,SUM(total),0,MAX(ghref),''
+,SUM(total),max(money),MAX(ghref),''
 from @tmp where datea between @t_bdate and @t_edate and gno ='2'
 group by noa,tggno,ordeno
+
+--請款金額
+update @tmp
+set money=money+tranmoney+tax
+where gno='1'
 
 --項次
 update a
