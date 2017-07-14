@@ -95,7 +95,7 @@ else
 begin
 	insert @tmp
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
-	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='1' then a.tranmoney else 0 end,productno
+	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
@@ -1131,7 +1131,7 @@ begin
 	insert @tmp
 	select '2','','','',a.noa,a.datea,a.custno,comp,addr2
 	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
-	,case when transtyle='1' then a.tranmoney else 0 end,tax
+	,case when transtyle='收費' then a.tranmoney else 0 end,tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
