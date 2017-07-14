@@ -118,7 +118,7 @@
 				,['txtPrice', 12, 3, 1],/*['txtCartrips', 11, 0, 1]*/];
 				bbsNum = [['txtPrice', 12, q_getPara('vcc.pricePrecision'), 1],['txtTranmoney', 12, q_getPara('vcc.pricePrecision'), 1],  ['txtMount', 9, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]];
 				bbtNum = [['txtMount', 10, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1]];
-				q_cmbParse("cmbTranstyle",',收費,含運,自運');
+				q_cmbParse("cmbTranstyle",'自運,收費,含運');
 				q_cmbParse("cmbTypea", q_getPara('vcc.typea'));
 				q_cmbParse("cmbStype", q_getPara('vcc.stype'));
 				//q_cmbParse("cmbTaxtype", q_getPara('sys.taxtype'));
@@ -1819,7 +1819,7 @@
 			}
 
 			function btnPrint() {
-				q_box('z_vccp_sf.aspx' + "?;;;noa=" + trim($('#txtNoa').val()) + ";" + r_accy, '', "95%", "95%", q_getMsg("popPrint"));
+				q_box('z_vccp_sf.aspx' + "?;;;noa=" + trim($('#txtNoa').val()) + " and addr2="+ trim($('#txtAddr2').val()) +";"+ r_accy, '', "95%", "95%", q_getMsg("popPrint"));
 			}
 
 			function wrServer(key_value) {
