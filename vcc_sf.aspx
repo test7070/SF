@@ -1542,8 +1542,11 @@
 					$('#lblSot_weight').text(FormatNumber(sot_weight));
 					if(q_cur==1 || q_cur==2)
 						$('#textQweight1').val(FormatNumber(sot_weight));
-				}else
+				}else{
 					$('#lblSot_weight').text('');
+					if(q_cur==1 || q_cur==2)
+						$('#textQweight1').val(0);
+				}
             }
 			
 			function bbtAssign() {
