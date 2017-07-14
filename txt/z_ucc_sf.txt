@@ -745,7 +745,7 @@ select '0','ucce',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,b.total,case when b.weight=0 then 0 else b.total/b.weight end,b.total
 from view_ucce a left join view_ucces b on a.noa=b.noa
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%  or isnull(b.product,'') like '其他%')
+and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%'  or isnull(b.product,'') like '其他%')
 and b.storeno between @t_bstoreno and @t_estoreno and b.weight>0
 
 --成領
@@ -1983,9 +1983,9 @@ gno,product,spec,size
 ,dbo.getComma(tweight,2) tweight
 ,dbo.getComma(tmoney,2) tmoney
 ,case when isnull(tweight,0)=0 then dbo.getComma(0,2) else dbo.getComma(round(tmoney/tweight,2),2) end tprice
-,case when isnull(product,'') like '續接器%' or isnull(product,'') like '水泥方塊%' then '件數' else '重量' end utype
+,case when isnull(product,'') like '續接器%' or isnull(product,'') like '水泥方塊%' or isnull(product,'') like '其他%' then '件數' else '重量' end utype
 from #tmpa a order by 
-case when isnull(product,'') like '%費' then 2 when isnull(product,'') like '續接%' or isnull(product,'') like '水泥方塊%' or isnull(product,'') like '組接%' then 1 else 0 end
+case when isnull(product,'') like '%費' then 2 when isnull(product,'') like '續接%' or isnull(product,'') like '水泥方塊%' or isnull(product,'') like '組接%' or isnull(product,'') like '其他%' then 1 else 0 end
 ,product,spec,size,storeno,gno,datea,typea,noa,noq
 
 IF OBJECT_ID('tempdb..#tmp')is not null
