@@ -524,7 +524,11 @@
             }
 
             function btnPrint() {
-                q_box("z_ordhp_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";noa='"+trim($('#txtNoa').val())+"';" + r_accy + "_" + r_cno, 'z_ordhp_sf', "95%", "95%", m_print);
+            	if(q_getPara('sys.project').toUpperCase()=='VU'){
+            		q_box("z_ordhp_vu.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";noa='"+trim($('#txtNoa').val())+"';" + r_accy + "_" + r_cno, 'z_ordhp_sf', "95%", "95%", m_print);
+            	}else{
+                	q_box("z_ordhp_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";noa='"+trim($('#txtNoa').val())+"';" + r_accy + "_" + r_cno, 'z_ordhp_sf', "95%", "95%", m_print);
+                }
             }
 
             function wrServer(key_value) {
