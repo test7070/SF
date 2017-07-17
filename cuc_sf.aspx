@@ -880,6 +880,26 @@
                 	}
 				});
 				
+				$('#btnStyleCopy').click(function() {
+                	if(q_cur==1 || q_cur==2){
+                		//106/07/17
+                		var t_tmp=$('#txtPicno_0').val();
+                		var t_tmp2=$('#txtPicname_0').val();
+                		for (var i = 1; i < q_bbsCount; i++) {
+                			if(emp($('#txtPicno_'+i).val())){
+	                			$('#txtPicno_'+i).val(t_tmp);
+	                			$('#txtPicname_'+i).val(t_tmp2);
+	                			var n = i;
+		                		t_noa = $('#txtPicno_'+n).val();
+		                		q_gt('img', "where=^^noa='"+t_noa+"'^^", 0, 0, 0, JSON.stringify({action:"getimg",n:n}),1);
+	                		}else{
+	                			t_tmp=$('#txtPicno_'+i).val();
+                				t_tmp2=$('#txtPicname_'+i).val();
+	                		}
+                		}
+                	}
+				});
+				
 				$('#btnClassCopy').click(function() {
                 	if(q_cur==1 || q_cur==2){
                 		if(!emp($('#txtClass_0').val())){
@@ -894,11 +914,21 @@
 				
 				$('#btnMemoCopy').click(function() {
                 	if(q_cur==1 || q_cur==2){
-                		if(!emp($('#txtMemo_0').val())){
+                		/*if(!emp($('#txtMemo_0').val())){
 	                		for (var i = 1; i < q_bbsCount; i++) {
 	                			if(emp($('#txtMemo_'+i).val())){
 	                				$('#txtMemo_'+i).val($('#txtMemo_0').val());
 	                			}
+	                		}
+                		}*/
+                		
+                		//106/07/17
+                		var t_tmp=$('#txtMemo_0').val();
+                		for (var i = 1; i < q_bbsCount; i++) {
+                			if(emp($('#txtMemo_'+i).val())){
+	                			$('#txtMemo_'+i).val(t_tmp);
+	                		}else{
+	                			t_tmp=$('#txtMemo_'+i).val();
 	                		}
                 		}
                 	}
@@ -918,11 +948,20 @@
 				
 				$('#btnBtimeCopy').click(function() {
                 	if(q_cur==1 || q_cur==2){
-                		if(!emp($('#cmbBtime_0').val())){
+                		/*if(!emp($('#cmbBtime_0').val())){
 	                		for (var i = 1; i < q_bbsCount; i++) {
 	                			if(emp($('#cmbBtime_'+i).val())){
 	                				$('#cmbBtime_'+i).val($('#cmbBtime_0').val());
 	                			}
+	                		}
+                		}*/
+                		//106/07/17
+                		var t_tmp=$('#cmbBtime_0').val();
+                		for (var i = 1; i < q_bbsCount; i++) {
+                			if(emp($('#cmbBtime_'+i).val())){
+	                			$('#cmbBtime_'+i).val(t_tmp);
+	                		}else{
+	                			t_tmp=$('#cmbBtime_'+i).val();
 	                		}
                 		}
                 	}
@@ -930,11 +969,20 @@
 				
 				$('#btnEtimeCopy').click(function() {
                 	if(q_cur==1 || q_cur==2){
-                		if(!emp($('#cmbEtime_0').val())){
+                		/*if(!emp($('#cmbEtime_0').val())){
 	                		for (var i = 1; i < q_bbsCount; i++) {
 	                			if(emp($('#cmbEtime_'+i).val())){
 	                				$('#cmbEtime_'+i).val($('#cmbEtime_0').val());
 	                			}
+	                		}
+                		}*/
+                		
+                		var t_tmp=$('#cmbEtime_0').val();
+                		for (var i = 1; i < q_bbsCount; i++) {
+                			if(emp($('#cmbEtime_'+i).val())){
+	                			$('#cmbEtime_'+i).val(t_tmp);
+	                		}else{
+	                			t_tmp=$('#cmbEtime_'+i).val();
 	                		}
                 		}
                 	}
@@ -1441,7 +1489,10 @@
 							<a id='lblSize_s'> </a>
 							<input class="btn"  id="btnSizeCopy" type="button" value='≡' style="font-weight: bold;"  />
 						</td>
-						<td style="width:120px;"><a id='lblStyle_s'> </a></td>
+						<td style="width:120px;">
+							<a id='lblStyle_s'> </a>
+							<input class="btn"  id="btnStyleCopy" type="button" value='≡' style="font-weight: bold;"  />
+						</td>
 						<td style="width:100px;display: none;" class="pic"><a id='lblParaa_s'> </a></td>
 						<td style="width:100px;display: none;" class="pic"><a id='lblParab_s'> </a></td>
 						<td style="width:100px;display: none;" class="pic"><a id='lblParac_s'> </a></td>
