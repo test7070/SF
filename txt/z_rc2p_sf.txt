@@ -197,8 +197,13 @@ end
 close cursor_table 
 deallocate cursor_table 
 
-select case when typea='1' then '進貨單' else '退貨單' end typea
-	,*,tweight twei,eweight ewei,nweight nwei,pweight1 pwei1,pweight2 pwei2,pweight3 pwei3
-	,pweight4 pwei4,pweight5 pwei5,pweight6 pwei6
+select case when typea='1' then '進貨單' else '退貨單' end typea 
+,*,tweight twei,eweight ewei,nweight nwei
+,case when pweight1!=0 then pweight1 else pmount1 end pwei1
+,case when pweight2!=0 then pweight1 else pmount2 end pwei2
+,case when pweight3!=0 then pweight1 else pmount3 end pwei3 
+,case when pweight4!=0 then pweight1 else pmount4 end pwei4
+,case when pweight5!=0 then pweight1 else pmount5 end pwei5
+,case when pweight6!=0 then pweight1 else pmount6 end pwei6 
 from @tmp2 order by noa,gno
 ;
