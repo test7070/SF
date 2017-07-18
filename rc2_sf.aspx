@@ -87,7 +87,7 @@
 					t_tax = q_float('txtTax');
 					t_total = q_add(t_money, t_tax);
 				}
-				$('#txtTranmoney').val(q_mul($('#txtWeight').val(), $('#txtPrice').val()));
+				$('#txtTranmoney').val(q_mul(dec($('#txtWeight').val()), dec($('#txtPrice').val())));
 				$('#textQweight1').val(FormatNumber(t_weight));
 				$('#txtMoney').val(FormatNumber(t_money));
 				$('#txtTax').val(FormatNumber(t_tax));
@@ -1105,6 +1105,7 @@
 								//chgcombSpec(b_seq);
 								//chgcombUcolor(b_seq);
 								//chgcombClass(b_seq);
+								sum();
 							}
 						});
 						
@@ -1116,6 +1117,7 @@
 								//chgcombSpec(b_seq);
 								//chgcombUcolor(b_seq);
 								//chgcombClass(b_seq);
+								sum();
 							}
 						});
 						
@@ -1172,6 +1174,25 @@
 							}else{
 								if(emp($('#txtUno_'+b_seq).val())){
 									alert('批號不存在!!')
+								}
+							}
+						});
+						
+						$('#btnManu_'+j).click(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							if(q_cur==1 || q_cur==2){
+								if($('#txtProduct_'+b_seq).val()=='加工費'){
+									$('#txtWeight_'+b_seq).val(0);
+									
+									var t_price=dec($('#txtPrice_' + b_seq).val());
+									var sot_weight=0;
+	                                for (var i = 0; i < q_bbsCount; i++) {
+	                                    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
+	                                }
+	                                $('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));
+	                                sum();
 								}
 							}
 						});
@@ -1326,6 +1347,14 @@
 					$('#lblSot_weight').text(FormatNumber(sot_weight));
 				}else
 					$('#lblSot_weight').text('');
+					
+				for (var i = 0; i < q_bbsCount; i++) {
+					if((q_cur==1 || q_cur==2) && $('#txtProduct_'+i).val()=='加工費' && dec($('#txtPrice_'+i).val())!=0){
+						$('#btnManu_'+i).show();
+					}else{
+						$('#btnManu_'+i).hide();
+					}
+				}
             }
 
 			function btnIns() {
@@ -2058,7 +2087,10 @@
 					<td><input id="txtLengthc.*" type="text" class="txt num c1" /></td>
 					<td><input id="txtMount.*" type="text" class="txt num c1" /></td>
 					<td><input id="txtWeight.*" type="text" class="txt num c1" /></td>
-					<td><input id="txtPrice.*" type="text" class="txt num c1" /></td>
+					<td>
+						<input id="txtPrice.*" type="text" class="txt num c1" />
+						<input id="btnManu.*" type="button" class="txt c1" value="加工費計算" style="width:85px;font-size: 14px;float: none;display:none;"/>
+					</td>
 					<td><input id="txtTotal.*" type="text" class="txt num c1" /></td>
 					<td>
 						<input id="txtStoreno.*" type="text" class="txt c1" style="width: 30%;"/>

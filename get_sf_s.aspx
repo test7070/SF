@@ -37,8 +37,14 @@
                 bbmMask = [['txtBdate', r_picd], ['txtEdate', r_picd]];
                 q_mask(bbmMask);
 
-                $('#txtBdate').datepicker();
-                $('#txtEdate').datepicker();
+                if(r_len==4){                	
+                	$.datepicker.r_len=4;
+					//$.datepicker.setDefaults($.datepicker.regional["ENG"]);
+                }
+                
+				$('#txtBdate').datepicker();
+				$('#txtEdate').datepicker();
+				
                 $('#txtNoa').focus();
             }
 
