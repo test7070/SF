@@ -61,7 +61,7 @@ update @tmp1 set tweight = case when tweight is null then 0 else tweight end,
 				 nweight = case when nweight is null then 0 else nweight end			  					 
 where gno = '0'
 
-update @tmp1 set product = REPLACE(product,' ','') + (case when LEN(isnull(size,'')) = 0 then '' else size end)+(case when LEN(isnull(pmemo,''))= 0 then '' else +' '+pmemo end) 
+update @tmp1 set product = REPLACE(product,' ','') + (case when LEN(isnull(size,'')) = 0 then '' else size end)+ (case when LEN(isnull(long,'')) = 0 then '' else (case when class='板料' and product='鋼筋' then  ' '+cast(long as nvarchar(50))+'M' else '' end) end)+(case when LEN(isnull(pmemo,''))= 0 then '' else +' '+pmemo end) 
 where gno = '0'
 
 --後面一張進貨單只會有一個合約號碼
