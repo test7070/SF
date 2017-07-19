@@ -17,6 +17,7 @@ declare @qhref_acomp nvarchar(10) =''
 declare @t_check nvarchar(1)
 declare @t_bxdate nvarchar(20)
 declare @t_exdate nvarchar(20) 
+declare @t_typea nvarchar(20) = case when '#non'=[21] then '' else [21] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -74,6 +75,7 @@ else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when is
 ,'ina_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo 
 from view_ina a left join view_inas b on a.noa=b.noa 
 left join tgg c on a.tggno=c.noa 
+left join ordh d on a.ordeno=d.noa
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 (isnull(a.tggno,'') between @t_btggno and @t_etggno) and 
 (b.storeno between @t_bstoreno and @t_estoreno) and 
@@ -83,6 +85,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 (len(@t_class)=0 or @t_class=b.class) and 
 (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb) and 
 (len(@t_qno)=0 or a.ordeno = @t_qno) 
+and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 
 --小計
 insert @tmp 
@@ -192,6 +195,7 @@ declare @t_bstoreno nvarchar(20)
 declare @t_estoreno nvarchar(20)
 declare @qhref_acomp nvarchar(10) ='' 
 declare @t_check nvarchar(1)
+declare @t_typea nvarchar(20) = case when '#non'=[21] then '' else [21] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -243,6 +247,7 @@ select '0' gno, a.noa,a.datea,
 		,'ina'+b.accy,a.memo,b.ucolor,b.spec,b.size,b.lengthb
 		,case when len(dbo.get_num(size))=1 then '0'+dbo.get_num(size) else dbo.get_num(size) end
 from view_inas b left join view_ina a on a.noa = b.noa left join tgg c on a.tggno = c.noa 
+left join ordh d on a.ordeno=d.noa
 where (a.datea between @t_bdate and @t_edate) and 
 (a.tggno between @t_btggno and @t_etggno)  and
 (b.storeno between @t_bstoreno and @t_estoreno) and
@@ -252,6 +257,7 @@ where (a.datea between @t_bdate and @t_edate) and
 (len(@t_class)=0 or @t_class=b.class) and
 (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb) and 
 (len(@t_qno)=0 or a.ordeno = @t_qno)
+and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 order by b.productno,gno,a.datea,a.noa 
 
 if((select count(*) from @result)>0)
@@ -312,6 +318,7 @@ declare @t_bstoreno nvarchar(20)
 declare @t_estoreno nvarchar(20)
 declare @qhref_acomp nvarchar(10) ='' 
 declare @t_check nvarchar(1)
+declare @t_typea nvarchar(20) = case when '#non'=[21] then '' else [21] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -366,6 +373,7 @@ select '0' gno, a.noa, a.datea
 		,0 pcount,'ina'+b.accy ,b.ucolor,b.spec,b.size,b.lengthb,a.ordeno
 		,case when len(dbo.get_num(size))=1 then '0'+dbo.get_num(size) else dbo.get_num(size) end
 from view_inas b left join view_ina a on a.noa = b.noa left join tgg c on a.tggno = c.noa 
+left join ordh d on a.ordeno=d.noa
 where (a.datea between @t_bdate and @t_edate) and 
 (a.tggno between @t_btggno and @t_etggno)  and
 (b.storeno between @t_bstoreno and @t_estoreno) and
@@ -375,6 +383,7 @@ where (a.datea between @t_bdate and @t_edate) and
 (len(@t_class)=0 or @t_class=b.class) and
 (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb) and 
 (len(@t_qno)=0 or a.ordeno = @t_qno)
+and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 order by a.tggno,a.datea,a.noa 
 
 if((select count(*) from @result)>0)
@@ -435,6 +444,7 @@ declare @t_bstoreno nvarchar(20)
 declare @t_estoreno nvarchar(20)
 declare @qhref_acomp nvarchar(10) ='' 
 declare @t_check nvarchar(1)
+declare @t_typea nvarchar(20) = case when '#non'=[21] then '' else [21] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -484,6 +494,7 @@ select '0' gno,a.noa,a.datea,a.tggno,isnull(c.nick,'')
 		,'ina'+b.accy,a.memo,b.ucolor,b.spec,b.size,b.lengthb
 		,case when len(dbo.get_num(size))=1 then '0'+dbo.get_num(size) else dbo.get_num(size) end
 from view_inas b left join view_ina a on a.noa = b.noa left join tgg c on a.tggno = c.noa 
+left join ordh d on a.ordeno=d.noa
 where (a.datea between @t_bdate and @t_edate) and 
 (a.tggno between @t_btggno and @t_etggno)  and
 (b.storeno between @t_bstoreno and @t_estoreno) and
@@ -493,6 +504,7 @@ where (a.datea between @t_bdate and @t_edate) and
 (len(@t_class)=0 or @t_class=b.class) and
 (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb) and 
 (len(@t_qno)=0 or a.ordeno = @t_qno)
+and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 order by gno,a.datea,a.noa
  
 if((select count(*) from @result)>0)
@@ -546,6 +558,7 @@ declare @t_elengthb float
 declare @t_qno nvarchar(50)
 declare @t_bstoreno nvarchar(20) 
 declare @t_estoreno nvarchar(20)
+declare @t_typea nvarchar(20) = case when '#non'=[21] then '' else [21] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -579,6 +592,7 @@ select '0',a.tggno,(case when isnull(c.nick,'') = '' then c.comp else c.nick end
 ,sum(round((a.tax*(case when a.money=0 then 0 else (b.lengthc/a.money) end)),0)) 
 ,sum((round((a.tax*(case when a.money=0 then 0 else (b.lengthc/a.money) end)),0)+b.lengthc)) 
 from view_ina a left join view_inas b on a.noa = b.noa left join tgg c on a.tggno = c.noa 
+left join ordh d on a.ordeno=d.noa
 where (a.datea between @t_bdate and @t_edate) and 
 (a.tggno between @t_btggno and @t_etggno)  and
 (b.storeno between @t_bstoreno and @t_estoreno) and
@@ -588,6 +602,7 @@ where (a.datea between @t_bdate and @t_edate) and
 (len(@t_class)=0 or @t_class=b.class) and
 (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb) and 
 (len(@t_qno)=0 or a.ordeno = @t_qno)
+and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 group by a.tggno,c.nick,c.comp,left(a.datea,[2])
 
 if((select count(*) from @tmp)>0)
@@ -630,6 +645,7 @@ declare @qhref_acomp nvarchar(10) =''
 declare @t_check nvarchar(1)
 declare @t_bxdate nvarchar(20)
 declare @t_exdate nvarchar(20) 
+declare @t_typea nvarchar(20) = case when '#non'=[21] then '' else [21] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -675,7 +691,7 @@ declare @tmp table(
 	
 insert @tmp 
 select '2','','','',a.datea,a.noa,a.tggno,a.comp 
-,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney 
+,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),a.tax,a.tranmoney 
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno 
 ,case when len(b.ucolor)=0 then ''
 else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
@@ -684,10 +700,12 @@ else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case whe
 ,b.price,b.total,null,null,a.total 
 ,'ina_sf?noa=$noa?'+a.accy,a.memo 
 from view_ina a left join view_inas b on a.noa=b.noa 
+left join ordh d on a.ordeno=d.noa
 where (a.datea between @t_bdate and @t_edate) 
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
 and (len(@t_product)=0 or b.product=@t_product) 
 and (len(@t_qno)=0 or a.ordeno = @t_qno) 
+and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 
 insert @tmp
 select 1,0,0,0,max(datea),noa,tggno,max(comp),ordeno
@@ -766,6 +784,7 @@ declare @qhref_acomp nvarchar(10) =''
 declare @t_check nvarchar(1)
 declare @t_bxdate nvarchar(20)
 declare @t_exdate nvarchar(20) 
+declare @t_typea nvarchar(20) = case when '#non'=[21] then '' else [21] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -815,6 +834,7 @@ select '9','',a.datea,a.noa,a.tggno,c.nick
 ,'ina_sf?noa=$noa?'+a.accy,a.memo,ucolor,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end
 from view_ina a left join view_inas b on a.noa=b.noa 
 left join tgg c on a.tggno=c.noa 
+left join ordh d on a.ordeno=d.noa
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 (isnull(a.tggno,'') between @t_btggno and @t_etggno)  and
 (b.storeno between @t_bstoreno and @t_estoreno) and
@@ -824,6 +844,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 (len(@t_class)=0 or @t_class=b.class) and
 (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb) and 
 (len(@t_qno)=0 or a.ordeno = @t_qno)
+and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 
 insert @tmp
 select case when noq='1' then 1 else 2 end ,'',datea,noa,tggno,nick,ordeno

@@ -120,6 +120,10 @@
                     }, {
                         type : '1',//[19][20]
                         name : 'xdate'
+                    }, {
+                    	type : '5', //[21]
+						name : 'xtypea',
+						value : '#non@全部,委外代工@委外代工,來料加工@來料加工,互換@互換'.split(',')
                     }]
 				});
 				q_popAssign();

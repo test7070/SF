@@ -362,17 +362,7 @@
             
             function refreshBbs() {
             	if(q_cur==1 || q_cur==2){
-	            	for (var i = 0; i < q_bbsCount; i++) {
-	            		if($('#txtItem_'+i).val()=='1'){
-	            			$('#txtStoreno_'+i).attr('disabled', 'disabled');
-	            			$('#btnStoreno_'+i).attr('disabled', 'disabled');
-	            			$('#txtStore_'+i).attr('disabled', 'disabled');
-	            		}else{
-	            			$('#txtStoreno_'+i).removeAttr('disabled');
-	            			$('#btnStoreno_'+i).removeAttr('disabled');
-	            			$('#txtStore_'+i).removeAttr('disabled');
-	            		}
-	            	}
+	            	
             	}
             }
             
@@ -1685,10 +1675,7 @@
 										mount:$('#txtMount__'+i).val(),
 										weight:$('#txtWeight__'+i).val(),
 										noa:'',//$('#txtOrdeno__'+i).val()
-										no2:'',//$('#txtNo2__'+i).val()
-										storeno:'A1', //106/04/11
-										store:'三泰-成品', //106/04/11
-										item:'1'
+										no2:''//$('#txtNo2__'+i).val()
 									});
 								}
 								
@@ -1698,8 +1685,8 @@
 						
 						as.sort(bbssort);
 						
-						q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtOrdeno,txtNo2,txtStoreno,txtStore,txtItem'
-						, as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,noa,no2,storeno,store,item', 'txtOrdeno,txtNo2');
+						q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtOrdeno,txtNo2'
+						, as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,noa,no2', 'txtOrdeno,txtNo2');
 						
 						refreshBbs();
                 	}
@@ -2448,7 +2435,6 @@
 						<input id="txtStoreno.*" type="text" class="txt c1" style="width: 65%"/>
 						<input class="btn"  id="btnStoreno.*" type="button" value='.' style=" font-weight: bold;" />
 						<input id="txtStore.*" type="text" class="txt c1"/>
-						<input id="txtItem.*" type="hidden"/>
 					</td>
 					<td>
 						<input id="txtMemo.*" type="text" class="txt c1"/>
