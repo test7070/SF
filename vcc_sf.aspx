@@ -508,11 +508,14 @@
 			var q1_weight=0,q2_weight=0;
 			var a_spec='@',a_color='@',a_pro='@',a_class='@'; //106/01/04 續接器 類別 材質改抓續接參數 廠牌 =直彎
 			var a_img=[],a_class2='@';//106/01/06改抓img編號名稱
+			var tmpucc=[];
 			function q_gtPost(t_name) {
 				var as;
 				switch (t_name) {
 					case 'ucc':
 						var as = _q_appendData("ucc", "", true);
+						tmpucc=$.extend(true,[], as);
+						
 						var t_ucc='@';
 						for ( i = 0; i < as.length; i++) {
 							t_ucc+=","+as[i].product;
@@ -1275,18 +1278,34 @@
 								var t_mount=dec($('#txtMount_' + b_seq).val());
 								var t_price=dec($('#txtPrice_' + b_seq).val());
 								
-								if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
+								/*if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
 									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
 								else if($('#txtProduct_'+b_seq).val()=='運費' || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
-									/*var sot_weight=0;
-	                                for (var i = 0; i < q_bbsCount; i++) {
-	                                    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
-	                                }
-	                                $('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));*/
-	                               //106/07/11 楊小姐 加工費 會不同單價
-	                               $('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+									//var sot_weight=0;
+	                                //for (var i = 0; i < q_bbsCount; i++) {
+	                                //    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
+	                                //}
+	                                //$('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));
+									//106/07/11 楊小姐 加工費 會不同單價
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
 								}else{
 									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}*/
+								
+								//106/07/20 根據品名的單位去計算 (*最後一次調整)
+								var iskg=false;
+								for(var i=0;i<tmpucc.length;i++){
+									if($('#txtProduct_'+b_seq).val()==tmpucc[i].product){
+										if(tmpucc[i].unit.toUpperCase()=='KG'){
+											iskg=true;
+										}
+										break;
+									}
+								}
+								if(iskg){
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}else{
+									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
 								}
 								sum();
 							}
@@ -1331,18 +1350,34 @@
 								var t_mount=dec($('#txtMount_' + b_seq).val());
 								var t_price=dec($('#txtPrice_' + b_seq).val());
 								
-								if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
+								/*if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
 									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
-								else if($('#txtProduct_'+b_seq).val()=='運費'  || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
-									/*var sot_weight=0;
-	                                for (var i = 0; i < q_bbsCount; i++) {
-	                                    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
-	                                }
-	                                $('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));*/
+								else if($('#txtProduct_'+b_seq).val()=='運費' || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
+									//var sot_weight=0;
+	                                //for (var i = 0; i < q_bbsCount; i++) {
+	                                //    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
+	                                //}
+	                                //$('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));
 									//106/07/11 楊小姐 加工費 會不同單價
 									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
 								}else{
 									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}*/
+								
+								//106/07/20 根據品名的單位去計算 (*最後一次調整)
+								var iskg=false;
+								for(var i=0;i<tmpucc.length;i++){
+									if($('#txtProduct_'+b_seq).val()==tmpucc[i].product){
+										if(tmpucc[i].unit.toUpperCase()=='KG'){
+											iskg=true;
+										}
+										break;
+									}
+								}
+								if(iskg){
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}else{
+									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
 								}
 								bbssum();
 								sum();
@@ -1358,18 +1393,34 @@
 								var t_mount=dec($('#txtMount_' + b_seq).val());
 								var t_price=dec($('#txtPrice_' + b_seq).val());
 								
-								if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
+								/*if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
 									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
-								else if($('#txtProduct_'+b_seq).val()=='運費'  || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
-									/*var sot_weight=0;
-	                                for (var i = 0; i < q_bbsCount; i++) {
-	                                    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
-	                                }
-	                                $('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));*/
+								else if($('#txtProduct_'+b_seq).val()=='運費' || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
+									//var sot_weight=0;
+	                                //for (var i = 0; i < q_bbsCount; i++) {
+	                                //    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
+	                                //}
+	                                //$('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));
 									//106/07/11 楊小姐 加工費 會不同單價
 									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
 								}else{
 									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}*/
+								
+								//106/07/20 根據品名的單位去計算 (*最後一次調整)
+								var iskg=false;
+								for(var i=0;i<tmpucc.length;i++){
+									if($('#txtProduct_'+b_seq).val()==tmpucc[i].product){
+										if(tmpucc[i].unit.toUpperCase()=='KG'){
+											iskg=true;
+										}
+										break;
+									}
+								}
+								if(iskg){
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}else{
+									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
 								}
 								sum();
 							}
@@ -1458,6 +1509,40 @@
 								//chgcombUcolor(b_seq);
 								//chgcombClass(b_seq);
 								//chgimg(b_seq);
+								var t_weight=dec($('#txtWeight_' + b_seq).val());
+								var t_mount=dec($('#txtMount_' + b_seq).val());
+								var t_price=dec($('#txtPrice_' + b_seq).val());
+								
+								/*if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
+									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
+								else if($('#txtProduct_'+b_seq).val()=='運費' || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
+									//var sot_weight=0;
+	                                //for (var i = 0; i < q_bbsCount; i++) {
+	                                //    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
+	                                //}
+	                                //$('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));
+									//106/07/11 楊小姐 加工費 會不同單價
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}else{
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}*/
+								
+								//106/07/20 根據品名的單位去計算 (*最後一次調整)
+								var iskg=false;
+								for(var i=0;i<tmpucc.length;i++){
+									if($('#txtProduct_'+b_seq).val()==tmpucc[i].product){
+										if(tmpucc[i].unit.toUpperCase()=='KG'){
+											iskg=true;
+										}
+										break;
+									}
+								}
+								if(iskg){
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}else{
+									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
+								}
+								sum();
 							}
 						});
 						
@@ -1471,6 +1556,40 @@
 								//chgcombClass(b_seq);
 								//chgimg(b_seq);
 								
+								var t_weight=dec($('#txtWeight_' + b_seq).val());
+								var t_mount=dec($('#txtMount_' + b_seq).val());
+								var t_price=dec($('#txtPrice_' + b_seq).val());
+								
+								/*if($('#txtProduct_'+b_seq).val().indexOf('續接器')>-1 || $('#txtProduct_'+b_seq).val().indexOf('水泥方塊')>-1 || $('#txtProduct_'+b_seq).val()=='組裝工資')
+									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
+								else if($('#txtProduct_'+b_seq).val()=='運費' || $('#txtProduct_'+b_seq).val().substr(0,3)=='加工費'){
+									//var sot_weight=0;
+	                                //for (var i = 0; i < q_bbsCount; i++) {
+	                                //    sot_weight=q_add(sot_weight,dec($('#txtWeight_'+i).val()));
+	                                //}
+	                                //$('#txtTotal_'+b_seq).val(round(q_mul(t_price,sot_weight),0));
+									//106/07/11 楊小姐 加工費 會不同單價
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}else{
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}*/
+								
+								//106/07/20 根據品名的單位去計算 (*最後一次調整)
+								var iskg=false;
+								for(var i=0;i<tmpucc.length;i++){
+									if($('#txtProduct_'+b_seq).val()==tmpucc[i].product){
+										if(tmpucc[i].unit.toUpperCase()=='KG'){
+											iskg=true;
+										}
+										break;
+									}
+								}
+								if(iskg){
+									$('#txtTotal_'+b_seq).val(round(q_mul(t_price, t_weight), 0));
+								}else{
+									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
+								}
+								sum();
 							}
 						});
 						
