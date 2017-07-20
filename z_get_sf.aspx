@@ -87,7 +87,7 @@
                         value : xclassItem.split(',')
                     }, {
                     	type : '8', //[12]
-						name : 'xshowenda',
+						name : 'xshowsize',
 						value : "1@依號數排序".split(',')
                     }, {
                         type : '1',
@@ -115,6 +115,10 @@
                     }, {
                         type : '1', //[21][22]//1
                         name : 'xdate'
+                    }, {
+                    	type : '5', //[23]
+						name : 'xtypea',
+						value : '#non@全部,委外代工@委外代工,來料加工@來料加工,互換@互換'.split(',')
                     }]
                 });
                 q_popAssign();
@@ -221,14 +225,19 @@
 				$('#q_report .report').css('width','500px');
                 $('#q_report .report div').css('width','250px');
 				
-				$('#Xshowenda').css('width', '300px').css('height', '30px');
-				$('#Xshowenda .label').css('width','0px');
-				$('#chkXshowenda').css('width', '220px').css('margin-top', '5px');
-				$('#chkXshowenda span').css('width','180px')
+				$('#Xshowsize').css('width', '300px').css('height', '30px');
+				$('#Xshowsize .label').css('width','0px');
+				$('#chkXshowsize').css('width', '220px').css('margin-top', '5px');
+				$('#chkXshowsize span').css('width','180px')
 				
 				$('#Xlengthb').css('width', '300px');
 				$('#txtXlengthb1').css('width', '80px');
 				$('#txtXlengthb2').css('width', '80px');
+				
+				$('#Xatax').css('width', '300px').css('height', '30px');
+				$('#Xatax .label').css('width','0px');
+				$('#chkXatax').css('width', '220px').css('margin-top', '5px');
+				$('#chkXatax span').css('width','180px')
 								
 				$('#lblQno').css('font-size','12px');
 
