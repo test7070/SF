@@ -1,4 +1,4 @@
-﻿z_ucc_sf01:--z_ucc_sf01庫存表
+﻿z_ucc_sf01:--z_ucc_sf01 條碼庫存表
 declare @t_pno nvarchar(50)
 declare @t_ucolor nvarchar(50)
 declare @t_spec nvarchar(50)
@@ -200,7 +200,7 @@ BEGIN
 END
 ;
 --*****************************************************************************************
-z_ucc_sf02:--z_ucc_sf02庫存表-規格合併
+z_ucc_sf02:--z_ucc_sf02 條碼庫存表-規格合併
 declare @t_pno nvarchar(50)
 declare @t_ucolor nvarchar(50)
 declare @t_spec nvarchar(50)
@@ -401,7 +401,7 @@ END
 ;
 
 --*****************************************************************************************
-z_ucc_sf03:--z_ucc_sf03倉庫庫存表
+z_ucc_sf03:--z_ucc_sf03 倉庫庫存表
 declare @t_pno nvarchar(50)
 declare @t_ucolor nvarchar(50)
 declare @t_spec nvarchar(50)
@@ -651,8 +651,8 @@ declare @totpage int= isnull((select MAX(page) from #tmp),0)
 declare @today nvarchar(20)= replace(convert(varchar(19),getdate(),20),'-','/')
 
 select ROW_NUMBER() over (partition by storeno,product,spec,size,gno order by storeno,product,cast(dbo.get_num(size) as int),spec,cast(gno as int),ucolor,lengthb,class) rr
-,dbo.getComma(mount,[2])mount
-,dbo.getComma(weight,[3])weight
+,dbo.getComma(mount,0)mount
+,dbo.getComma(weight,0)weight
 ,dbo.getComma(avgweight,[3])avgweight
 ,@today today
 ,@totpage totpage
@@ -738,14 +738,18 @@ create table #tmp(
 	--primary key (datea,tablea,typea,noa,noq,product,spec,size,ucolor,lengthb,class)
 )
 
+--106/07/20 根據品名的單位去顯示 (*最後一次調整)
+
 --成入
 insert #tmp
 select '0','ucce',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,b.weight,case when b.weight=0 then 0 else b.total/b.weight end
 ,b.total,case when b.weight=0 then 0 else b.total/b.weight end,b.total
 from view_ucce a left join view_ucces b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%'  or isnull(b.product,'') like '其它%')
+--and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%'  or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.weight>0
 
 --成領
@@ -753,8 +757,10 @@ insert #tmp
 select '1','uccet',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,-1*b.weight,0,0,0,0
 from view_ucce a left join view_ucces b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+--and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.weight<0
 
 --調入
@@ -763,8 +769,10 @@ select '0','vcf','',a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,b.weight,case when b.weight=0 then 0 else b.money/b.weight end
 ,b.money,case when b.weight=0 then 0 else b.money/b.weight end,b.money
 from vcf a left join vcfs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+--and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.weight>0
 
 --調領
@@ -772,8 +780,10 @@ insert #tmp
 select '1','vcft','',a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,-1*b.weight,0,0,0,0
 from vcf a left join vcfs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+--and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.weight<0
 
 --進
@@ -783,8 +793,10 @@ select '2','rc2s',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,case when a.typea='2' then -1 else 1 end*b.total,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+--and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --銷
@@ -793,9 +805,11 @@ select '4','vccs',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,case when a.typea='2' then -1 else 1 end*b.weight,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,0,0
 from view_vcc a left join view_vccs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
 --and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+--and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --insert #tmp
@@ -815,8 +829,10 @@ select '3','inas',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,b.weight,b.mweight
 ,b.weight*b.mweight,b.mweight,b.weight*b.mweight
 from view_ina a left join view_inas b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+--and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))='KG'
 and a.storeno between @t_bstoreno and @t_estoreno
 
 --出
@@ -825,8 +841,10 @@ select '6','gets',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,b.weight,b.mweight
 ,b.weight*b.mweight,b.mweight,b.weight*b.mweight
 from view_get a left join view_gets b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
-and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+--and not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))='KG'
 and a.storeno between @t_bstoreno and @t_estoreno
 
 CREATE INDEX tmpindex0 on #tmp (datea,tablea,typea,noa,noq,product,spec,size,ucolor,lengthb,class)
@@ -1136,8 +1154,10 @@ select '0','ucce',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.mount,0,case when b.mount=0 then 0 else b.total/b.mount end
 ,b.total,case when b.mount=0 then 0 else b.total/b.mount end,b.total
 from view_ucce a left join view_ucces b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+--and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
 
 --成出
@@ -1145,8 +1165,10 @@ insert #tmp
 select '1','uccet',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,-1*b.mount,0,0,0,0,0
 from view_ucce a left join view_ucces b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+--and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount<0
 
 --調入
@@ -1155,8 +1177,10 @@ select '0','vcf','',a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.mount,0,case when b.mount=0 then 0 else b.money/b.mount end
 ,b.money,case when b.mount=0 then 0 else b.money/b.mount end,b.money
 from vcf a left join vcfs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+--and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
 
 --調領
@@ -1164,8 +1188,10 @@ insert #tmp
 select '1','vcft','',a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,-1*b.mount,0,0,0,0,0
 from vcf a left join vcfs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+--and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount<0
 
 --進
@@ -1175,8 +1201,10 @@ select '2','rc2s',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,case when a.typea='2' then -1 else 1 end*b.total,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+--and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --銷
@@ -1185,9 +1213,11 @@ select '4','vccs',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,case when a.typea='2' then -1 else 1 end*b.mount,0,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,0,0
 from view_vcc a left join view_vccs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 --and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+--and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --insert #tmp
@@ -1206,8 +1236,10 @@ insert #tmp
 select '3','inas',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.mount,0,b.mweight,b.mount*b.mweight,b.mweight,b.mount*b.mweight
 from view_ina a left join view_inas b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+--and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))!='KG'
 and a.storeno between @t_bstoreno and @t_estoreno
 
 --出
@@ -1215,8 +1247,10 @@ insert #tmp
 select '6','gets',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.mount,0,b.mweight,b.mount*b.mweight,b.mweight,b.mount*b.mweight
 from view_get a left join view_gets b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
-and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+--and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
+and UPPER(isnull(d.unit,''))!='KG'
 and a.storeno between @t_bstoreno and @t_estoreno
 
 --------------------------------------------------------------------
@@ -1463,28 +1497,28 @@ delete #tmpa where gno='9'
 ----------------------------------------------------------------------------------------------------------
 select 
 gno,product,spec,size
-,dbo.getComma(bw,2)bw
+,dbo.getComma(bw,0)bw
 ,dbo.getComma(bo,0)bo
-,dbo.getComma(bm,2)bm
-,dbo.getComma(rw,2)rw
+,dbo.getComma(bm,0)bm
+,dbo.getComma(rw,0)rw
 ,dbo.getComma(ro,0)ro
 ,dbo.getComma(rm,0)rm
-,dbo.getComma(vw,2)vw
+,dbo.getComma(vw,0)vw
 ,dbo.getComma(vo,0)vo
-,dbo.getComma(vc,2)vc
+,dbo.getComma(vc,0)vc
 ,dbo.getComma(vm,0)vm
 ,dbo.getComma(profit,2)profit
-,dbo.getComma(dw,2)dw
+,dbo.getComma(dw,0)dw
 ,dbo.getComma(do,0)do
-,dbo.getComma(dm,2)dm
-,dbo.getComma(lw,2)lw
+,dbo.getComma(dm,0)dm
+,dbo.getComma(lw,0)lw
 ,dbo.getComma(lo,0)lo
 ,dbo.getComma(lp,2)lp
-,dbo.getComma(lm,2)lm
+,dbo.getComma(lm,0)lm
 ,REPLACE(CONVERT (NVARCHAR(10), GETDATE(),20 ),'-','/') today
 ,case when @t_bstoreno='' then isnull((select top 1 store from store order by noa),'') else @t_bstoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end bstore
 ,case when @t_estoreno=char(255) then isnull((select top 1 store from store order by noa desc),'') else @t_estoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end estore
-from #tmpa order by gno,product,spec,size
+from #tmpa order by gno,product,spec,dbo.get_num(size)
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -1580,110 +1614,94 @@ CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 --成入
 insert #tmp
 select '0','ucce',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end
-,case when case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end=0 then 0
-else b.total/case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end end,b.total
-,b.storeno,case when case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end=0 then 0
-else b.total/case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end end,b.total
+,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+,case when case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end=0 then 0
+else b.total/case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end end,b.total
+,b.storeno,case when case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end=0 then 0
+else b.total/case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end end,b.total
 ,'ucce_sf?noa=$noa'
 from view_ucce a left join view_ucces b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%'))
-and case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end>0
+and case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end>0
 
 --成領
 insert #tmp
 select '1','uccet',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,-1*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end
+,-1*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 ,0,0,b.storeno,0,0,'ucce_sf?noa=$noa'
 from view_ucce a left join view_ucces b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%'))
-and case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end<0
+and case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end<0
 
 --調入
 insert #tmp
 select '0','vcf','',a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end
-,case when case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end=0 then 0
-else b.money/case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end end,b.money
-,b.storeno,case when case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end=0 then 0
-else b.money/case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end end,b.money
+,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+,case when case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end=0 then 0
+else b.money/case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end end,b.money
+,b.storeno,case when case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end=0 then 0
+else b.money/case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end end,b.money
 ,'vcf_sf?noa=$noa'
 from vcf a left join vcfs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%'))
-and case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end>0
+and case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end>0
 
 --調領
 insert #tmp
 select '1','vcft','',a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,-1*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end
+,-1*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 ,0,0,b.storeno,0,0,'vcf_sf?noa=$noa'
 from vcf a left join vcfs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%'))
-and case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end<0
+and case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end<0
 
 --進
 insert #tmp
 select '2','rc2s',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end,b.price
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,'rc2_sf?noa=$noa'
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%'))
 
 --銷
 insert #tmp
 select '4','vccs',a.accy,a.noa,b.noq,a.datea,'',b.product,'',b.spec,b.size,0,''
-,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end,b.price
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end,b.price
 ,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,0,0,'vcc_sf?noa=$noa'
 from view_vcc a left join view_vccs b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 --and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%'))
-
---insert #tmp
---select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
---,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,c.price
---,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end*c.price
---,'',0,0,'vcc_sf?noa=$noa'
---from view_vcc a left join view_vcct b on a.noa=b.noa
---outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
---where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
---and isnull(b.product,'') not like '續接%' and isnull(b.product,'') not like '%費'  and isnull(b.product,'') not like '組接%'
-
---update  a
---set storeno=isnull(b.storeno,'')
---from #tmp a outer apply (select top 1 storeno from #tmp where tablea not like 'vcc%' and uno=a.uno order by datea) b
---where tablea='vcct' 
---and isnull(product,'') not like '續接%' and isnull(product,'') not like '%費'  and isnull(product,'') not like '組接%'
 
 --互換
 --入
 insert #tmp
 select '3','inas',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,'',b.spec,b.size,0,''
-,case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end,b.mweight
-,b.mweight*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end
+,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end,b.mweight
+,b.mweight*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 ,b.storeno,b.mweight
-,b.mweight*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end
+,b.mweight*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 ,'ina_sf?noa=$noa'
 from view_ina a left join view_inas b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%'))
 
 --出
 insert #tmp
 select '5','gets',a.accy,a.noa,b.noq,a.datea,'',b.product,'',b.spec,b.size,0,''
-,case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end,b.mweight
-,b.mweight*case when isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%' then b.mount else b.weight end
+,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end,b.mweight
+,b.mweight*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 ,b.storeno,0,0,'get_sf?noa=$noa'
 from view_get a left join view_gets b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
-and not exists(select* from view_gett where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
-and (not(isnull(b.product,'') like '續接%' or isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '%費'  or isnull(b.product,'') like '組接%') or (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%'))
+--and not exists(select* from view_gett where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 --------------------------------------------------------------------
 --月成本
 create table #tmpb(
@@ -1975,18 +1993,19 @@ when tablea='gets' then '互出'
 else tablea end
 
 select 
-gno,product,spec,size
+a.gno,a.product,a.spec,a.size
 ,(select top 1 store from store where noa=a.storeno )store
-,tablea,typea,noa,noq,datea,storeno,uno,qhref
-,dbo.getComma(weight,2) weight
-,dbo.getComma(money,2) money
-,dbo.getComma(tweight,2) tweight
-,dbo.getComma(tmoney,2) tmoney
+,tablea,a.typea,a.noa,a.noq,a.datea,a.storeno,uno,qhref
+,dbo.getComma(weight,0) weight
+,dbo.getComma(money,0) money
+,dbo.getComma(tweight,0) tweight
+,dbo.getComma(tmoney,0) tmoney
 ,case when isnull(tweight,0)=0 then dbo.getComma(0,2) else dbo.getComma(round(tmoney/tweight,2),2) end tprice
-,case when isnull(product,'') like '續接器%' or isnull(product,'') like '水泥方塊%' or isnull(product,'') like '其它%' then '件數' else '重量' end utype
-from #tmpa a order by 
-case when isnull(product,'') like '%費' then 2 when isnull(product,'') like '續接%' or isnull(product,'') like '水泥方塊%' or isnull(product,'') like '組接%' or isnull(product,'') like '其它%' then 1 else 0 end
-,product,spec,size,storeno,gno,datea,typea,noa,noq
+,case when UPPER(isnull(d.unit,''))='KG' then '重量' else '件數' end utype
+from #tmpa a left join ucc d on a.product=d.product
+order by case when isnull(a.product,'') like '%費' then 3 when UPPER(isnull(d.unit,''))!='KG' then 2
+when isnull(a.product,'') like '%廢%' then 1 else 0 end
+,a.product,a.spec,dbo.get_num(a.size),a.storeno,a.gno,a.datea,a.typea,a.noa,a.noq
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -2042,11 +2061,6 @@ BEGIN
 	drop table #tmp
 END
 
-IF OBJECT_ID('tempdb..#tmpb')is not null
-BEGIN
-	drop table #tmpb
-END
-
 IF OBJECT_ID('tempdb..#tmpa')is not null
 BEGIN
 	drop table #tmpa
@@ -2070,8 +2084,6 @@ create table #tmp(
 	price float,
 	total float,
 	storeno nvarchar(20),
-	aprice float, --均價
-	cost float, --成本
 	qhref nvarchar(100)
 	primary key (datea,tablea,typea,noa,noq,product,spec,size,ucolor,lengthb,class)
 )
@@ -2079,79 +2091,89 @@ create table #tmp(
 CREATE INDEX tmpindex on #tmp (product,spec,size,ucolor,lengthb,class,datea,typea,noa,noq)
 CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 
---106/06/13不使用盤點單 只使用調整單 其他倉庫 基本上都是當天就會領用完 所以不會有庫存
-
---盤
---insert #tmp
---select '0','ucce',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
---,case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end
---,b.price,b.total,b.storeno,b.price,b.total,'ucce_vu?noa=$noa'
---from view_ucce a left join view_ucces b on a.noa=b.noa
---where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
---and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
---and b.storeno='A' --106/04/05
---and len(isnull(b.uno,''))>0 --106/04/11
+--106/01/06 不顯示成本
+--106/06/13 不使用盤點單 只使用調整單 其他倉庫 基本上都是當天就會領用完 所以不會有庫存
+--106/04/11 只需要批號的資料 所以不抓vccs
 
 --進
 insert #tmp
 select '1','rc2s',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
-,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,b.price
-,case when a.typea='2' then -1 else 1 end*b.total,'rc2_sf?noa=$noa'
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end,b.price
+,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,'rc2_sf?noa=$noa?'+a.accy
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
+left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
 
---銷 -106/04/11 只需要批號的資料 所以不抓vccs
---insert #tmp
---select '5','vccs',a.accy,a.noa,b.noq,a.datea,'',b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
---,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,b.price
---,case when a.typea='2' then -1 else 1 end*b.total,b.storeno,0,0,'vcc_sf?noa=$noa'
---from view_vcc a left join view_vccs b on a.noa=b.noa
---where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
---and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
---and (len(@x_uno)=0)
---and b.storeno='A' --106/04/05
+--加工入
+insert #tmp
+select '6','cubs' tablea,a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+,0,0,b.storeno,'cub_sf?noa=$noa?'+a.accy
+from view_cub a left join view_cubs b on a.noa=b.noa
+left join ucc d on b.product=d.product
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
+and b.storeno='A' --106/04/05
+and len(isnull(b.uno,''))>0 --106/04/11
 
+--互換入
+insert #tmp
+select '6','inas' tablea,a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+,b.mweight,b.lengthc,a.storeno,'ina_sf?noa=$noa?'+a.accy
+from view_ina a left join view_inas b on a.noa=b.noa
+left join ucc d on b.product=d.product
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
+and b.storeno='A' --106/04/05
+and len(isnull(b.uno,''))>0 --106/04/11
+
+--銷
 insert #tmp
 select '5','vcct',a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
-,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end,c.price
-,case when a.typea='2' then -1 else 1 end*case when isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '水泥方塊%' then b.mount else b.weight end*c.price
-,'',0,0,'vcc_sf?noa=$noa'
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end,c.price
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end*c.price
+,'','vcc_sf?noa=$noa?'+a.accy
 from view_vcc a left join view_vcct b on a.noa=b.noa
+left join ucc d on b.product=d.product
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate 
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
 
+--加工領
+insert #tmp
+select '6','cubt' tablea,a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+,0,0,'' storeno,'cub_sf?noa=$noa?'+a.accy
+from view_cub a left join view_cubt b on a.noa=b.noa
+left join ucc d on b.product=d.product
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
+and b.storeno='A' --106/04/05
+and len(isnull(b.uno,''))>0 --106/04/11
+
+--互換出
+insert #tmp
+select '6','gett' tablea,a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+,0,0,'' storeno,'ina_sf?noa=$noa?'+a.accy
+from view_get a left join view_gett b on a.noa=b.noa
+left join ucc d on b.product=d.product
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
+and b.storeno='A' --106/04/05
+and len(isnull(b.uno,''))>0 --106/04/11
+
 update  a
 set storeno=isnull(b.storeno,'')
-from #tmp a outer apply (select top 1 storeno from #tmp where tablea not like 'vcc%' and uno=a.uno order by datea) b
-where tablea='vcct'
-
---------------------------------------------------------------------
---月成本
-create table #tmpb(
-	mon nvarchar(10),
-	storeno nvarchar(50), 
-	product nvarchar(50),
-	spec nvarchar(50),
-	size nvarchar(20),
-	ucolor nvarchar(50),
-	lengthb float,
-	class nvarchar(50),
-	weight float,
-	total float,
-	aprice float,
-	primary key (product,spec,size,ucolor,lengthb,class,storeno,mon)
-)
-
-insert #tmpb
-select LEFT(datea,@t_lenm),storeno,product,spec,size,ucolor,lengthb,class,0,0,0
-from #tmp group by LEFT(datea,@t_lenm),storeno,product,spec,size,ucolor,lengthb,class
+from #tmp a outer apply (select top 1 storeno from #tmp 
+where tablea!='vcct' and tablea!='cubt' and tablea!='gett' and uno=a.uno order by datea) b
+where tablea='vcct' or tablea='cubt' or tablea='gett'
 
 --------------------------------------------------------------------
 declare @tablea nvarchar(10)
@@ -2192,107 +2214,6 @@ declare @ttotal float
 declare @tuweight float
 declare @tutotal float
 
---計算成本
-declare cursor_table cursor for
-select tablea,datea,LEFT(datea,@t_lenm),storeno,product,spec,size,ucolor,lengthb,class,noa,noq,isnull(weight,0),isnull(total,0)
-from #tmp order by LEFT(datea,@t_lenm),datea,typea,noa,noq,product,spec,size,ucolor,lengthb,class
-open cursor_table
-fetch next from cursor_table
-into @tablea,@datea,@mon,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@noa,@noq,@weight,@total
-while(@@FETCH_STATUS <> -1)
-begin
-	--避免前期超領負數造成金額溢位
-	if(round(@tweight,0)<=0)
-	begin
-		set @ttotal=0
-		--避免領用有小數點導致無法全部被領用
-		if(round(@tweight,0)=0)
-		begin
-			set @tweight=0
-		end
-	end
-	
-	if(@tproduct!=@product or @tspec!=@spec or @tsize!=@size or @tucolor!=@ucolor or @tlengthb!=@lengthb or @tclass!=@class or @tstoreno!=@storeno or @t_mon!=@mon )
-	begin
-		if(@tproduct!='#non')
-		begin
-			update #tmpb
-			set weight=@tweight,total=@ttotal,aprice=@aprice
-			where mon>=@t_mon and product=@tproduct and spec=@tspec and size=@tsize and ucolor=@tucolor and lengthb=@tlengthb and class=@tclass and storeno=@tstoreno
-		end
-		
-		if(@tproduct!=@product or @tspec!=@spec or @tsize!=@size or @tucolor!=@ucolor or @tlengthb!=@lengthb or @tclass!=@class or @tstoreno!=@storeno)
-		begin
-			select @tweight=isnull(weight,0),@ttotal=isnull(total,0),@aprice=isnull(aprice,0)
-			from #tmpb
-			where mon=@mon and product=@product and spec=@spec and size=@size and ucolor=@ucolor and lengthb=@lengthb and class=@class and storeno=@storeno
-		end
-	end
-
-	--盤點
-	if(@tablea='ucce')
-	begin
-		set @tweight=@weight
-		set @ttotal=@total
-		set @aprice=case when @weight=0 then 0 else round(@total/@weight,4) end
-	end
-	
-	--進貨
-	if(@tablea='rc2s')
-	begin
-		if(@ttotal<=0 or @tweight<=0) --處理超領導致金額不正確 以最近進貨的單價作為目前超領的單價
-			set @ttotal=@tweight*case when @weight=0 then 0 else round(@total/@weight,4) end
-			
-		set @tweight=@tweight+@weight
-		set @ttotal=@ttotal+@total
-		set @aprice=case when @tweight=0 then 0 else round(@ttotal/@tweight,4) end
-	end
-	
-	--出貨
-	if(@tablea='vccs' or @tablea='vcct')
-	begin
-		set @tweight=@tweight-@weight
-		set @ttotal=@ttotal-round(@weight*@aprice,4)
-	end
-	
-	update #tmp 
-	set aprice=@aprice,cost=round(isnull(@aprice,0)*weight,4)
-	where noa=@noa and noq=@noq and tablea=@tablea
-
-	set @tproduct=@product
-	set @tspec=@spec
-	set @tsize=@size
-	set @tucolor=@ucolor
-	set @tlengthb=@lengthb
-	set @tclass=@class
-	set @t_mon=@mon
-	set @tstoreno=@storeno
-	
-	fetch next from cursor_table
-	into @tablea,@datea,@mon,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@noa,@noq,@weight,@total
-end
-close cursor_table
-deallocate cursor_table
---最後一筆更新-------------------------------------------------------------
---避免前期超領負數造成金額溢位
-if(round(@tweight,0)<=0)
-begin
-	set @ttotal=0
-	--避免領用有小數點導致無法全部被領用
-	if(round(@tweight,0)=0)
-	begin
-		set @tweight=0
-	end
-end
-
-if(@tproduct!='#non')
-begin
-	update #tmpb
-	set weight=@tweight,total=@ttotal,aprice=@aprice
-	where mon>=@t_mon and product=@tproduct and spec=@tspec and size=@tsize and ucolor=@tucolor and lengthb=@tlengthb and class=@tclass and storeno=@tstoreno
-end
-
-update a set cost=total from #tmp a where a.tablea='rc2s' or a.tablea='ucce'
 ----------------------------------------------------------------
 delete #tmp where not((len(@t_pno)=0 or isnull(product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(ucolor,'')=@t_ucolor)
 and (len(@t_spec)=0 or isnull(spec,'')=@t_spec) and (len(@t_size)=0 or isnull(size,'')=@t_size)
@@ -2351,65 +2272,58 @@ declare @qhref nvarchar(100)
 CREATE INDEX tmpindex3 on #tmp (storeno,product,spec,size,ucolor,lengthb,class,datea,typea,noa,noq)
 
 declare cursor_table cursor for
-select tablea,typea,noa,noq,datea,storeno,product,spec,size,ucolor,lengthb,class,isnull(weight,0),isnull(cost,0),qhref,uno
+select tablea,typea,noa,noq,datea,storeno,product,spec,size,ucolor,lengthb,class,isnull(weight,0),qhref,uno
 from #tmp 
 order by storeno,product,spec,size,ucolor,lengthb,class,datea,typea,noa,noq
 open cursor_table
 fetch next from cursor_table
-into @tablea,@typea,@noa,@noq,@datea,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@weight,@total,@qhref,@uno
+into @tablea,@typea,@noa,@noq,@datea,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@weight,@qhref,@uno
 while(@@FETCH_STATUS <> -1)
 begin
 	if(@tproduct!=@product or @tspec!=@spec or @tsize!=@size or @tucolor!=@ucolor or @tlengthb!=@lengthb or @tclass!=@class or @tstoreno!=@storeno)
 	begin
 		set @tweight=0
-		set @ttotal=0
+		--set @ttotal=0
 	end
 
-	--盤點
-	if(@tablea='ucce')
-	begin
-		set @tweight=@weight
-		set @ttotal=@total
-	end
 	--進貨--入庫
-	if(@tablea='rc2s' or @tablea='cubs')
+	if(@tablea='rc2s' or @tablea='cubs' or @tablea='inas')
 	begin
 		set @tweight=@tweight+@weight
-		set @ttotal=@ttotal+@total
+		--set @ttotal=@ttotal+@total
 	end
 	
 	--領料--出貨
-	if(@tablea='vccs' or @tablea='vcct')
+	if(@tablea='vccs' or @tablea='vcct' or @tablea='gett' or @tablea='cubt')
 	begin
-		if(@total=0)
-			set @total=@weight*case when @tweight=0 then 0 else @ttotal/@tweight end
+		--if(@total=0)
+		--	set @total=@weight*case when @tweight=0 then 0 else @ttotal/@tweight end
 				
 		set @tweight=@tweight-@weight
-		set @ttotal=@ttotal-@total
+		--set @ttotal=@ttotal-@total
 	end
 	
-	--避免前期超領負數造成金額溢位
-	if(round(@tweight,0)<=0)
-	begin
-		set @ttotal=0
-		--避免領用有小數點導致無法全部被領用
-		if(round(@tweight,0)=0)
-		begin
-			set @tweight=0
-		end
-	end
+	----避免前期超領負數造成金額溢位
+	--if(round(@tweight,0)<=0)
+	--begin
+	--	set @ttotal=0
+	--	--避免領用有小數點導致無法全部被領用
+	--	if(round(@tweight,0)=0)
+	--	begin
+	--		set @tweight=0
+	--	end
+	--end
 		
 	if(@datea<@t_bdate)
 	begin
 		update #tmpa
-		set tweight=@tweight,tmoney=@ttotal
+		set tweight=@tweight
 		where product=@product and spec=@spec and size=@size and ucolor=@ucolor and lengthb=@lengthb and class=@class and storeno=@storeno and tablea='期初'
 	end
 	else
 	begin
-		insert #tmpa(gno,tablea,typea,noa,noq,uno,datea,storeno,product,spec,size,ucolor,lengthb,class,weight,money,tweight,tmoney,qhref)
-		select '0',@tablea,@typea,@noa,@noq,@uno,@datea,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@weight,@total
-		,@tweight,@ttotal,@qhref
+		insert #tmpa(gno,tablea,typea,noa,noq,uno,datea,storeno,product,spec,size,ucolor,lengthb,class,weight,tweight,qhref)
+		select '0',@tablea,@typea,@noa,@noq,@uno,@datea,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@weight,@tweight,@qhref
 	end
 	
 	set @tproduct=@product
@@ -2421,7 +2335,7 @@ begin
 	set @tstoreno=@storeno
 	
 	fetch next from cursor_table
-	into @tablea,@typea,@noa,@noq,@datea,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@weight,@total,@qhref,@uno
+	into @tablea,@typea,@noa,@noq,@datea,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@weight,@qhref,@uno
 end
 close cursor_table
 deallocate cursor_table
@@ -2438,30 +2352,27 @@ update #tmpa
 set tablea=case 
 when tablea='ucce' then '盤點' 
 when tablea='rc2s' then '進貨' 
-when tablea='vccs' then '出貨'
 when tablea='vcct' then '出貨'
+when tablea='cubs' then '入庫' 
+when tablea='cubt' then '領料'
+when tablea='inas' then '互進' 
+when tablea='gett' then '互出'
 else tablea end
 
 select 
-gno,product,spec,size,ucolor,dbo.getComma(lengthb,-1)lengthb,class
+a.gno,a.product,a.spec,a.size,a.ucolor,dbo.getComma(a.lengthb,-1)lengthb,a.class
 ,(select top 1 store from store where noa=a.storeno )store
-,tablea,typea,noa,noq,datea,storeno,uno,qhref
-,dbo.getComma(weight,2) weight
-,dbo.getComma(money,2) money
-,dbo.getComma(tweight,2) tweight
-,dbo.getComma(tmoney,2) tmoney
-,case when isnull(tweight,0)=0 then dbo.getComma(0,2) else dbo.getComma(round(tmoney/tweight,2),2) end tprice
-,case when isnull(product,'') like '續接器%' or isnull(product,'') like '水泥方塊%' then '件數' else '重量' end utype
-from #tmpa a order by product,ucolor,spec,size,lengthb,class,storeno,datea,gno,typea,noa,noq
+,a.tablea,a.typea,a.noa,a.noq,a.datea,a.storeno,a.uno,a.qhref
+,dbo.getComma(a.weight,[3]) weight
+,dbo.getComma(a.tweight,[3]) tweight
+,case when UPPER(isnull(d.unit,''))='KG' then '重量' else '件數' end utype
+from #tmpa a 
+left join ucc d on a.product=d.product
+order by a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class,a.storeno,a.datea,a.gno,a.typea,a.noa,a.noq
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
 	drop table #tmp
-END
-
-IF OBJECT_ID('tempdb..#tmpb')is not null
-BEGIN
-	drop table #tmpb
 END
 
 IF OBJECT_ID('tempdb..#tmpa')is not null
