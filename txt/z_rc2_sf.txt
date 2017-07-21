@@ -928,13 +928,13 @@ begin
 	select '2','','','',a.datea,a.noa,a.tggno,a.tgg
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
-	,case when len(b.ucolor)=0 then ''
-	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
-	,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total,a.total
-	,'rc2_sf?noa=$noa?'+a.accy,a.memo
+	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,b.total,case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
+	,b.total,a.total,'rc2_sf?noa=$noa?'+a.accy,a.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
+	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
 	(a.tggno between @t_btggno and @t_etggno)  and
 	(isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) and
@@ -953,13 +953,14 @@ begin
 	select '2','','','',a.datea,a.noa,a.tggno,a.tgg
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
-	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
-	,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total,a.total
+	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,b.total,case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
+	,b.total,a.total
 	,'rc2_sf?noa=$noa?'+a.accy,a.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
+	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
 	(a.tggno between @t_btggno and @t_etggno)  and
 	(isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) and
@@ -976,9 +977,7 @@ end
 insert @tmp
 select '1' ,0,0,0,MAX(datea),noa,tggno,MAX(comp),ordeno
 ,MAX(tax),MAX(tranmoney),'','','',null,null,null
-,SUM(case when product like '%續接器%' or product like '%水泥方塊%' 
-or product like '%組裝工資%' or product like '%運費%' 
-or product like '%加工費%' then 0 else mount end)
+,SUM(tmount)
 ,SUM(total),max(money),MAX(ghref),''
 from @tmp where datea between @t_bdate and @t_edate and gno ='2'
 group by noa,tggno,ordeno
