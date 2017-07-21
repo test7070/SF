@@ -61,6 +61,9 @@ declare @tmp table(
 	ucolor nvarchar(50), 
 	memo nvarchar(max) 
 ) 
+
+--106/07/20 根據品名的單位去顯示 (*最後一次調整)
+
 --明細
 insert @tmp 
 select '9','','','',a.datea,a.noa,a.tggno,c.nick 
@@ -68,14 +71,15 @@ select '9','','','',a.datea,a.noa,a.tggno,c.nick
 ,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney 
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno 
 ,case when len(b.ucolor)=0 then ''
-else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
+else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 +b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
-,b.price,b.total,null,null
-,'ina_sf?noa=$noa?'+a.accy,a.carno,b.ucolor,b.memo 
+,case when UPPER(isnull(e.unit,''))='KG' then b.weight else b.mount end
+,b.mweight,b.lengthc,null,null
+,'ina_sf?noa=$noa?'+a.accy,a.carno,case when UPPER(isnull(e.unit,''))='KG' then b.ucolor else '其他' end,b.memo 
 from view_ina a left join view_inas b on a.noa=b.noa 
 left join tgg c on a.tggno=c.noa 
 left join ordh d on a.ordeno=d.noa
+left join ucc e on b.product=e.product
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 (isnull(a.tggno,'') between @t_btggno and @t_etggno) and 
 (b.storeno between @t_bstoreno and @t_estoreno) and 
@@ -91,7 +95,7 @@ and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 insert @tmp 
 select '1',0,0,0,max(datea),noa,tggno,max(nick),ordeno,max(transtyle) 
 ,max(tranmoney),'','','',null,null,null
-,SUM(case when product like '%續接器%' or product like '%水泥方塊%' or product like '%組裝工資%'  or product like '%運費%' or product like '%加工費%' then 0 else mount end)
+,SUM(case when ucolor='其他' then 0 else mount end)
 ,SUM(total),max(ghref),max(carno),'','' 
 from @tmp 
 where datea between @t_bdate and @t_edate and gno='9'
@@ -116,7 +120,7 @@ from @tmp where gno='1'
 --統計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
-	select noa,tranmoney,SUM(mount)tmount,sum(total)ttotal
+	select noa,tranmoney,SUM(case when ucolor='其他' then 0 else mount end)tmount,sum(total)ttotal
 	from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
 	group by noa,tranmoney
 )tmpz
@@ -688,7 +692,8 @@ declare @tmp table(
 	ghref nvarchar(max), 
 	memo nvarchar(max) 
 )
-	
+
+--106/07/20 根據品名的單位去顯示 (*最後一次調整)
 insert @tmp 
 select '2','','','',a.datea,a.noa,a.tggno,a.comp 
 ,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),a.tax,a.tranmoney 
@@ -696,11 +701,13 @@ select '2','','','',a.datea,a.noa,a.tggno,a.comp
 ,case when len(b.ucolor)=0 then ''
 else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 +b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
-,b.price,b.total,null,null,a.total 
+,case when UPPER(isnull(e.unit,''))='KG' then b.weight else b.mount end
+,b.mweight,b.lengthc,case when UPPER(isnull(e.unit,''))='KG' then b.weight else 0 end
+,b.lengthc,a.total
 ,'ina_sf?noa=$noa?'+a.accy,a.memo 
 from view_ina a left join view_inas b on a.noa=b.noa 
 left join ordh d on a.ordeno=d.noa
+left join ucc e on b.product=e.product
 where (a.datea between @t_bdate and @t_edate) 
 and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno) 
 and (len(@t_product)=0 or b.product=@t_product) 
@@ -710,9 +717,7 @@ and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 insert @tmp
 select 1,0,0,0,max(datea),noa,tggno,max(comp),ordeno
 ,max(tax),max(tranmoney),'','','',null,null,null
-,SUM(case when product like '%續接器%' or product like '%水泥方塊%' 
-or product like '%組裝工資%' or product like '%運費%' 
-or product like '%加工費%' then 0 else mount end)
+,SUM(tmount)
 ,SUM(total),max(money),max(ghref),''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='2'

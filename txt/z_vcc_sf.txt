@@ -39,45 +39,48 @@ set @t_bxdate = case when '#non'=[24] then '' else [24] end
 set @t_exdate = case when '#non'=[25] then char(255) else [25] end
 set @t_noshowget = case when '#non'=[26] then '' else [26] end 
 
-declare @tmp table(
-	gno nvarchar(1),
-	rr int,
-	recno int,
-	datea nvarchar(10),
-	noa nvarchar(50),
-	custno nvarchar(50),
-	nick nvarchar(100),
-	addr2 nvarchar(100),
-	ordeno nvarchar(100),
-	transtyle nvarchar(50),
-	tranmoney float,
-	productno nvarchar(50),
-	product nvarchar(max),
-	mount float,
-	price float,
-	total float,
-	tmount float,
-	ttotal float,
-	store2 nvarchar(max),
-	ghref nvarchar(max),
-	carno nvarchar(50),
-	ucolor nvarchar(50),
-	memo nvarchar(max)
-)
+declare @tmp table( 
+	gno nvarchar(1), 
+	rr int, 
+	recno int, 
+	datea nvarchar(10), 
+	noa nvarchar(50), 
+	custno nvarchar(50), 
+	nick nvarchar(100), 
+	addr2 nvarchar(100), 
+	ordeno nvarchar(100), 
+	transtyle nvarchar(50), 
+	tranmoney float, 
+	productno nvarchar(50), 
+	product nvarchar(max), 
+	mount float, 
+	price float, 
+	total float, 
+	tmount float, 
+	ttotal float, 
+	store2 nvarchar(max), 
+	ghref nvarchar(max), 
+	carno nvarchar(50), 
+	ucolor nvarchar(50), 
+	memo nvarchar(max) 
+) 
+
+--106/07/20 根據品名的單位去顯示 (*最後一次調整)
 if(@t_noshowget='1')
 begin
 	insert @tmp
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0  then ''
-	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
+	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
+	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,b.total,null,null
-	,case when product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,a.carno
-	,case when b.product like '%續接%' or b.product like '%水泥方塊%' or b.product like '%組裝%' or b.product like '%運費%' or b.product like '%加工費%' then '其他' else b.ucolor end,b.memo
+	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
+	left join ucc d on b.product=d.product
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 		  (a.custno between @t_bcustno and @t_ecustno)  and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
@@ -97,14 +100,15 @@ begin
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0 then ''
-	else CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' '+case when isnull(spec,'')!='' then spec+' ' else '' end end
+	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end
+	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,b.total,null,null
-	,case when product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,a.carno
-	,case when b.product like '%續接%' or b.product like '%水泥方塊%' or b.product like '%組裝%' or b.product like '%運費%' or b.product like '%加工費%' then '其他' else b.ucolor end,b.memo
+	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
+	left join ucc d on b.product=d.product
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 		  (a.custno between @t_bcustno and @t_ecustno)  and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
@@ -123,7 +127,7 @@ end
 insert @tmp
 select '1',0,0,max(datea),noa,custno,max(nick),addr2,ordeno,max(transtyle)
 ,max(tranmoney),'','',null,null,null
-,SUM(case when product like '%續接器%' or product like '%水泥方塊%' or product like '%組裝工資%'  or product like '%運費%' or product like '%加工費%' then 0 else mount end)
+,SUM(case when ucolor='其他' then 0 else mount end)
 ,sum(total),'',MAX(ghref),MAX(carno),'',''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
@@ -156,9 +160,7 @@ from @tmp where gno='1'
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
 	select noa,tranmoney
-	,SUM(case when product like '%續接器%' or product like '%水泥方塊%' 
-	or product like '%組裝工資%' or product like '%運費%' 
-	or product like '%加工費%' then 0 else mount end)tmount
+	,SUM(case when ucolor='其他' then 0 else mount end)tmount
 	,sum(total)ttotal
 	from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
 	group by noa,tranmoney
@@ -174,9 +176,7 @@ select '5',CHAR(255)
 --類別小計
 insert @tmp(gno,noa,ucolor,tmount,ttotal)
 select '6',CHAR(255),ucolor
-,SUM(case when product like '%續接器%' or product like '%水泥方塊%' 
-or product like '%組裝工資%' or product like '%運費%' 
-or product like '%加工費%' then null else mount end)
+,SUM(case when ucolor='其他' then 0 else mount end)
 ,sum(total)
 from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
 and ucolor!=''
@@ -1126,6 +1126,8 @@ declare @tmp table(
 	ghref nvarchar(max),
 	memo nvarchar(max)
 )
+
+--106/07/20 根據品名的單位去顯示 (*最後一次調整)
 --明細
 if(@t_noshowget='1')
 begin
@@ -1134,14 +1136,14 @@ begin
 	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
 	,case when transtyle='收費' then a.tranmoney else 0 end,tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%'  or b.product like '%運費%'   or b.product like '%加工費%' then ''
-	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end,b.price,b.total
-	,null,null,a.total
-	,case when product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,b.total,case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end,b.total,a.total
+	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,b.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
+	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
 		  (a.custno between @t_bcustno and @t_ecustno)  and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
@@ -1162,14 +1164,14 @@ begin
 	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
 	,case when transtyle='收費' then a.tranmoney else 0 end,tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,case when len(b.ucolor)=0 then ''
-	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when b.product like '%續接器%' or b.product like '%水泥方塊%' or b.product like '%組裝工資%' then b.mount else b.weight end,b.price,b.total
-	,null,null,a.total
-	,case when product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
+	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,b.total,case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end,b.total,a.total
+	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,b.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
+	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
 		  (a.custno between @t_bcustno and @t_ecustno)  and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
@@ -1194,9 +1196,9 @@ end
 
 insert @tmp
 select '1',0,0,0,noa,MAX(datea),custno,MAX(comp),MAX(addr2),ordeno
-,MAX(tranmoney),MAX(tax),'','','',null,null,null,''
-,SUM(case when product like '%續接器%' or product like '%水泥方塊%' or product like '%組裝工資%'  or product like '%運費%' or product like '%加工費%' then 0 else mount end)
-,sum(total),max(money),'',MAX(ghref)
+,MAX(tranmoney),MAX(tax),'','','',null,null,null
+,SUM(tmount)
+,sum(total),max(money),'',MAX(ghref),''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='2'
 group by noa,custno,ordeno
