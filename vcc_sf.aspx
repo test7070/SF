@@ -86,6 +86,11 @@
 				for (var j = 0; j < q_bbsCount; j++) {
 					t_money = q_add(t_money, dec(q_float('txtTotal_' + j)));
 				}
+				
+				//106/07/24 
+				if($('#cmbTranstyle').val()=='收費')
+					t_money = q_add(t_money, dec($('#txtTranmoney').val()));
+				
 				if($('#chkAtax').prop('checked')){
 					var t_taxrate = q_div(parseFloat(q_getPara('sys.taxrate')), 100);
 					var t_tranmoney = round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0);
@@ -100,8 +105,6 @@
 					t_total = q_add(t_money, t_tax);
 				}
 				
-				t_total = q_add(t_total, dec($('#txtCartrips').val()));
-				
 				$('#txtMoney').val(FormatNumber(t_money));
 				$('#txtTax').val(FormatNumber(t_tax));
 				$('#txtTotal').val(FormatNumber(t_total));
@@ -115,7 +118,7 @@
 				bbmNum = [['txtTranmoney', 11, 0, 1], ['txtMoney', 15, 0, 1], ['txtTax', 15, 0, 1],['txtTotal', 15, 0, 1]
 				,['txtTranadd', 15, q_getPara('vcc.weightPrecision'), 1],['txtBenifit', 15, q_getPara('vcc.weightPrecision'), 1],['txtWeight', 15, q_getPara('vcc.weightPrecision'), 1]
 				,['textQweight1', 15, q_getPara('vcc.weightPrecision'), 1],['textQweight2', 15, q_getPara('vcc.weightPrecision'), 1]
-				,['txtPrice', 12, 3, 1],/*['txtCartrips', 11, 0, 1]*/];
+				,['txtPrice', 12, 3, 1]];
 				bbsNum = [['txtPrice', 12, q_getPara('vcc.pricePrecision'), 1],['txtTranmoney', 12, q_getPara('vcc.pricePrecision'), 1],  ['txtMount', 9, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]];
 				bbtNum = [['txtMount', 10, q_getPara('vcc.mountPrecision'), 1], ['txtWeight', 9, q_getPara('vcc.weightPrecision'), 1], ['txtLengthb', 15, 2, 1]];
 				q_cmbParse("cmbTranstyle",'自運,收費,含運');
@@ -328,19 +331,27 @@
 				$('#txtWeight').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
+						sum();
 					}
-					sum();
 				});
 				
 				$('#txtPrice').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
+						sum();
 					}
-					sum();
 				});
 				
-				$('#txtCartrips').change(function() {
-					sum();
+				$('#cmbTranstyle').change(function() {
+					if(q_cur==1 || q_cur==2){
+						sum();	
+					}
+				});
+				
+				$('#txtTranmoney').change(function() {
+					if(q_cur==1 || q_cur==2){
+						sum();	
+					}
 				});
 			}
 			
@@ -2476,8 +2487,6 @@
 							<input id="txtWorker2" type="text" class="txt c1"/>
 							<input id="txtPart2" type="hidden"/><!--由GET轉來的單子-->
 						</td>
-						<!--<td><span> </span><a id="lblCartrips_sf" class="lbl">應收運費</a></td>
-						<td><input id="txtCartrips" type="text" class="txt num c1"/></td>-->
 						<td style="display: none;"><span> </span><a id='lblAccc' class="lbl btn"> </a></td>
 						<td style="display: none;"><input id="txtAccno" type="text" class="txt c1"/></td>
 					</tr>

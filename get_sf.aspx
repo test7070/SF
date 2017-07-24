@@ -65,6 +65,11 @@
 					t1=q_add(t1,t_money);
 					tt_weight=q_add(tt_weight,dec(t_weight));
 				}
+				
+				//106/07/24 
+				if($('#cmbKind').val()=='收費')
+					t1 = q_add(t1, dec($('#txtTranmoney').val()));
+				
 				if($('#chkAtax').prop('checked')){
 					var t_taxrate = q_div(parseFloat(q_getPara('sys.taxrate')), 100);
 					var t_tranmoney=round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0);
@@ -78,8 +83,6 @@
 					t_tax = q_float('txtTax');
 					t_total = q_add(t1, t_tax);
 				}
-				
-				t_total = q_add(t_total, dec($('#txtCartrips').val()));
 				
 				$('#txtMoney').val(FormatNumber(t1));
 				$('#txtTax').val(FormatNumber(t_tax));
@@ -149,36 +152,45 @@
 					if(q_cur==1 || q_cur==2){
 						$('#txtMount').val(q_sub(dec($('#txtTweight').val()),dec($('#txtTranstyle').val())));
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
+						sum();
 					}
 				});
 				$('#txtTranstyle').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtMount').val(q_sub(dec($('#txtTweight').val()),dec($('#txtTranstyle').val())));
-						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
+						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0));
+						sum();
 					}
 				});
 				$('#txtMount').change(function() {
 					if(q_cur==1 || q_cur==2){
-						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
+						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0));
+						sum();
 					}
-					sum();
 				});
 				$('#txtPrice').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
+						sum();
 					}
-					sum();
 				});
 				$('#chkAtax').click(function() {
 					refreshBbm();
 					sum();
 				});
+				
 				$('#txtTax').change(function() {
 					sum();
 				});
-				$('#txtCartrips').change(function() {
+				
+				$('#cmbKind').change(function() {
 					sum();
 				});
+				
+				$('#txtTranmoney').change(function() {
+					sum();
+				});
+				
 			}
 			
 			function q_popPost(s1) {

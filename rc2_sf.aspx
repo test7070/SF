@@ -2068,10 +2068,10 @@
                             <input id="txtCarno" type="text" class="txt" style="width:75%;"/>
                             <select id="combCarno" style="width: 20%;"> </select>
                         </td>
+                        <td><!--<select id="cmbTranstyle" style="width: 100%;"> </select>--></td>
 						<td><span> </span><a id='lblCardeal' class="lbl btn"> </a></td>
 						<td><input id="txtCardealno" type="text" class="txt c1"/></td>
 						<td><input id="txtCardeal" type="text" class="txt c1"/></td>
-						<td><!--<select id="cmbTranstyle" style="width: 100%;"> </select>--></td>
 						<td><span> </span><a id='lblTranmoney' class="lbl"> </a></td>
 						<td><input id="txtTranmoney" type="text" class="txt num c1" /></td>
 					</tr>

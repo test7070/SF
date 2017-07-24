@@ -78,8 +78,6 @@
 					t_total = q_add(t1, t_tax);
 				}
 				
-				t_total = q_add(t_total, dec($('#txtCartrips').val()));
-				
 				$('#txtMoney').val(FormatNumber(t1));
 				$('#txtTax').val(FormatNumber(t_tax));
 				$('#txtTotal').val(FormatNumber(t_total));
@@ -181,9 +179,6 @@
 					sum();
 				});
 				$('#txtTax').change(function() {
-					sum();
-				});
-				$('#txtCartrips').change(function() {
 					sum();
 				});
 
