@@ -87,7 +87,7 @@
 					t_tax = q_float('txtTax');
 					t_total = q_add(t_money, t_tax);
 				}
-				$('#txtTranmoney').val(q_mul(dec($('#txtWeight').val()), dec($('#txtPrice').val())));
+				//$('#txtTranmoney').val(q_mul(dec($('#txtWeight').val()), dec($('#txtPrice').val())));
 				$('#textQweight1').val(FormatNumber(t_weight));
 				$('#txtMoney').val(FormatNumber(t_money));
 				$('#txtTax').val(FormatNumber(t_tax));
@@ -176,6 +176,7 @@
 						}
 						$('#txtWeight_'+t_n).val(t_weight);
 					}*/
+					$('#txtTranmoney').val(q_mul(dec($('#txtWeight').val()), dec($('#txtPrice').val())));
 				});
 				
 				//限制帳款月份的輸入 只有在備註的第一個字為*才能手動輸入					
@@ -263,6 +264,7 @@
 				});
 					
 				$('#txtPrice').change(function(){
+					$('#txtTranmoney').val(q_mul(dec($('#txtWeight').val()), dec($('#txtPrice').val())));
 					sum();
 				});
 				

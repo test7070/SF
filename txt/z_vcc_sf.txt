@@ -66,11 +66,12 @@ declare @tmp table(
 ) 
 
 --106/07/20 根據品名的單位去顯示 (*最後一次調整)
+--106/07/27 月報表 收費和含運要顯示運費要跟對帳 付給司機 但在收款 只有收費才會計算在應收內 
 if(@t_noshowget='1')
 begin
 	insert @tmp
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
-	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' then a.tranmoney else 0 end,productno
+	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' or transtyle='含運' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0  then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
@@ -98,7 +99,7 @@ else
 begin
 	insert @tmp
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
-	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' then a.tranmoney else 0 end,productno
+	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' or transtyle='含運' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
