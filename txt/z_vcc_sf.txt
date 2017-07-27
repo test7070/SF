@@ -66,7 +66,7 @@ declare @tmp table(
 ) 
 
 --106/07/20 根據品名的單位去顯示 (*最後一次調整)
---106/07/27 月報表 收費和含運要顯示運費要跟對帳 付給司機 但在收款 只有收費才會計算在應收內 
+--106/07/27 月報表 收費和含運要顯示運費要跟對帳 付給司機 但在小計和總計 只需計算收費的運費
 if(@t_noshowget='1')
 begin
 	insert @tmp
@@ -75,8 +75,8 @@ begin
 	,case when len(b.ucolor)=0  then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
-	,b.price,b.total,null,null
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,a.carno
 	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo
@@ -103,8 +103,8 @@ begin
 	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
-	,b.price,b.total,null,null
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,a.carno
 	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo
@@ -122,7 +122,6 @@ begin
 		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 		  and (len(@t_addr2)=0 or a.addr2 like '%'+@t_addr2+'%')
 end 
-
 
 --小計	  
 insert @tmp
@@ -149,18 +148,17 @@ from (select ROW_NUMBER()over(partition by gno order by noa)rx,rr from @tmp wher
 
 --合計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '3',CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal)
+select '3',CHAR(255),SUM(case when transtyle='收費' then tranmoney else 0 end),SUM(tmount),sum(ttotal)
 from @tmp where gno='1'
-
 
 --統計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
-	select noa,tranmoney
+	select noa,case when transtyle='收費' then tranmoney else 0 end tranmoney
 	,SUM(case when ucolor='其他' then 0 else mount end)tmount
 	,sum(total)ttotal
 	from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
-	group by noa,tranmoney
+	group by noa,case when transtyle='收費' then tranmoney else 0 end
 )tmpz
 
 --插空白行
