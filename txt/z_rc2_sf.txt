@@ -244,8 +244,8 @@ begin
 	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
-	,b.price,b.total,null,null
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then a.memo else a.carno end
 	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end
 	,b.memo
@@ -274,8 +274,8 @@ begin
 	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
-	,b.price,b.total,null,null
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then a.memo else a.carno end
 	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end
 	,b.memo
@@ -930,9 +930,11 @@ begin
 	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
 	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
-	,b.price,b.total,case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
-	,b.total,a.total,'rc2_sf?noa=$noa?'+a.accy,a.memo
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,case when a.typea='2' then -1 else 1 end*b.total
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
+	,case when a.typea='2' then -1 else 1 end*b.total,case when a.typea='2' then -1 else 1 end*a.total
+	,'rc2_sf?noa=$noa?'+a.accy,a.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
@@ -955,9 +957,10 @@ begin
 	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
 	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
-	,b.price,b.total,case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
-	,b.total,a.total
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,case when a.typea='2' then -1 else 1 end*b.total
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
+	,case when a.typea='2' then -1 else 1 end*b.total,case when a.typea='2' then -1 else 1 end*a.total
 	,'rc2_sf?noa=$noa?'+a.accy,a.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	left join ucc d on b.product=d.product

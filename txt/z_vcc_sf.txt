@@ -1133,8 +1133,10 @@ begin
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
-	,b.price,b.total,case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end,b.total,a.total
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,case when a.typea='2' then -1 else 1 end*b.total
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
+	,case when a.typea='2' then -1 else 1 end*b.total,case when a.typea='2' then -1 else 1 end*a.total
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,b.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
@@ -1161,8 +1163,10 @@ begin
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
-	,b.price,b.total,case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end,b.total,a.total
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+	,b.price,case when a.typea='2' then -1 else 1 end*b.total
+	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
+	,case when a.typea='2' then -1 else 1 end*b.total,case when a.typea='2' then -1 else 1 end*a.total
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,b.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
