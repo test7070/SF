@@ -128,7 +128,6 @@ CREATE INDEX tmpindex0 on #tmp (datea,tablea,typea,noa,noq,product,spec,size)
 CREATE INDEX tmpindex1 on #tmp (product,spec,size,datea,typea,noa,noq)
 CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 
-update #tmp set size=''
 --------------------------------------------------------------------
 --月成本
 create table #tmpb(
@@ -400,13 +399,13 @@ outer apply (select SUM(case when tablea='uccet' then -1 else 1 end*weight)weigh
 
 delete #tmpa where bw=0 and rw=0 and vw=0 and dw=0 and lw=0
 
-insert #tmpa (gno,product,spec,bw,bm,rw,rm,vw,vc,vm,profit,dw,dm,lw,lp,lm)
-select '2'gno,product,spec
+insert #tmpa (gno,product,spec,size,bw,bm,rw,rm,vw,vc,vm,profit,dw,dm,lw,lp,lm)
+select '2'gno,product,spec,size
 ,sum(bw),sum(bm),sum(rw),sum(rm)
 ,sum(vw),sum(vc),sum(vm)
 ,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
 ,sum(dw),sum(dm),sum(lw),case when sum(lw)=0 then 0 else round(sum(lm)/sum(lw),4) end,sum(lm)
-from #tmpa where gno='9' group by product,spec
+from #tmpa where gno='9' group by product,spec,size
 
 if((select count(*) from #tmpa where gno='2')>0)
 begin
@@ -414,12 +413,21 @@ begin
 	select '1'gno
 	
 	insert #tmpa (gno,product,spec,bw,bm,rw,rm,vw,vc,vm,profit,dw,dm,lw,lp,lm)
-	select '3'gno,CHAR(255),CHAR(255)
+	select '3'gno,CHAR(255),spec
 	,sum(bw),sum(bm),sum(rw),sum(rm)
 	,sum(vw),sum(vc),sum(vm)
 	,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
 	,sum(dw),sum(dm),sum(lw),case when sum(lw)=0 then 0 else round(sum(lm)/sum(lw),4) end,sum(lm)
 	from #tmpa where gno='9' 
+	group by spec
+	
+	insert #tmpa (gno,product,spec,bw,bm,rw,rm,vw,vc,vm,profit,dw,dm,lw,lp,lm) 
+	select '4'gno,CHAR(255),CHAR(255) 
+	,sum(bw),sum(bm),sum(rw),sum(rm) 
+	,sum(vw),sum(vc),sum(vm) 
+	,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end 
+	,sum(dw),sum(dm),sum(lw),case when sum(lw)=0 then 0 else round(sum(lm)/sum(lw),4) end,sum(lm) 
+	from #tmpa where gno='9'
 end
 
 delete #tmpa where gno='9'
@@ -435,6 +443,7 @@ from view_ucce a left join view_ucces b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and UPPER(isnull(d.unit,''))!='KG'
+and (left(b.product,4)='水泥方塊' or b.product='續接器-T頭(支)' or b.product='續接器-直牙(支)' or b.product='續接器-電焊型(支)' or b.product='續接器-錐牙(支)')
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
 
 --成出
@@ -445,6 +454,7 @@ from view_ucce a left join view_ucces b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and UPPER(isnull(d.unit,''))!='KG'
+and (left(b.product,4)='水泥方塊' or b.product='續接器-T頭(支)' or b.product='續接器-直牙(支)' or b.product='續接器-電焊型(支)' or b.product='續接器-錐牙(支)')
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount<0
 
 --進
@@ -457,6 +467,7 @@ from view_rc2 a left join view_rc2s b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 and UPPER(isnull(d.unit,''))!='KG'
+and (left(b.product,4)='水泥方塊' or b.product='續接器-T頭(支)' or b.product='續接器-直牙(支)' or b.product='續接器-電焊型(支)' or b.product='續接器-錐牙(支)')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --銷
@@ -469,6 +480,7 @@ left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 --and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and UPPER(isnull(d.unit,''))!='KG'
+and (left(b.product,4)='水泥方塊' or b.product='續接器-T頭(支)' or b.product='續接器-直牙(支)' or b.product='續接器-電焊型(支)' or b.product='續接器-錐牙(支)')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --insert #tmp
@@ -492,6 +504,7 @@ from view_ina a left join view_inas b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 and UPPER(isnull(d.unit,''))!='KG'
+and (left(b.product,4)='水泥方塊' or b.product='續接器-T頭(支)' or b.product='續接器-直牙(支)' or b.product='續接器-電焊型(支)' or b.product='續接器-錐牙(支)')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 --出
@@ -504,6 +517,7 @@ left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
 --and not exists(select* from view_gett where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and UPPER(isnull(d.unit,''))!='KG'
+and (left(b.product,4)='水泥方塊' or b.product='續接器-T頭(支)' or b.product='續接器-直牙(支)' or b.product='續接器-電焊型(支)' or b.product='續接器-錐牙(支)')
 and b.storeno between @t_bstoreno and @t_estoreno
 
 ----------------------------------------------------------------
@@ -614,7 +628,7 @@ update a set cost=total from #tmp a where a.tablea='rc2s'  or a.tablea='inas' or
 ----------------------------------------------------------------
 declare @umount float=0
 
-delete #tmpa where gno>='4'
+delete #tmpa where gno>'4'
 
 --插入資料
 insert #tmpa (gno,product,spec,size,bo,bm,lo,lp,lm)
@@ -723,20 +737,20 @@ where gno='9'
 delete #tmpa where bo=0 and ro=0 and vo=0 and do=0 and lo=0 and gno='9'
 
 insert #tmpa (gno,product,size,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
-select '5'gno,product,size
+select '6'gno,product,size
 ,sum(bo),sum(bm),sum(ro),sum(rm)
 ,sum(vo),sum(vc),sum(vm)
 ,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
 ,sum(do),sum(dm),sum(lo),case when sum(lo)=0 then 0 else round(sum(lm)/sum(lo),4) end,sum(lm)
 from #tmpa where gno='9' group by product,size
 
-if((select count(*) from #tmpa where gno='5')>0)
+if((select count(*) from #tmpa where gno='6')>0)
 begin
 	insert #tmpa (gno)
-	select '4'gno
+	select '5'gno
 	
 	insert #tmpa (gno,product,size,bo,bm,ro,rm,vo,vc,vm,profit,do,dm,lo,lp,lm)
-	select '6'gno,CHAR(255),CHAR(255)
+	select '7'gno,CHAR(255),CHAR(255)
 	,sum(bo),sum(bm),sum(ro),sum(rm)
 	,sum(vo),sum(vc),sum(vm)
 	,case when isnull(sum(vc),0)=0 then 0 else round((isnull(sum(vm),0)-isnull(sum(vc),0))/sum(vc)*100,2) end
@@ -770,7 +784,7 @@ gno,product,spec,size
 ,REPLACE(CONVERT (NVARCHAR(10), GETDATE(),20 ),'-','/') today
 ,case when @t_bstoreno='' then isnull((select top 1 store from store order by noa),'') else @t_bstoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end bstore
 ,case when @t_estoreno=char(255) then isnull((select top 1 store from store order by noa desc),'') else @t_estoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end estore
-from #tmpa order by gno,product,spec,dbo.get_num(size)
+from #tmpa order by gno,product,cast(dbo.get_num(size) as int),spec
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
