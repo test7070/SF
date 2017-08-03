@@ -1151,7 +1151,7 @@ begin
 		  (isnull(b.lengthb,0) between @t_blengthb and @t_elengthb)
 		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
 		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
-		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
+		  and not exists(select noa from view_get where noa=a.noa)
 		  and (len(@t_addr2)=0 or a.addr2 like '%'+@t_addr2+'%')
 end
 else
