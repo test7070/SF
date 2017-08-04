@@ -83,6 +83,13 @@
 					}, {
                         type : '1',
                         name : 'xdate' //[18][19]
+                    }, {
+                        type : '1',
+                        name : 'xmon' //[20][21]
+                    },{
+                        type : '0', //[22]
+                        name : 'xlen',
+                        value : r_len
                     }]
                 });
                 q_popAssign();
@@ -102,6 +109,11 @@
                 $('#txtXdate2').mask(r_picd);
                 $('#txtXdate1').val(q_date().substr(0,r_lenm)+'/01');
                 $('#txtXdate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',35).substr(0,r_lenm)+'/01',-1));
+                
+                $('#txtXmon1').mask(r_picm);
+                $('#txtXmon2').mask(r_picm);
+                $('#txtXmon1').val(q_date().substr(0,r_lenm));
+                $('#txtXmon2').val(q_date().substr(0,r_lenm));
                 
                 $("#Xlengthb").css('width', '302px');
                 $("#Xlengthb input").css('width', '90px');

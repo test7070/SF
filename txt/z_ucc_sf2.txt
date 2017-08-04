@@ -13,6 +13,8 @@ declare @t_bdate nvarchar(50)
 declare @t_edate nvarchar(50)
 declare @x_blengthb float=0
 declare @x_elengthb float=999
+declare @t_bmon nvarchar(50)
+declare @t_emon nvarchar(50)
 
 set @t_pno = case when '#non'=[7] then '' else [7] end
 set @t_ucolor = case when '#non'=[8] then '' else [8] end
@@ -27,9 +29,11 @@ set @t_bdate = case when '#non'=[18] then '' else [18] end
 set @t_edate = case when '#non'=[19] then char(255) else [19] end
 set @x_blengthb = cast(@t_blengthb as float)
 set @x_elengthb = cast(@t_elengthb as float)
+set @t_bmon = case when '#non'=[20] then '' else [20] end
+set @t_emon = case when '#non'=[21] then char(255) else [21] end
 -----------------------------------------------------------------------------------
 declare @t_lenm nvarchar(10) = '7'
-
+--106/08/04 改用月平均計算成本
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
 	drop table #tmp
@@ -76,7 +80,7 @@ select '0','ucce',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,case when b.weight=0 then 0 else b.total/b.weight end,b.total
 from view_ucce a left join view_ucces b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon
 and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.weight>0
 
@@ -86,7 +90,7 @@ select '1','uccet',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,-1*b.weight,0,0,0,0
 from view_ucce a left join view_ucces b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon
 and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.weight<0
 
@@ -98,7 +102,7 @@ select '2','rc2s',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
 ,case when a.typea='2' then -1 else 1 end*b.total
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon and isnull(b.weight,0)!=0
 and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
 
@@ -109,20 +113,10 @@ select '5','vccs',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.
 ,case when a.typea='2' then -1 else 1 end*b.total,0,0
 from view_vcc a left join view_vccs b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon and isnull(b.weight,0)!=0
 --and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and UPPER(isnull(d.unit,''))='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
-
---insert #tmp
---select '5','vcct',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,'',0
---,case when a.typea='2' then -1 else 1 end*b.weight,c.price
---,case when a.typea='2' then -1 else 1 end*b.weight*c.price,0,0
---from view_vcc a left join view_vcct b on a.noa=b.noa
---outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
---where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
---and UPPER(isnull(d.unit,''))='KG'
---and b.storeno between @t_bstoreno and @t_estoreno
 
 CREATE INDEX tmpindex0 on #tmp (datea,tablea,typea,noa,noq,product,spec,size)
 CREATE INDEX tmpindex1 on #tmp (product,spec,size,datea,typea,noa,noq)
@@ -182,8 +176,49 @@ declare @ttotal float
 declare @tuweight float=0
 declare @tutotal float
 
+---------------------------------------
+--月加權
+declare @t_pmon nvarchar(10)='' 
+set @t_mon=isnull((select MIN(mon) from #tmpb),'')
+set @mon=isnull((select MAX(mon) from #tmpb),'')
+set @t_pmon=LEFT(dbo.q_cdn(@t_mon+'/01',-5),@t_lenm)
+
+while(@mon>=@t_mon)
+begin
+	--取得當月進貨成本
+	update a
+	set weight=isnull(b.weight,0)+isnull(r.weight,0)
+	,total=isnull(b.total,0)+isnull(r.cost,0)
+	,aprice=
+	case when isnull(b.weight,0)+isnull(r.weight,0)=0 then 0 else 
+	round((isnull(b.total,0)+isnull(r.cost,0))/(isnull(b.weight,0)+isnull(r.weight,0)),6) end
+	from #tmpb a 
+	outer apply (select weight,total from #tmpb where mon=@t_pmon and product=a.product and spec=a.spec)b
+	outer apply (select sum(weight)weight,SUM(cost)cost from #tmp where product=a.product and spec=a.spec
+	and LEFT(datea,@t_lenm)=@t_mon and (tablea='ucce' or tablea='rc2s')) r
+	where mon=@t_mon
+	
+	--更新出貨成本
+	update a
+	set cost=a.weight*b.aprice
+	from #tmp a left join #tmpb b on a.product=b.product and a.spec=b.spec and LEFT(datea,@t_lenm)=b.mon
+	where LEFT(datea,@t_lenm)=@t_mon and not(tablea='ucce' or tablea='rc2s')
+	
+	--更新當月期末成本
+	update a
+	set weight=isnull(a.weight,0)-isnull(v.weight,0)
+	,total=isnull(a.total,0)-isnull(v.cost,0)
+	from #tmpb a 
+	outer apply (select sum(weight)weight,SUM(cost)cost from #tmp where product=a.product and spec=a.spec
+	and LEFT(datea,@t_lenm)=@t_mon and not(tablea='ucce' or tablea='rc2s')) v
+	where mon=@t_mon	
+	
+	set @t_pmon=LEFT(dbo.q_cdn(@t_pmon+'/01',35),@t_lenm)
+	set @t_mon=LEFT(dbo.q_cdn(@t_mon+'/01',35),@t_lenm)
+end
+--------------------------------------
 --計算成本 三泰 鋼筋成本只看材質
-declare cursor_table cursor for
+/*declare cursor_table cursor for
 select tablea,datea,LEFT(datea,@t_lenm),product,spec,'' size,noa,noq,isnull(weight,0),isnull(total,0)
 from #tmp order by LEFT(datea,@t_lenm),datea,typea,noa,noq,product,spec,size
 open cursor_table
@@ -272,6 +307,7 @@ begin
 end
 
 update a set cost=total from #tmp a where a.tablea='rc2s' or a.tablea='ucce'
+*/
 ----------------------------------------------------------------
 declare @uweight float=0
 declare @utotal float=0
@@ -362,7 +398,7 @@ begin
 		end
 	end
 		
-	if(@datea<@t_bdate)
+	if(@datea<@t_bmon)
 	begin
 		update #tmpa
 		set bw=@tweight+@uweight,bm=@ttotal+@utotal
@@ -395,9 +431,9 @@ set rw=isnull(b.weight,0),rm=isnull(b.cost,0),
 	dw=isnull(d.weight,0),dm=isnull(d.cost,0),
 	vm=isnull(c.total,0),profit=case when isnull(c.cost,0)=0 then 0 else round((isnull(c.total,0)-isnull(c.cost,0))/c.cost*100,2) end
 from #tmpa a
-outer apply (select SUM(weight)weight,SUM(cost)cost from #tmp where product=a.product and spec=a.spec and tablea='rc2s' and datea between @t_bdate and @t_edate)b 
-outer apply (select SUM(weight)weight,SUM(cost)cost,SUM(total)total from #tmp where product=a.product and spec=a.spec and (tablea='vccs' or tablea='vcct') and datea between @t_bdate and @t_edate )c 
-outer apply (select SUM(case when tablea='uccet' then -1 else 1 end*weight)weight,SUM(case when tablea='uccet' then -1 else 1 end*cost)cost from #tmp where product=a.product and spec=a.spec and (tablea='ucce' or tablea='uccet') and datea between @t_bdate and @t_edate )d 
+outer apply (select SUM(weight)weight,SUM(cost)cost from #tmp where product=a.product and spec=a.spec and tablea='rc2s' and left(datea,@t_lenm) between @t_bmon and @t_emon)b 
+outer apply (select SUM(weight)weight,SUM(cost)cost,SUM(total)total from #tmp where product=a.product and spec=a.spec and (tablea='vccs' or tablea='vcct') and left(datea,@t_lenm) between @t_bmon and @t_emon )c 
+outer apply (select SUM(case when tablea='uccet' then -1 else 1 end*weight)weight,SUM(case when tablea='uccet' then -1 else 1 end*cost)cost from #tmp where product=a.product and spec=a.spec and (tablea='ucce' or tablea='uccet') and left(datea,@t_lenm) between @t_bmon and @t_emon )d 
 
 delete #tmpa where bw=0 and rw=0 and vw=0 and dw=0 and lw=0
 
@@ -426,7 +462,7 @@ begin
 	--插入 材質號數數量小計資料 成本不帶入
 	insert #tmpa (gno,product,spec,size,bw)
 	select '2',product,spec,size,
-	sum(case when datea>=@t_bdate then 0 when tablea='rc2s' or tablea='ucce' then 1 else -1 end* weight)
+	sum(case when datea>=@t_bmon then 0 when tablea='rc2s' or tablea='ucce' then 1 else -1 end* weight)
 	from #tmp where (len(@t_pno)=0 or isnull(product,'')=@t_pno) 
 	and (len(@t_spec)=0 or isnull(spec,'')=@t_spec) and (len(@t_size)=0 or isnull(size,'')=@t_size)
 	group by product,spec,size
@@ -438,7 +474,7 @@ begin
 	sum(case when tablea='rc2s' then 1 else 0 end * weight) rw,
 	sum(case when tablea='vccs' then 1 else 0 end * weight) vw,
 	SUM(case when tablea='ucce' then 1 when tablea='uccet' then -1 else 0 end*weight) dw
-	from #tmp where product=a.product and spec=a.spec and size=a.size and datea between @t_bdate and @t_edate)b
+	from #tmp where product=a.product and spec=a.spec and size=a.size and left(datea,@t_lenm) between @t_bmon and @t_emon)b
 	where gno='2'
 	
 end
@@ -454,7 +490,7 @@ select '0','ucce',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,case when b.mount=0 then 0 else b.total/b.mount end,b.total
 from view_ucce a left join view_ucces b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon
 and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount>0
 
@@ -464,7 +500,7 @@ select '1','uccet',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,-1*b.mount,0,0,0,0,0
 from view_ucce a left join view_ucces b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon
 and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno and b.mount<0
 
@@ -476,7 +512,7 @@ select '2','rc2s',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,case when a.typea='2' then -1 else 1 end*b.total
 from view_rc2 a left join view_rc2s b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon and isnull(b.mount,0)!=0
 and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
 
@@ -487,7 +523,7 @@ select '4','vccs',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,case when a.typea='2' then -1 else 1 end*b.total,0,0
 from view_vcc a left join view_vccs b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon and isnull(b.mount,0)!=0
 --and not exists(select* from view_vcct where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
@@ -498,7 +534,7 @@ and b.storeno between @t_bstoreno and @t_estoreno
 --,case when a.typea='2' then -1 else 1 end*b.mount*c.price,0,0
 --from view_vcc a left join view_vcct b on a.noa=b.noa
 --outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
---where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
+--where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon and isnull(b.mount,0)!=0
 --and (isnull(b.product,'') like '水泥方塊%' or isnull(b.product,'') like '續接器%' or isnull(b.product,'') like '其它%')
 --and b.storeno between @t_bstoreno and @t_estoreno
 
@@ -511,7 +547,7 @@ select '3','inas',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.mount*b.mweight
 from view_ina a left join view_inas b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon and isnull(b.mount,0)!=0
 and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
 
@@ -522,7 +558,7 @@ select '5','gets',a.accy,a.noa,b.noq,a.datea,b.product,'',b.spec,b.size,0,''
 ,b.mount*b.mweight,0,0
 from view_get a left join view_gets b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and left(isnull(a.datea,''),@t_lenm) <=@t_emon and isnull(b.mount,0)!=0
 --and not exists(select* from view_gett where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)
 and UPPER(isnull(d.unit,''))!='KG'
 and b.storeno between @t_bstoreno and @t_estoreno
@@ -547,8 +583,49 @@ declare @smount float=0
 declare @tmount float=0
 declare @tumount float=0
 
+---------------------------------------
+--月加權
+set @t_mon=isnull((select MIN(mon) from #tmpb),'')
+set @mon=isnull((select MAX(mon) from #tmpb),'')
+set @t_pmon=LEFT(dbo.q_cdn(@t_mon+'/01',-5),@t_lenm)
+
+while(@mon>=@t_mon)
+begin
+	--取得當月進貨成本
+	update a
+	set mount=isnull(b.mount,0)+isnull(r.mount,0)
+	,total=isnull(b.total,0)+isnull(r.cost,0)
+	,aprice=
+	case when isnull(b.mount,0)+isnull(r.mount,0)=0 then 0 else 
+	round((isnull(b.total,0)+isnull(r.cost,0))/(isnull(b.mount,0)+isnull(r.mount,0)),6) end
+	from #tmpb a 
+	outer apply (select mount,total from #tmpb where mon=@t_pmon and product=a.product and spec=a.spec)b
+	outer apply (select sum(mount)mount,SUM(cost)cost from #tmp where product=a.product and spec=a.spec
+	and LEFT(datea,@t_lenm)=@t_mon and (tablea='ucce' or tablea='rc2s' or tablea='inas')) r
+	where mon=@t_mon
+	
+	--更新出貨成本
+	update a
+	set cost=a.mount*b.aprice
+	from #tmp a left join #tmpb b on a.product=b.product and a.spec=b.spec and LEFT(datea,@t_lenm)=b.mon
+	where LEFT(datea,@t_lenm)=@t_mon and not(tablea='ucce' or tablea='rc2s' or tablea='inas')
+	
+	--更新當月期末成本
+	update a
+	set mount=isnull(a.mount,0)-isnull(v.mount,0)
+	,total=isnull(a.total,0)-isnull(v.cost,0)
+	from #tmpb a 
+	outer apply (select sum(mount)mount,SUM(cost)cost from #tmp where product=a.product and spec=a.spec
+	and LEFT(datea,@t_lenm)=@t_mon and not(tablea='ucce' or tablea='rc2s' or tablea='inas')) v
+	where mon=@t_mon	
+	
+	set @t_pmon=LEFT(dbo.q_cdn(@t_pmon+'/01',35),@t_lenm)
+	set @t_mon=LEFT(dbo.q_cdn(@t_mon+'/01',35),@t_lenm)
+end
+--------------------------------------
+
 --計算成本
-declare cursor_table cursor for
+/*declare cursor_table cursor for
 select tablea,datea,LEFT(datea,@t_lenm),product,spec,size,noa,noq,isnull(mount,0),isnull(total,0)
 from #tmp order by LEFT(datea,@t_lenm),datea,typea,noa,noq,product,spec,size
 open cursor_table
@@ -635,7 +712,7 @@ begin
 	where mon>=@t_mon and product=@tproduct and spec=@tspec and size=@tsize 
 end
 
-update a set cost=total from #tmp a where a.tablea='rc2s'  or a.tablea='inas' or a.tablea='ucce'
+update a set cost=total from #tmp a where a.tablea='rc2s'  or a.tablea='inas' or a.tablea='ucce'*/
 ----------------------------------------------------------------
 declare @umount float=0
 
@@ -710,7 +787,7 @@ begin
 		end
 	end
 		
-	if(@datea<@t_bdate)
+	if(@datea<@t_bmon)
 	begin
 		update #tmpa
 		set bo=@tmount+@umount,bm=@ttotal+@utotal
@@ -740,9 +817,9 @@ set ro=isnull(b.mount,0),rm=isnull(b.cost,0),
 	do=isnull(d.mount,0),dm=isnull(d.cost,0),
 	vm=isnull(c.total,0),profit=case when isnull(c.cost,0)=0 then 0 else round((isnull(c.total,0)-isnull(c.cost,0))/c.cost*100,2) end
 from #tmpa a
-outer apply (select SUM(mount)mount,SUM(cost)cost from #tmp where product=a.product and spec=a.spec and size=a.size and (tablea='rc2s' or tablea='inas') and datea between @t_bdate and @t_edate)b
-outer apply (select SUM(mount)mount,SUM(cost)cost,SUM(total)total from #tmp where product=a.product and spec=a.spec and size=a.size and (tablea='vccs' or tablea='vcct' or tablea='gets') and datea between @t_bdate and @t_edate )c 
-outer apply (select SUM(case when tablea='uccet' then -1 else 1 end*mount)mount,SUM(case when tablea='uccet' then -1 else 1 end*cost)cost from #tmp where product=a.product and spec=a.spec and size=a.size and (tablea='ucce' or tablea='uccet') and datea between @t_bdate and @t_edate )d
+outer apply (select SUM(mount)mount,SUM(cost)cost from #tmp where product=a.product and spec=a.spec and size=a.size and (tablea='rc2s' or tablea='inas') and left(datea,@t_lenm) between @t_bmon and @t_emon)b
+outer apply (select SUM(mount)mount,SUM(cost)cost,SUM(total)total from #tmp where product=a.product and spec=a.spec and size=a.size and (tablea='vccs' or tablea='vcct' or tablea='gets') and left(datea,@t_lenm) between @t_bmon and @t_emon )c 
+outer apply (select SUM(case when tablea='uccet' then -1 else 1 end*mount)mount,SUM(case when tablea='uccet' then -1 else 1 end*cost)cost from #tmp where product=a.product and spec=a.spec and size=a.size and (tablea='ucce' or tablea='uccet') and left(datea,@t_lenm) between @t_bmon and @t_emon )d
 where gno='9'
 
 delete #tmpa where bo=0 and ro=0 and vo=0 and do=0 and lo=0 and gno='9'
@@ -811,7 +888,6 @@ IF OBJECT_ID('tempdb..#tmpa')is not null
 BEGIN
 	drop table #tmpa
 END;
-
 ----------------------------------------------------------------------------------------------------------------------------------
 z_ucc_sf202:--z_ucc_sf202 進銷存
 SET QUOTED_IDENTIFIER OFF
