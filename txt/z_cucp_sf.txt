@@ -310,8 +310,8 @@ dbo.getComma(lengthc,0) lengthc,
 dbo.getComma(mount,0) mount,
 dbo.getComma(weight,0) weight
 ,case when len(isnull(imgdata,''))>0 then 
-'<img src="'+imgdata+'" style="width:140px'+char(59)+'height:50px'+char(59)+'"/>' 
-else '<span style="display:block'+char(59)+'width:150px'+char(59)+'height:50px'+char(59)+'"></span>' end image1
+'<img src="'+imgdata+'" style="width:120px'+char(59)+'height:40px'+char(59)+'"/>' 
+else '<span style="display:block'+char(59)+'width:120px'+char(59)+'height:40px'+char(59)+'"></span>' end image1
 ,*
 from @tmp
 order by idno
