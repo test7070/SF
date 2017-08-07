@@ -190,6 +190,9 @@
                 $('#combUcolor').change(function() {
 					$('#txtXucolor').val($('#combUcolor').find("option:selected").text());
 				});
+				
+				$('#txtXstore1a').val('A').change();
+				$('#txtXstore2a').val('A').change();
             }
 
             function q_popPost(s1) {

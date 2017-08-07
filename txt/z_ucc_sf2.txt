@@ -587,9 +587,11 @@ declare @tumount float=0
 --月加權
 set @t_mon=isnull((select MIN(mon) from #tmpb),'')
 set @mon=isnull((select MAX(mon) from #tmpb),'')
-set @t_pmon=LEFT(dbo.q_cdn(@t_mon+'/01',-5),@t_lenm)
 
-while(@mon>=@t_mon)
+if(LEN(@t_mon)>0)
+	set @t_pmon=LEFT(dbo.q_cdn(@t_mon+'/01',-5),@t_lenm)
+
+while(@mon>=@t_mon and @t_mon!='')
 begin
 	--取得當月進貨成本
 	update a
