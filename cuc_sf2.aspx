@@ -74,7 +74,13 @@
                 document.title='現場裁剪作業';
 				
 				//載入案號 資料
-                var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+                //var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+                
+                //106/08/08 避免載入太多資料 只取最後一筆表身 與 不讀取NOA空白
+                var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(a.noa,'')!=''"; 
+                t_where+=" and exists (select * from(select xa.noa,MAX(xb.noq)noq from view_cuc xa left join view_cucs xb on xa.noa=xb.noa where isnull(xa.gen,0)=0 and isnull(xb.mins,0)=0  group by xa.noa )t where a.noa=t.noa and b.noq=t.noq)";
+                t_where+=" order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+                
                 var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 				q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
 				
@@ -175,8 +181,15 @@
                 	/*$('#cuct_table .minut').each(function() {
 						$(this).click();
                     });*/
+                   	
                 	//初始化cucs
-                	var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+					//var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq^^";
+                	
+                	//106/08/08 避免載入太多資料 只取最後一筆表身 與 不讀取NOA空白
+					var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and isnull(a.noa,'')!=''"; 
+	                t_where+=" and exists (select * from(select xa.noa,MAX(xb.noq)noq from view_cuc xa left join view_cucs xb on xa.noa=xb.noa where isnull(xa.gen,0)=0 and isnull(xb.mins,0)=0  group by xa.noa )t where a.noa=t.noa and b.noq=t.noq)";
+	                t_where+=" order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+                	
                 	var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 					q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'init', r_accy);
                 });
