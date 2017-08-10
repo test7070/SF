@@ -1105,8 +1105,8 @@ set rr=rx
 from (select ROW_NUMBER()over(partition by gno,custno order by noa)rx,rr from @tmp where gno='1')a
 
 --合計
-insert @tmp(gno,custno,ordeno,noa,tranmoney,tmount,ttotal,money)
-select '3',custno,ordeno,CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal),SUM(tranmoney)+SUM(tax)+SUM(ttotal)
+insert @tmp(gno,custno,ordeno,noa,tranmoney,tmount,ttotal,money,tax)
+select '3',custno,ordeno,CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal),SUM(tranmoney)+SUM(tax)+SUM(ttotal),sum(tax)
 from @tmp where gno='1'
 group by custno,ordeno
 	  

@@ -100,7 +100,7 @@
 				q_getFormat();
 				bbmMask = [['txtDatea', r_picd], ['txtMon', r_picm]];
 				q_mask(bbmMask);
-				bbmNum = [['txtMoney', 15, 0, 1], ['txtTax', 10, 0, 1], ['txtTotal', 15, 0, 1], ['txtTotal', 15, 3, 1],['txtTranmoney',15,0,1]
+				bbmNum = [['txtMoney', 15, 0, 1], ['txtTax', 10, 0, 1], ['txtTotal', 15, 0, 1], ['txtTotal', 15, 3, 1],['txtTranmoney', 11, 0, 1]
 								,['txtTranadd', 15, q_getPara('rc2.weightPrecision'), 1],['txtBenifit', 15, q_getPara('rc2.weightPrecision'), 1],['txtWeight', 15, q_getPara('rc2.weightPrecision'), 1]
 								,['textQweight1', 15, q_getPara('rc2.weightPrecision'), 1],['textQweight2', 15, q_getPara('rc2.weightPrecision'), 1]];
 				bbsNum = [['txtMount', 15, q_getPara('rc2.mountPrecision'), 1],['txtWeight', 15, q_getPara('rc2.weightPrecision'), 1], ['txtPrice', 15, q_getPara('rc2.pricePrecision'), 1]
@@ -176,7 +176,7 @@
 						}
 						$('#txtWeight_'+t_n).val(t_weight);
 					}*/
-					$('#txtTranmoney').val(q_mul(dec($('#txtWeight').val()), dec($('#txtPrice').val())));
+					$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0));
 				});
 				
 				//限制帳款月份的輸入 只有在備註的第一個字為*才能手動輸入					
@@ -264,7 +264,7 @@
 				});
 					
 				$('#txtPrice').change(function(){
-					$('#txtTranmoney').val(q_mul(dec($('#txtWeight').val()), dec($('#txtPrice').val())));
+					$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
 					sum();
 				});
 				
