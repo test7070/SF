@@ -208,6 +208,7 @@
 						//先取得最新的資料再判斷是否要轉加工單						
                     	var bbsrow=document.getElementById("cucs_table").rows.length-1;
                     	t_err='';
+                    	var t_noawhere='1=0 ';
                     	for(var j=0;j<bbsrow;j++){
                     		if($('#cucs_chk'+j).prop('checked')){
                     			var t_ordeweight=dec($('#cucs_weight'+j).text());
@@ -216,19 +217,21 @@
                     			if(q_div(q_add(t_ordebweight,t_ordexweight),t_ordeweight)>=1.03){
                     				t_err=t_err+(t_err.length>0?'\n':'')+'案號【'+$('#cucs_noa'+j).text()+'-'+$('#cucs_noq'+j).text()+'】完工重量超過訂單重量3%，確定是否要入庫?';
                     			}
+                    			
+                    			t_noawhere=t_noawhere+" or a.noa+'-'+b.no2='"+$('#cucs_noa'+j).text()+"'+'-'+'"+$('#cucs_noq'+j).text()+"' ";
                     		}
                     	}
 						
 						if(t_err.length>0){
 							if(confirm(t_err)){
-								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and ("+t_noawhere+") order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'tocub', r_accy);
 								Lock();
 							}
 						}else{
 							if(confirm("確定是否要入庫?")){//確定轉至加工單
-								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
+								var t_where = "where=^^ 1=1 and isnull(a.gen,0)=0 and isnull(b.mins,0)=0 and ("+t_noawhere+") order by b.size,b.spec,b.lengthb desc,b.noa,b.noq ^^";
 								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype='1' ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'tocub', r_accy);
 								Lock();
