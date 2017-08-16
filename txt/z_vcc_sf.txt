@@ -42,7 +42,8 @@ set @t_noshowget = case when '#non'=[26] then '' else [26] end
 declare @tmp table( 
 	gno nvarchar(1), 
 	rr int, 
-	recno int, 
+	recno int,
+	page int, 
 	datea nvarchar(10), 
 	noa nvarchar(50), 
 	custno nvarchar(50), 
@@ -70,7 +71,7 @@ declare @tmp table(
 if(@t_noshowget='1')
 begin
 	insert @tmp
-	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
+	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,0,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' or transtyle='含運' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0  then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
@@ -98,7 +99,7 @@ end
 else
 begin
 	insert @tmp
-	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,a.datea,a.noa,a.custno,nick,addr2
+	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,0,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' or transtyle='含運' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
@@ -125,7 +126,7 @@ end
 
 --小計	  
 insert @tmp
-select '1',0,0,max(datea),noa,custno,max(nick),addr2,ordeno,max(transtyle)
+select '1',0,0,0,max(datea),noa,custno,max(nick),addr2,ordeno,max(transtyle)
 ,max(tranmoney),'','',null,null,null
 ,SUM(case when ucolor='其他' then 0 else mount end)
 ,sum(total),'',MAX(ghref),MAX(carno),'',''
@@ -134,7 +135,7 @@ where datea between @t_bdate and @t_edate and gno ='9'
 group by noa,custno,addr2,ordeno
 
 insert @tmp
-select '2',rr,0,datea,noa,custno,nick,addr2,ordeno,transtyle
+select '2',rr,0,0,datea,noa,custno,nick,addr2,ordeno,transtyle
 ,tranmoney,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno,ucolor,memo
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
@@ -196,7 +197,12 @@ begin
 	set @tpage=@tpage+1
 	insert @tmp(gno,recno)
 	select '8',@tpage*@pageline
-end  
+end 
+
+--更新頁數
+update a
+set page=ceiling(cast(recno as float)/@pageline)
+from (select page,recno from @tmp)a 
  
 select 
 @t_bxdate bxdate,@t_exdate exdate
