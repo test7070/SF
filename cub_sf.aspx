@@ -76,7 +76,7 @@
                 q_mask(bbmMask);
                 document.title='加工入庫/領料作業';
                 
-                q_cmbParse("combMechno2",'1@1剪,2@2剪,3@3剪,7@7辦公室,成型組,續接組');
+                q_cmbParse("combMechno2",'1@A剪,2@B剪,3@C剪,7@7辦公室,成型組,續接組');
                 q_cmbParse("cmbItype",'1@裁剪,2@成型,3@續接');
                 
                 if(r_userno.toUpperCase()=='B01'){

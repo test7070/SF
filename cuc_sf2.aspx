@@ -86,7 +86,7 @@
 				
 				q_cmbParse("combSize", ',#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16');
 				q_cmbParse("combOrder",' @ ,memo@備註(標籤)');
-				q_cmbParse("combMechno2",'1@1剪,2@2剪,7@7辦公室');
+				q_cmbParse("combMechno2",'1@A剪,2@B剪,7@7辦公室');
 				$('#combOrder').val('memo');//1124預設
 				
 				if(r_userno.toUpperCase()=='B01'){
