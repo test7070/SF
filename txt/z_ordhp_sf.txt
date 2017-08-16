@@ -24,7 +24,7 @@ END
 
 create table #tmp(
 	gno nvarchar(2),
-	idno nvarchar(10),
+	idno int,
 	datea nvarchar(50),
 	noa nvarchar(50),
 	cno nvarchar(50),
@@ -119,7 +119,8 @@ dbo.getComma(f9,-1) f9,
 dbo.getComma(f10,-1) f10,
 case when fx>=0 then dbo.getComma(abs(fx),-1) else '<font color=red>('+dbo.getComma(abs(fx),-1)+')</font>' end fx,
 dbo.getComma(tweight,-1) tweight,
-case when gno='0' and len(noa)>0 then 'ordh_sf?noa=$noa' else '' end qhref,
+case when gno='0' and len(noa)>0 then 'ordh_sf?noa=$noa' else '' end qhrefa,
+case when gno='0' and len(noa)>0 then "z_ordhp_sf?report=\'z_ordhp_sf03\' and noa=\'"+noa+"\' and "+cast(idno as nvarchar(100))+"=$idno" else '' end qhrefb,
 dbo.charbr(addr,10) addr,
 * from #tmp order by gno,idno
 
@@ -377,4 +378,131 @@ IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
 	drop table #tmp
 END
+;
+
+--*******************************************************************************************************
+z_ordhp_sf03:--z_ordhp_sf03
+SET QUOTED_IDENTIFIER OFF 
+declare @t_noa nvarchar(30)
+set @t_noa = case when '#non'=[6] then '' else [6] end 
+
+-----------------------------------------------------------------------------------
+declare @tmp table(
+	gno nvarchar(1),
+	rr int,
+	recno int,
+	page int,
+	noa nvarchar(50),
+	datea nvarchar(10),
+	custno nvarchar(50),
+	comp nvarchar(100),
+	addr2 nvarchar(100),
+	ordeno nvarchar(100),
+	tranmoney float,
+	tax float,
+	noq nvarchar(50),
+	productno nvarchar(50),
+	product nvarchar(max),
+	mount float,
+	price float,
+	total float,
+	tmount float,
+	ttotal float,
+	money float,
+	ghref nvarchar(max),
+	memo nvarchar(max),
+	typea nvarchar(10)
+)
+
+--106/07/20 根據品名的單位去顯示 (*最後一次調整)
+--明細
+
+--互出
+insert @tmp
+select '2','','','',a.noa,a.datea,a.custno,comp,addr
+,a.idno
+,case when a.kind='收費' then a.tranmoney else 0 end,tax
+,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),b.productno
+,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
++b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+,b.mweight,case when a.typea='2' then -1 else 1 end*b.lengthc
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
+,case when a.typea='2' then -1 else 1 end*b.lengthc,case when a.typea='2' then -1 else 1 end*a.total
+,'get_sf?noa=$noa?'+a.accy,b.memo,'get'
+from view_get a left join view_gets b on a.noa=b.noa
+left join ucc d on b.product=d.product
+where a.idno=@t_noa
+
+--互進
+insert @tmp
+select '2','','','',a.noa,a.datea,a.tggno,a.comp,''
+,a.ordeno
+,case when a.kind='收費' then a.tranmoney else 0 end,tax
+,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),b.productno
+,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
++b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
+,b.mweight,case when a.typea='2' then -1 else 1 end*b.lengthc
+,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
+,case when a.typea='2' then -1 else 1 end*b.lengthc,case when a.typea='2' then -1 else 1 end*a.total
+,'ina_sf?noa=$noa?'+a.accy,b.memo,'ina'
+from view_ina a left join view_inas b on a.noa=b.noa
+left join ucc d on b.product=d.product
+where a.ordeno=@t_noa
+
+insert @tmp
+select '1',0,0,0,noa,MAX(datea),custno,MAX(comp),MAX(addr2),ordeno
+,MAX(tranmoney),MAX(tax),'','','',null,null,null
+,SUM(tmount)
+,sum(total),max(money),MAX(ghref),'',typea
+from @tmp
+where gno ='2'
+group by noa,custno,ordeno,typea
+
+--項次
+update a
+set rr=rx
+from (select ROW_NUMBER()over(partition by gno order by datea,case when typea='ina' then 1 else 0 end,noa)rx,rr from @tmp where gno='1')a
+
+--合計
+insert @tmp(gno,custno,datea,ordeno,noa,tranmoney,tmount,ttotal,money,tax)
+select '3',CHAR(255),CHAR(255),ordeno,CHAR(255)
+--,SUM(tranmoney),SUM(tmount),sum(ttotal),SUM(tranmoney)+SUM(tax)+SUM(ttotal),sum(tax)
+,null,SUM(case when typea='get' then -1 else 1 end *tmount)
+,sum(case when typea='get' then -1 else 1 end *ttotal)
+,null,sum(case when typea='get' then -1 else 1 end *tax)
+from @tmp where gno='1'
+group by ordeno
+
+--重新排序
+update a
+set recno=recno2
+from (select recno,ROW_NUMBER()over (order by datea,case when typea='ina' then 1 else 0 end,noa,gno,rr)recno2 from @tmp)a
+
+--插入換頁
+declare @pageline float=37
+declare @page int=ceiling(cast((select count(*) from @tmp) as float)/@pageline)
+declare @tpage int=0
+
+update a
+set page=ceiling(cast(recno as float)/@pageline)
+from (select page,recno from @tmp)a
+
+--分頁
+insert @tmp(gno,custno,datea,recno,ordeno,page,noa)
+select '4',CHAR(255),CHAR(255),MAX(recno),ordeno,page,CHAR(255)
+from @tmp 
+group by ordeno,page 
+	  
+select 
+dbo.getComma(total,0) total
+,dbo.getComma(ttotal,0) ttotal
+,dbo.getComma(price,3) price
+,dbo.getComma(mount,0) mount
+,dbo.getComma(tmount,0) tmount
+,dbo.getComma(tranmoney,0) tranmoney
+,dbo.getComma(tax,0) tax
+,dbo.getComma(money,0) money
+,* from @tmp order by page,recno,noa,gno
 ;

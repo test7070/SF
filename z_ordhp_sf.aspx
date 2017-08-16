@@ -33,6 +33,7 @@
 				};
 				//將預設語系設定為中文
 				$.datepicker.setDefaults($.datepicker.regional["zh-TW"]);
+				
             });
 
             function q_gfPost() {
@@ -59,10 +60,34 @@
                 q_popAssign();
                 q_getFormat();
                 q_langShow();
-    
+    			
+    			$('#txtXdate1').mask(r_picd);
                 $('#txtXdate1').val(q_date().substr(0, r_lenm)+'/01');
                 $('#txtXdate2').mask(r_picd);
                 $('#txtXdate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',35).substr(0,r_lenm)+'/01',-1));
+                
+                var t_report=q_getHref()[1];
+				var t_index=-1;
+				for(var i=0;i<$('#q_report').data().info.reportData.length;i++){
+					if($('#q_report').data('info').reportData[i].report=='z_ordhp_sf03'){
+						t_index=i;
+						break;	
+					}
+				}
+				if(t_report!=undefined && t_report=='z_ordhp_sf03'){
+					var t_noa=q_getHref()[3];
+					$('#txtXnoa').val(t_noa);
+					for(var i=0;i<$('#q_report').data().info.reportData.length;i++){
+						if($('#q_report').data('info').reportData[i].report!='z_ordhp_sf03'){
+							$('#q_report div div').eq(i).hide();
+						}
+					}
+					$('#q_report').find('span.radio').eq(t_index).parent().click();	
+					$('#txtXnoa').attr('disabled','disabled');
+					$("#btnOk").click();
+				}else{
+					$('#q_report div div').eq(t_index).hide();
+				}
             }
 
             function q_boxClose(s2) {
