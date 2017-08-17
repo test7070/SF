@@ -466,9 +466,9 @@
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textProduct__'+i+'"  type="text" class="txt c3" value="鋼筋"/><select id="combProduct__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textUcolor__'+i+'"  type="text" class="txt c3" value="" /><select id="combUcolor__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textSpec__'+i+'"  type="text" class="txt c3" /><select id="combSpec__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
-	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textSize__'+i+'"  type="text" class="txt c3 sizea" style="width:50%;" /><select id="combSize__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textSize__'+i+'"  type="text" class="txt c3 sizea" style="width:30px" /><select id="combSize__'+i+'" class="txt comb" style="width: 40px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textLengthb__'+i+'"  type="text" class="txt num c1" /></td>';
-	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textClass__'+i+'"  type="text" class="txt c3" /><select id="combClass__'+i+'" class="txt comb" style="width: 20px;"> </select></td>';
+	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textClass__'+i+'"  type="text" class="txt c3" style="width:50px;" /><select id="combClass__'+i+'" class="txt comb" style="width: 40px;"> </select></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textImount__'+i+'"  type="text" class="txt num c1" /></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textIlengthc__'+i+'"  type="text" class="txt num c1" /></td>';
 	    				string+='<td style="text-align: center;color:'+t_color[i%t_color.length]+'"><input id="textIweight__'+i+'"  type="text" class="txt num c1" /></td>';
@@ -708,13 +708,13 @@
 						string+='<td id="cucs_chk" align="center" style="width:30px; color:black;">鎖定</td>';
 						string+='<td id="cucs_cubno" align="center" style="width:20px; color:black;display:none;">鎖定人</td>'
 						string+='<td id="cucs_noa" align="center" style="width:85px; color:black;">案號</td>'
-						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;">工令</td>';
+						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;font-weight: bold;">工令</td>';
 						string+='<td id="cucs_noq" align="center" style="width:40px; color:black;">案序</td>'
 						string+='<td id="cucs_ucolor" title="類別" align="center" style="width:120px; color:black;display:none;">類別</td>';
 						string+='<td id="cucs_product" title="品名" align="center" style="width:70px; color:black;display:none;">品名</td>';
-						string+='<td id="cucs_spec" title="材質" align="center" style="width:80px; color:black;">材質</td>';
-						string+='<td id="cucs_size" title="號數" align="center" style="width:50px; color:black;">號數</td>';
-						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:50px; color:black;">米數</td>';
+						string+='<td id="cucs_spec" title="材質" align="center" style="width:80px; color:black;font-weight: bold;">材質</td>';
+						string+='<td id="cucs_size" title="號數" align="center" style="width:50px; color:black;font-weight: bold;">號數</td>';
+						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:50px; color:black;font-weight: bold;">米數</td>';
 						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:50px; color:black;display:none;" class="co1">訂單件數</td>';
 						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:50px; color:black;" class="co1">訂單支數</td>';
 						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:50px; color:black;" class="co1">訂單重量</td>';
@@ -725,17 +725,17 @@
 						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:60px; color:black;" class="co2">已完工支數</td>';
 						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:60px; color:black;" class="co2">已完工重量</td>';
 						string+='<td id="cucs_xmount" title="件數" align="center" style="width:50px; color:black;" class="co3">件數</td>';
-						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;" class="co3">支數<BR><input id="btnAutoxcount" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
+						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;font-weight: bold;" class="co3">支數<BR><input id="btnAutoxcount" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
 						string+='<td id="cucs_xweight" title="重量" align="center" style="width:60px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
 						string+="<td id='cucs_mins' align='center' style='width:30px; color:black;'><input type='button' id='btnMins' style='font-size:16px;width: 30px;height: 45px;white-space: inherit;' value='完工'/></td>";
 						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:110px; color:black;">備註(標籤)</td>';
-						string+='<td id="cucs_btime" title="顏色1" align="center" style="width:50px; color:black;">顏色1</td>';
-						string+='<td id="cucs_etime" title="顏色2" align="center" style="width:50px; color:black;">顏色2</td>';
+						string+='<td id="cucs_btime" title="顏色1" align="center" style="width:50px; color:black;font-weight: bold;">顏色1</td>';
+						string+='<td id="cucs_etime" title="顏色2" align="center" style="width:50px; color:black;font-weight: bold;">顏色2</td>';
+						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;font-weight: bold;">廠牌</td>';
 						string+='<td id="cucs_custno" title="客戶編號" align="center" style="width:75px; color:black;display:none;">客戶編號</td>';
 						string+='<td id="cucs_cust" title="客戶名稱" align="center" style="width:75px; color:black;">客戶名稱</td>';
 						string+='<td id="cucs_ordeno" title="訂單號碼" align="center" style="width:90px; color:black;display:none;">訂單號碼</td>';
 						string+='<td id="cucs_no2" title="訂單序號" align="center" style="width:90px; color:black;display:none;">訂單序號</td>';
-						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;">廠牌</td>';
 						string+='<td id="cucs_img" title="形狀" align="center" style="width:150px; color:black;">形狀</td>';
 						string+='<td id="cucs_waste" align="center" style="width:30px; color:black;">待續接</td>';
 						string+='<td id="cucs_hours" align="center" style="width:30px; color:black;">待成型</td>';
@@ -750,13 +750,13 @@
 						string+='<td id="cucs_chk" align="center" style="width:30px; color:black;">鎖定</td>';
 						string+='<td id="cucs_cubno" align="center" style="width:20px; color:black;display:none;">鎖定人</td>'
 						string+='<td id="cucs_noa" align="center" style="width:85px; color:black;">案號</td>'
-						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;">工令</td>';
+						string+='<td id="cucs_work" title="工令" align="center" style="width:100px; color:black;font-weight: bold;">工令</td>';
 						string+='<td id="cucs_noq" align="center" style="width:40px; color:black;">案序</td>'
 						string+='<td id="cucs_ucolor" title="類別" align="center" style="width:120px; color:black;display:none;">類別</td>';
 						string+='<td id="cucs_product" title="品名" align="center" style="width:70px; color:black;display:none;">品名</td>';
-						string+='<td id="cucs_spec" title="材質" align="center" style="width:80px; color:black;">材質</td>';
-						string+='<td id="cucs_size" title="號數" align="center" style="width:50px; color:black;">號數</td>';
-						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:50px; color:black;">米數</td>';
+						string+='<td id="cucs_spec" title="材質" align="center" style="width:80px; color:black;font-weight: bold;">材質</td>';
+						string+='<td id="cucs_size" title="號數" align="center" style="width:50px; color:black;font-weight: bold;">號數</td>';
+						string+='<td id="cucs_lengthb" title="米數" align="center" style="width:50px; color:black;font-weight: bold;">米數</td>';
 						string+='<td id="cucs_mount" title="訂單件數" align="center" style="width:50px; color:black;display:none;" class="co1" >訂單件數</td>';
 						string+='<td id="cucs_1mount" title="訂單支數" align="center" style="width:50px; color:black;" class="co1">訂單支數</td>';
 						string+='<td id="cucs_weight" title="訂單重量" align="center" style="width:50px; color:black;" class="co1">訂單重量</td>';
@@ -767,17 +767,17 @@
 						string+='<td id="cucs_cublengthc" title="已完工支數" align="center" style="width:60px; color:black;" class="co2">已完工支數</td>';
 						string+='<td id="cucs_cubweight" title="已完工重量" align="center" style="width:60px; color:black;" class="co2">已完工重量</td>';
 						string+='<td id="cucs_xmount" title="件數" align="center" style="width:50px; color:black;" class="co3">件數</td>';
-						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;" class="co3">支數<BR><input id="btnAutoxcount2" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
+						string+='<td id="cucs_xcount" title="支數" align="center" style="width:50px; color:black;font-weight: bold;" class="co3">支數<BR><input id="btnAutoxcount2" type="button" style="font-size: medium; font-weight: bold;" value="代入"></td>';
 						string+='<td id="cucs_xweight" title="重量" align="center" style="width:60px; color:black;" class="co3">重量<BR><a class="total_xweight" style="color: forestgreen;font-weight: bold;"></a></td>';
 						string+="<td id='cucs_mins' align='center' style='width:30px; color:black;'><input type='button' id='btnMins2' style='font-size:16px;width: 30px;height: 45px;white-space: inherit;' value='完工'/></td>";
 						string+='<td id="cucs_memo" title="備註(標籤)" align="center" style="width:110px; color:black;">備註(標籤)</td>';
-						string+='<td id="cucs_btime" title="顏色1" align="center" style="width:50px; color:black;">顏色1</td>';
-						string+='<td id="cucs_etime" title="顏色2" align="center" style="width:50px; color:black;">顏色2</td>';
+						string+='<td id="cucs_btime" title="顏色1" align="center" style="width:50px; color:black;font-weight: bold;">顏色1</td>';
+						string+='<td id="cucs_etime" title="顏色2" align="center" style="width:50px; color:black;font-weight: bold;">顏色2</td>';
+						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;font-weight: bold;">廠牌</td>';
 						string+='<td id="cucs_custno" title="客戶編號" align="center" style="width:75px; color:black;display:none;">客戶編號</td>';
 						string+='<td id="cucs_cust" title="客戶名稱" align="center" style="width:75px; color:black;">客戶名稱</td>';
 						string+='<td id="cucs_ordeno" title="訂單號碼" align="center" style="width:90px; color:black;display:none;">訂單號碼</td>';
 						string+='<td id="cucs_no2" title="訂單序號" align="center" style="width:90px; color:black;display:none;">訂單序號</td>';
-						string+='<td id="cucs_class" title="廠牌" align="center" style="width:50px; color:black;">廠牌</td>';
 						string+='<td id="cucs_img" title="形狀" align="center" style="width:150px; color:black;">形狀</td>';
 						string+='<td id="cucs_waste" align="center" style="width:30px; color:black;">待續接</td>';
 						string+='<td id="cucs_hours" align="center" style="width:30px; color:black;">待成型</td>';
@@ -1039,11 +1039,11 @@
 								string+='<td id="cucs_memo'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_btime'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_etime'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
+								string+='<td id="cucs_class'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"><a id="lblCucs_class'+(i+bbsrow)+'"></a></td>';
 								string+='<td id="cucs_custno'+(i+bbsrow)+'" style="display:none;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_cust'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_ordeno'+(i+bbsrow)+'" style="display:none;font-size: 12px;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_no2'+(i+bbsrow)+'" style="display:none;font-size: 12px;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
-								string+='<td id="cucs_class'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"><a id="lblCucs_class'+(i+bbsrow)+'"></a></td>';
 								string+='<td id="cucs_img'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_hours'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
 								string+='<td id="cucs_waste'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"></td>';
@@ -1079,11 +1079,11 @@
 							string+='<td id="cucs_memo'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].memo+'</td>';
 							string+='<td id="cucs_btime'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].btime+'</td>';
 							string+='<td id="cucs_etime'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].etime+'</td>';
+							string+='<td id="cucs_class'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"><a id="lblCucs_class'+(i+bbsrow)+'">'+as[i].class+'</a><select id="combXclass_'+(i+bbsrow)+'" class="txt comb" style="width: 20px;"> </select></td>';
 							string+='<td id="cucs_custno'+(i+bbsrow)+'" style="display:none;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].acustno+'</td>';
 							string+='<td id="cucs_cust'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].acust.substr(0,4)+'</td>';
 							string+='<td id="cucs_ordeno'+(i+bbsrow)+'" style="display:none;font-size: 12px;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].ordeno+'</td>';
 							string+='<td id="cucs_no2'+(i+bbsrow)+'" style="display:none;font-size: 12px;text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+as[i].no2+'</td>';
-							string+='<td id="cucs_class'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'"><a id="lblCucs_class'+(i+bbsrow)+'">'+as[i].class+'</a><select id="combXclass_'+(i+bbsrow)+'" class="txt comb" style="width: 20px;"> </select></td>';
 							string+='<td id="cucs_img'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+"<img style='width:150px;height:50px;' src='"+as[i].imgbarcode+"'>"+'</td>';
 							string+='<td id="cucs_hours'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+((as[i].paraf!='' || as[i].parag!='')?'Y':'')+'</td>';
 							string+='<td id="cucs_waste'+(i+bbsrow)+'" style="text-align: center;color:'+t_color[(i+bbsrow)%t_color.length]+'">'+((as[i].picname!='直料' && as[i].picname!='板料' && as[i].picname!='')?'Y':'')+'</td>';
