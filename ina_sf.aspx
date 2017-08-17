@@ -1325,6 +1325,7 @@
             .dview {
                 float: left;
                 width: 98%;
+                border-width: 0px;
             }
             .tview {
                 margin: 0;
@@ -1343,8 +1344,6 @@
             .dbbm {
                 float: left;
                 width: 98%;
-                margin: -1px;
-                border: 1px black solid;
                 border-radius: 5px;
             }
             .tbbm {
@@ -1444,120 +1443,122 @@
 		</style>
 	</head>
 	<body>
-		<!--#include file="../inc/toolbar.inc"-->
-		<div class="dview" id="dview" style="float: left;  width:32%;"  >
-			<table class="tview" id="tview"   border="1" cellpadding='2'  cellspacing='0' style="background-color: #FFFF66;">
-				<tr>
-					<td align="center" style="width:1%"><a id='vewChk'> </a></td>
-					<td align="center" style="width:25%"><a id='vewDatea'> </a></td>
-					<td align="center" style="width:35%"><a id='vewTgg'> </a></td>
-					<td align="center" style="width:35%"><a id='vewNoa_sf'>互換進貨單號</a></td>
-				</tr>
-				<tr>
-					<td><input id="chkBrow.*" type="checkbox" style=' '/></td>
-					<td align="center" id='datea'>~datea</td>
-					<td align="center" id='comp,8'>~comp,8</td>
-					<td align="center" id='noa'>~noa</td>
-				</tr>
-			</table>
-		</div>
-		<div class='dbbm' style="width: 68%;float:left">
-			<table class="tbbm"  id="tbbm"   border="0" cellpadding='2'  cellspacing='0'>
-				<tr style="height: 1px;">
-					<td> </td>
-					<td> </td>
-					<td> </td>
-					<td> </td>
-					<td> </td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblDatea_sf" class="lbl">互換進貨日期</a></td>
-					<td><input id="txtDatea" type="text" class="txt c1"/></td>
-					<td><span> </span><a id="lblNoa_sf" class="lbl" >互換進貨單號</a></td>
-					<td><input id="txtNoa" type="text" class="txt c1"/></td>
-					<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
-					<td><input id="txtTranstart" type="text" class="txt c1"/></td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblTgg" class="lbl btn"> </a></td>
-					<td colspan="3">
-						<input id="txtTggno" type="text"  class="txt c2"/>
-						<input id="txtComp" type="text"  class="txt c3"/>
-					</td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
-					<td><input id="txtTranstyle" type="text" class="txt num c1"/></td>
-					<td><span> </span><a id="lblTweight_sf" class="lbl">車總重</a></td>
-					<td><input id="txtTweight" type="text" class="txt num c1"/></td>
-					<td><span> </span><a id="lblMount_sf" class="lbl" >淨重</a></td>
-					<td><input id="txtMount" type="text" class="txt num c1"/></td>
-					<!--SF不使用，先佔用欄位--->
-					<td style="display: none;"><span> </span><a id="lblPlace_sf" class="lbl">發票號碼</a></td>
-					<td style="display: none;"><input id="txtPlace" type="text" class="txt num c1"/></td>
-					<!--SF不使用，先佔用欄位--->
-				</tr>
-				<tr>
-				    <td><span> </span><a id="lblCarno" class="lbl"> </a></td>
-                    <td>
-                        <input id="txtCarno" type="text" class="txt" style="width:75%;"/>
-                        <select id="combCarno" style="width: 20px;"> </select>
-                    </td>
-					<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
-					<td>
-						<input id="txtCardealno" type="text" class="txt c2"/>
-						<input id="txtCardeal" type="text" class="txt c3"/>
-					</td>
-				</tr>
-				<tr>
-					<td style="width: 108px;"><span> </span><a id='lblKind_sf' class="lbl" style="color:red;">運費種類</a></td>
-                    <td><select id="cmbKind" style="width: 108px;"> </select></td>
-					<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
-					<td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>
-					<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
-					<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblMoney_sf" class="lbl">應收</a></td>
-					<td><input id="txtMoney" type="text" class="txt num c1"/></td>
-					<td><span> </span><a id='lblTax_sf' class="lbl">營業稅</a></td>
-					<td><input id="txtTax" type="text" class="txt num c1 istax"/></td>
-					<td><input id="chkAtax" type="checkbox" onchange='sum()' />
-						<a id='lblTotal_sf' class="lbl istax">總計<span> </span></a>
-					</td>
-					<td><input id="txtTotal" type="text" class="txt num c1 istax"/></td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblMemo_sf" class="lbl">備註</a></td>
-					<td colspan='5'>
-						<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
-					</td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblOrdeno_sf" class="lbl btn">合約號碼</a></td>
-					<td><input id="txtOrdeno" type="text" class="txt c1"/></td>
-					<td><span> </span><a id="lblWeight_sf" class="lbl">合約重量</a></td>
-					<td><input id="txtWeight" type="text" class="txt num c1"/></td>
-					<td><span> </span><a id="lblStore" class="lbl btn" > </a></td>
-					<td>
-						<input id="txtStoreno"  type="text"  class="txt c2"/>
-						<input id="txtStore"  type="text" class="txt c3"/>
-					</td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
-					<td><input id="txtWorker" type="text" class="txt c1"/></td>
-					<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
-					<td><input id="txtWorker2" type="text" class="txt c1"/></td>
-					<td><span> </span><a id="lblTranstartno_sf" class="lbl btn">立帳單號</a></td>
-					<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
-				</tr>
-				<tr>
-					<td><span> </span><a id="lblMechno_sf" class="lbl">列印機台</a></td>
-					<td><select id="combMechno" class="txt c1"> </select></td>
-					<td colspan="2" style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
-				</tr>
-			</table>
+		<div id="dmain">
+			<!--#include file="../inc/toolbar.inc"-->
+			<div class="dview" id="dview" style="float: left;  width:32%;"  >
+				<table class="tview" id="tview"   border="1" cellpadding='2'  cellspacing='0' style="background-color: #FFFF66;">
+					<tr>
+						<td align="center" style="width:1%"><a id='vewChk'> </a></td>
+						<td align="center" style="width:25%"><a id='vewDatea'> </a></td>
+						<td align="center" style="width:35%"><a id='vewTgg'> </a></td>
+						<td align="center" style="width:35%"><a id='vewNoa_sf'>互換進貨單號</a></td>
+					</tr>
+					<tr>
+						<td><input id="chkBrow.*" type="checkbox" style=' '/></td>
+						<td align="center" id='datea'>~datea</td>
+						<td align="center" id='comp,8'>~comp,8</td>
+						<td align="center" id='noa'>~noa</td>
+					</tr>
+				</table>
+			</div>
+			<div class='dbbm' style="width: 68%;float:left">
+				<table class="tbbm"  id="tbbm"   border="0" cellpadding='2'  cellspacing='0'>
+					<tr style="height: 1px;">
+						<td> </td>
+						<td> </td>
+						<td> </td>
+						<td> </td>
+						<td> </td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblDatea_sf" class="lbl">互換進貨日期</a></td>
+						<td><input id="txtDatea" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblNoa_sf" class="lbl" >互換進貨單號</a></td>
+						<td><input id="txtNoa" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblTranstart_sf" class="lbl">入廠時間</a></td>
+						<td><input id="txtTranstart" type="text" class="txt c1"/></td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblTgg" class="lbl btn"> </a></td>
+						<td colspan="3">
+							<input id="txtTggno" type="text"  class="txt c2"/>
+							<input id="txtComp" type="text"  class="txt c3"/>
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblTranstyle_sf" class="lbl" >空重</a></td>
+						<td><input id="txtTranstyle" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id="lblTweight_sf" class="lbl">車總重</a></td>
+						<td><input id="txtTweight" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id="lblMount_sf" class="lbl" >淨重</a></td>
+						<td><input id="txtMount" type="text" class="txt num c1"/></td>
+						<!--SF不使用，先佔用欄位--->
+						<td style="display: none;"><span> </span><a id="lblPlace_sf" class="lbl">發票號碼</a></td>
+						<td style="display: none;"><input id="txtPlace" type="text" class="txt num c1"/></td>
+						<!--SF不使用，先佔用欄位--->
+					</tr>
+					<tr>
+					    <td><span> </span><a id="lblCarno" class="lbl"> </a></td>
+	                    <td>
+	                        <input id="txtCarno" type="text" class="txt" style="width:75%;"/>
+	                        <select id="combCarno" style="width: 20px;"> </select>
+	                    </td>
+						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
+						<td>
+							<input id="txtCardealno" type="text" class="txt c2"/>
+							<input id="txtCardeal" type="text" class="txt c3"/>
+						</td>
+					</tr>
+					<tr>
+						<td style="width: 108px;"><span> </span><a id='lblKind_sf' class="lbl" style="color:red;">運費種類</a></td>
+	                    <td><select id="cmbKind" style="width: 108px;"> </select></td>
+						<td><span> </span><a id="lblPrice_sf" class="lbl" >應付費用單價</a></td>
+						<td><input id="txtPrice" type="text" class="txt num c1" style="width: 80px;"/>/KG</td>
+						<td><span> </span><a id="lblTranmoney_sf" class="lbl" >應付運費</a></td>
+						<td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblMoney_sf" class="lbl">應收</a></td>
+						<td><input id="txtMoney" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id='lblTax_sf' class="lbl">營業稅</a></td>
+						<td><input id="txtTax" type="text" class="txt num c1 istax"/></td>
+						<td><input id="chkAtax" type="checkbox" onchange='sum()' />
+							<a id='lblTotal_sf' class="lbl istax">總計<span> </span></a>
+						</td>
+						<td><input id="txtTotal" type="text" class="txt num c1 istax"/></td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblMemo_sf" class="lbl">備註</a></td>
+						<td colspan='5'>
+							<textarea id="txtMemo" cols="10" rows="5" style="width: 99%;height: 50px;"> </textarea>
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblOrdeno_sf" class="lbl btn">合約號碼</a></td>
+						<td><input id="txtOrdeno" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblWeight_sf" class="lbl">合約重量</a></td>
+						<td><input id="txtWeight" type="text" class="txt num c1"/></td>
+						<td><span> </span><a id="lblStore" class="lbl btn" > </a></td>
+						<td>
+							<input id="txtStoreno"  type="text"  class="txt c2"/>
+							<input id="txtStore"  type="text" class="txt c3"/>
+						</td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
+						<td><input id="txtWorker" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
+						<td><input id="txtWorker2" type="text" class="txt c1"/></td>
+						<td><span> </span><a id="lblTranstartno_sf" class="lbl btn">立帳單號</a></td>
+						<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
+					</tr>
+					<tr>
+						<td><span> </span><a id="lblMechno_sf" class="lbl">列印機台</a></td>
+						<td><select id="combMechno" class="txt c1"> </select></td>
+						<td colspan="2" style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
+					</tr>
+				</table>
+			</div>
 		</div>
 		<div class='dbbs' style="width: 1435px;">
 			<table id="tbbs" class='tbbs'  border="1"  cellpadding='2' cellspacing='1'  >

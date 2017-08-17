@@ -2198,7 +2198,7 @@
 			}
 			.dview {
 				float: left;
-				width: 30%;
+				width: 38%;
 				border-width: 0px;
 			}
 			.tview {
@@ -2219,7 +2219,7 @@
 			}
 			.dbbm {
 				float: left;
-				width: 70%;
+				width: 62%;
 				border-radius: 5px;
 			}
 			.tbbm {
@@ -2334,11 +2334,12 @@
 			<div class="dview" id="dview" >
 				<table class="tview" id="tview">
 					<tr>
-						<td align="center" style="width:5%"><a id='vewChk'> </a></td>
-						<td align="center" style="width:5%"><a id='vewType'> </a></td>
-						<td align="center" style="width:25%"><a id='vewDatea'> </a></td>
-						<td align="center" style="width:25%"><a id='vewNoa'> </a></td>
-						<td align="center" style="width:40%"><a id='vewComp'> </a></td>
+						<td align="center" style="width:25px;"><a id='vewChk'> </a></td>
+						<td align="center" style="width:20px;"><a id='vewType'> </a></td>
+						<td align="center" style="width:85px;"><a id='vewDatea'> </a></td>
+						<td align="center" style="width:105px;"><a id='vewNoa'> </a></td>
+						<td align="center" style="width:75px;"><a id='vewComp'> </a></td>
+						<td align="center"><a id='vewAddr2'>工地名稱</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox" style=''/></td>
@@ -2346,11 +2347,12 @@
 						<td align="center" id='datea'>~datea</td>
 						<td align="center" id='noa'>~noa</td>
 						<td align="center" id='comp,4'>~comp,4</td>
+						<td align="center" id='addr2'>~addr2</td>
 					</tr>
 				</table>
 			</div>
 			<div class='dbbm'>
-				<table class="tbbm"  id="tbbm">
+				<table class="tbbm" id="tbbm">
 					<tr>
 						<td style="width: 108px;"><span> </span><a id='lblType' class="lbl"> </a></td>
 						<td style="width: 108px;"><select id="cmbTypea"> </select></td>
@@ -2420,26 +2422,26 @@
 						<td><input id="txtSales" type="text" class="txt c1"/></td>
 						<td><span> </span><a id='lblTranadd' class="lbl"> </a></td>
 						<td colspan="2">
-							<input id="txtTranadd" type="text" class="txt num c1" style="width:35%;"/>
+							<input id="txtTranadd" type="text" class="txt num c1" style="width:30%;"/>
 							<span style="float: left"> </span>
 							<a style="float: left" id='lblBenifit' class="lbl"> </a>
 							<span style="float: left"> </span>
-							<input id="txtBenifit" type="text" class="txt num c1"  style="width:35%;"/>
+							<input id="txtBenifit" type="text" class="txt num c1"  style="width:30%;"/>
 						</td>
 						<td><span> </span><a id='lblWeight' class="lbl"> </a></td>
 						<td><input id="txtWeight" type="text" class="txt num c1"/></td>
 					</tr>
 					<tr>
-					    <td><span> </span><a id='lblCarno' class="lbl btn"> </a><span style="float: left;"> </span>
-                        </td>
-						<td>
-						    <input id="txtCarno"  type="text" class="txt" style="width:50px;float: left;"/>
+					    <td><span> </span><a id='lblCarno' class="lbl btn"> </a></td>
+						<td colspan="2">
+						    <input id="txtCarno"  type="text" class="txt" style="width:100px;float: left;"/>
                             <select id="combCarno" style="width: 20px;float: left;"> </select>
-                            <span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
-						<td>
-							<input id="txtCardealno" type="text" class="txt c1" style="width: 49%;"/>
-							<input id="txtCardeal" type="text" class="txt c1"  style="width: 49%;"/>
 						</td>
+						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
+						<td><input id="txtCardealno" type="text" class="txt c1"/></td>
+						<td><input id="txtCardeal" type="text" class="txt c1"/></td>
+					</tr>
+					<tr>
 						<td><span> </span><a id="lblPrice_sf" class="lbl">運費單價</a></td>
                         <td><input id="txtPrice"  type="text" class="txt num c1"/></td>
                         <td>/KG</td>

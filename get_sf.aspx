@@ -1504,8 +1504,6 @@
 			.dbbm {
 				float: left;
 				width: 98%;
-				margin: -1px;
-				border: 1px black solid;
 				border-radius: 5px;
 			}
 			.tbbm {
