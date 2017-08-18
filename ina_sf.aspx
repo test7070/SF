@@ -1566,7 +1566,8 @@
 					<td align="center" style="width:1%;"><input class="btn" id="btnPlus" type="button" value='＋' style="font-weight: bold;"  /></td>
 					<td align="center" style="width:35px;">列印<input class="checkAll" type="checkbox" onclick="checkAll()"/></td>
 					<td align="center" style="width:35px;">項序</td>
-					<td style="width:120px; text-align: center;"><a id="lblUno_st" > </a></td>
+					<!--SF 106/08/17 取消批號入庫--->
+					<td style="width:120px; text-align: center;display: none;"><a id="lblUno_st" > </a></td>
 					<td style="width:120px; text-align: center;">品名</td>
 					<td style="width:150px; text-align: center;">類別</td>
 					<td style="width:110px; text-align: center;">材質</td>
@@ -1588,7 +1589,7 @@
 					</td>
 					<td align="center"><input id="checkIsprint.*" class="isPrint" type="checkbox"/></td>
 					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
-					<td>
+					<td style="display: none;">
 						<input id="txtUno.*" type="text" class="txt c1"/>
 						<input id="btnGenuno.*" type="button" value="入庫"/>
 						<input id="btnDeleuno.*" type="button" value="刪除"/>

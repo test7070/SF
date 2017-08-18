@@ -2131,7 +2131,8 @@
 					<td align="center" style="width:1%;"><input class="btn" id="btnPlus" type="button" value='＋' style="font-weight: bold;" /></td>
 					<td align="center" style="width:35px;">列印<input class="checkAll" type="checkbox" onclick="checkAll()"/></td>
 					<td align="center" style="width:50px;"><a id='lblNoq_s'> </a></td>
-					<td align="center" style="width:160px;"><a id='lblUno_s'> </a></td>
+					<!--SF 106/08/17 取消批號入庫--->
+					<td align="center" style="width:160px;display: none;"><a id='lblUno_s'> </a></td>
 					<!--<td align="center" style="width:150px;"><a id='lblProductno_s'> </a></td>-->
 					<td align="center" style="width:150px;">
 						<a id='lblProduct_s'> </a>
@@ -2179,7 +2180,7 @@
 					<td><input class="btn" id="btnMinus.*" type="button" value='－' style=" font-weight: bold;" /></td>
 					<td align="center"><input id="checkIsprint.*" class="isPrint" type="checkbox"/></td>
 					<td><input id="txtNoq.*" type="text" class="txt c1"/></td>
-					<td>
+					<td style="display: none;">
 						<input id="txtUno.*" type="text" class="txt c1"/>
 						<input id="btnGenuno.*" type="button" value="入庫"/>
 						<input id="btnDeleuno.*" type="button" value="刪除"/>
