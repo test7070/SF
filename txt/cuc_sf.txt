@@ -331,10 +331,25 @@ lock:--lock
 	
 	set @accy=isnull((select accy from view_cucs where noa=@noa and noq=@noq),@accy)
 		
+	--EXEC("
+	--	update cucs"+@accy+" set cubno='"+@userno+"'+'##'+'"+@namea+"'
+	--	+'##'+'"+@mech+"'+'##'+'"+@now_datetime+"'
+	--	where noa='"+@noa+"' and noq='"+@noq+"'
+	--")
+	
+	--106/08/17 改為 合併匯入 鎖定改為合併鎖定
 	EXEC("
-		update cucs"+@accy+" set cubno='"+@userno+"'+'##'+'"+@namea+"'
+		update a set cubno='"+@userno+"'+'##'+'"+@namea+"'
 		+'##'+'"+@mech+"'+'##'+'"+@now_datetime+"'
-		where noa='"+@noa+"' and noq='"+@noq+"'
+		from cucs"+@accy+" a 
+		outer apply (select * from view_cucs where noa=a.noa
+		and product=a.product and ucolor=a.ucolor
+		and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class
+		and imgbarcode=a.imgbarcode and memo=a.memo
+		and size=a.size and btime=a.btime and etime=a.etime
+		and picno=a.picno and picname=a.picname and paraf=a.paraf and parag=a.parag
+		and noa='"+@noa+"' and noq='"+@noq+"'
+		) b	where a.noa is not null and b.noq is not null
 	")
 ;
 -------------------------------------------------------------------------------------------------------------------------------
@@ -349,9 +364,23 @@ unlock:--unlock
 	
 	set @accy=isnull((select accy from view_cucs where noa=@noa and noq=@noq),@accy)
 		
+	--EXEC("
+	--	update cucs"+@accy+" set cubno='' 
+	--	where noa='"+@noa+"' and noq='"+@noq+"' and left(cubno,len('"+@userno+"'))='"+@userno+"'
+	--")
+	
+	--106/08/17 改為 合併匯入 解鎖改為合併解鎖
 	EXEC("
-		update cucs"+@accy+" set cubno='' 
-		where noa='"+@noa+"' and noq='"+@noq+"' and left(cubno,len('"+@userno+"'))='"+@userno+"'
+		update a set cubno='' 
+		from cucs"+@accy+" a
+		outer apply (select * from view_cucs where noa=a.noa
+		and product=a.product and ucolor=a.ucolor
+		and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class
+		and imgbarcode=a.imgbarcode and memo=a.memo
+		and size=a.size and btime=a.btime and etime=a.etime
+		and picno=a.picno and picname=a.picname and paraf=a.paraf and parag=a.parag
+		and noa='"+@noa+"' and noq='"+@noq+"' and left(cubno,len('"+@userno+"'))='"+@userno+"'
+		) b	where a.noa is not null and b.noq is not null
 	")
 ;
 -------------------------------------------------------------------------------------------------------------------------------
@@ -390,7 +419,7 @@ updateclass:--updateclass
 	declare @class nvarchar(max) = [6]
 	declare @o_class nvarchar(max) = ''
 	
-	--鎖定時間
+	--變動時間
 	declare @now_datetime nvarchar(20)
 	set @now_datetime=CONVERT (VARCHAR(20), GETDATE(),20 )
 	select @now_datetime
@@ -398,8 +427,22 @@ updateclass:--updateclass
 	set @accy=isnull((select accy from view_cucs where noa=@noa and noq=@noq),@accy)
 	set @o_class=isnull((select class from view_cucs where noa=@noa and noq=@noq),'')
 		
+	--EXEC("
+	--	update cucs"+@accy+" set class='"+@class+"' where noa='"+@noa+"' and noq='"+@noq+"'
+	--")
+	
+	--106/08/17 改為 合併匯入 變動改為合併變動
 	EXEC("
-		update cucs"+@accy+" set class='"+@class+"' where noa='"+@noa+"' and noq='"+@noq+"'
+		update a set class='"+@class+"' 
+		from cucs"+@accy+" a
+		outer apply (select * from view_cucs where noa=a.noa
+		and product=a.product and ucolor=a.ucolor
+		and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class
+		and imgbarcode=a.imgbarcode and memo=a.memo
+		and size=a.size and btime=a.btime and etime=a.etime
+		and picno=a.picno and picname=a.picname and paraf=a.paraf and parag=a.parag
+		and noa='"+@noa+"' and noq='"+@noq+"'
+		) b	where a.noa is not null and b.noq is not null
 	")
 	
 	insert drun (datea,timea,usera,action,tablea,memo)
@@ -408,6 +451,7 @@ updateclass:--updateclass
 	
 ;
 -------------------------------------------------------------------------------------------------------------------------------
+--cuc_sf入庫
 cucstocub:--cucstocub
 	SET QUOTED_IDENTIFIER OFF
 	declare @cmd nvarchar(max) = ''
@@ -487,7 +531,7 @@ cucstocub:--cucstocub
 				,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
 				,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
 				(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
-				,'A','三泰本倉'
+				,'A2','三泰-成品'
 				from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
 			")
 		end
@@ -504,7 +548,7 @@ cucstocub:--cucstocub
 					,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
 					,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
 					(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
-					,'A','三泰本倉'
+					,'A2','三泰-成品'
 					from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
 				")
 			end
@@ -519,7 +563,7 @@ cucstocub:--cucstocub
 					,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
 					,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
 					(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
-					,'A','三泰本倉'
+					,'A2','三泰-成品'
 					from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
 				")
 			end
@@ -768,7 +812,7 @@ enda:--enda
 	declare @userno nvarchar(max) = [4]
 	declare @namea nvarchar(max) = [5]
 	
-	--鎖定時間
+	--結案時間
 	declare @now_datetime nvarchar(20)
 	set @now_datetime=CONVERT (VARCHAR(20), GETDATE(),20 )
 	select @now_datetime
@@ -780,6 +824,21 @@ enda:--enda
 		,mins=1
 		where noa='"+@noa+"' and noq='"+@noq+"'
 	")
+	
+	--106/08/17 改為 合併匯入 結案改為合併結案
+	EXEC("
+		update a set cubno='"+@userno+"'+'##'+'"+@namea+"'+'##'+'"+@now_datetime+"' ,mins=1
+		from cucs"+@accy+" a 
+		outer apply (select * from view_cucs where noa=a.noa
+		and product=a.product and ucolor=a.ucolor
+		and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class
+		and imgbarcode=a.imgbarcode and memo=a.memo
+		and size=a.size and btime=a.btime and etime=a.etime
+		and picno=a.picno and picname=a.picname and paraf=a.paraf and parag=a.parag
+		and noa='"+@noa+"' and noq='"+@noq+"'
+		) b	where a.noa is not null and b.noq is not null
+	")
+	
 ;
 -------------------------------------------------------------------------------------------------------------------------------
 cucutocubs:--cucutocubs
@@ -1072,4 +1131,96 @@ begin
 end
 
 select @noa noa,@noq noq,@t_err terr
+;
+
+---------------------------------------------------------------------------------------------
+--106/08/17 加工單採用合併匯入
+importcucs:--importcucs
+SET QUOTED_IDENTIFIER OFF
+declare @t_where nvarchar(max)=[1]
+declare @t_where1 nvarchar(max)=[2]
+declare @t_order nvarchar(max)=case when '#non'=[3] then '' else [3] end
+
+set @t_where=replace(@t_where,'~#^','''') --單引號
+set @t_where=replace(@t_where,'#^#',',') --逗號
+set @t_where=replace(@t_where,'@^@','+') --加號
+set @t_where1=replace(@t_where1,'~#^','''')
+set @t_where1=replace(@t_where1,'#^#',',')
+set @t_where1=replace(@t_where1,'@^@','+')
+
+IF OBJECT_ID('tempdb..#tmpcucs')is not null
+BEGIN
+	drop table #tmpcucs
+END
+
+create table #tmpcucs(
+	noa nvarchar(MAX),
+	noq nvarchar(MAX),
+	cubno nvarchar(MAX),--判斷是否被鎖定
+	product nvarchar(MAX),--品名
+	ucolor nvarchar(MAX),--類別
+	spec nvarchar(MAX),--材質
+	size nvarchar(MAX),--號數
+	lengthb nvarchar(MAX),--米數
+	class nvarchar(MAX),--廠牌
+	imgbarcode nvarchar(MAX),--圖片
+	memo nvarchar(MAX),--備註(標籤)
+	size2 nvarchar(MAX),--工令
+	btime nvarchar(MAX),--顏色1
+	etime nvarchar(MAX),--顏色2
+	picno nvarchar(MAX),--型狀編號
+	picname nvarchar(MAX),--型狀名稱
+	paraf nvarchar(MAX),--參數f
+	parag nvarchar(MAX),--參數g
+	mount float,--訂單件數
+	mount1 float,--訂單支數
+	weight float,--訂單重量
+	emount float,--未完工件數
+	elengthc float,--未完工支數
+	eweight float,--未完工重量
+	cubmount float,--已完工件數
+	cublengthc float,--已完工支數
+	cubweight float,--已完工重量
+	acustno nvarchar(MAX),--客戶編號
+	acust nvarchar(MAX),--客戶名稱
+	ordeno nvarchar(MAX),--訂單編號
+	no2 nvarchar(MAX)--訂單序號
+)
+
+EXEC("
+insert #tmpcucs (noa,noq,cubno,product,ucolor,spec,size,lengthb,class,imgbarcode,memo,size2,btime,etime
+,picno,picname,paraf,parag,mount,mount1,weight,emount,elengthc,eweight,cubmount,cublengthc,cubweight,acustno,acust,ordeno,no2)
+select a.noa,MIN(b.noq),b.cubno
+,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.imgbarcode,b.memo,b.size,b.btime,b.etime
+,b.picno,b.picname,b.paraf,b.parag
+,SUM(b.mount),SUM(b.mount1),SUM(b.weight)
+,ISNULL(SUM(b.mount),0)-ISNULL(SUM(c.cubmount),0) emount
+,ISNULL(SUM(b.mount1),0)-ISNULL(SUM(c.cublengthc),0) elengthc
+,ISNULL(SUM(b.weight),0)-ISNULL(SUM(c.cubweight),0) eweight
+,ISNULL(SUM(c.cubmount),0),ISNULL(SUM(c.cublengthc),0),ISNULL(SUM(c.cubweight),0)
+,a.custno,a.cust,MIN(b.ordeno),MIN(b.no2)
+from view_cuc a left join view_cucs b on a.noa=b.noa
+outer apply (select SUM(d.mount) cubmount,SUM(d.weight) cubweight,SUM(d.lengthc)cublengthc 
+from view_cub c left join view_cubs d on c.noa=d.noa where "+@t_where1+")c
+where "+@t_where+"
+group by a.noa,b.cubno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.imgbarcode
+,b.memo,b.size,b.btime,b.etime,b.picno,b.picname,b.paraf,b.parag,a.custno,a.cust ")
+
+if(@t_order='init')
+begin
+	select noa from #tmpcucs group by noa order by noa
+end
+else if(@t_order='memo')
+begin
+	select * from #tmpcucs order by isnull(memo,''),size,spec,lengthb desc,noa,noq
+end
+else
+begin
+	select * from #tmpcucs order by size,spec,lengthb desc,noa,noq
+end
+
+IF OBJECT_ID('tempdb..#tmpcucs')is not null
+BEGIN
+	drop table #tmpcucs
+END
 ;
