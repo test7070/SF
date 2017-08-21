@@ -57,9 +57,10 @@
 				q_mask(bbmMask);
 				bbsNum = [['txtMount', 12, q_getPara('rc2.mountPrecision'), 1]
 				, ['txtWeight', 12, q_getPara('rc2.weightPrecision'), 1]
-				, ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]];
+				, ['txtLengthb', 15, 2, 1], ['txtTotal', 15, 0, 1]
+				, ['txtPrice', 12, q_getPara('rc2.pricePrecision'), 1]];
 				
-				document.title='成本庫存調整單';
+				//document.title='成本庫存調整單';
 				
 				var t_where = "where=^^ 1=1 ^^";
 				q_gt('ucc', t_where, 0, 0, 0, "");
@@ -184,6 +185,45 @@
                             var n = $(this).attr('id').replace('txtStoreno_', '');
                             $('#btnStore_' + n).click();
                         });
+                        
+                        $('#txtMount_' + j).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							var t_unit=trim($('#txtUnit_' + b_seq).val()),t_mount=0;
+							if (t_unit.length == 0 || t_unit == 'KG' || t_unit == 'M2' || t_unit == 'M' || t_unit == '批' || t_unit == '公斤' || t_unit == '噸' || t_unit == '頓' || t_unit == 'T') {
+								t_mount = $('#txtWeight_' + b_seq).val();
+							}else{
+								t_mount = $('#txtMount_' + b_seq).val();
+							}
+							$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), dec(t_mount)), 0));
+						});
+						
+						$('#txtWeight_' + j).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							var t_unit=trim($('#txtUnit_' + b_seq).val()),t_mount=0;
+							if (t_unit.length == 0 || t_unit == 'KG' || t_unit == 'M2' || t_unit == 'M' || t_unit == '批' || t_unit == '公斤' || t_unit == '噸' || t_unit == '頓' || t_unit == 'T') {
+								t_mount = $('#txtWeight_' + b_seq).val();
+							}else{
+								t_mount = $('#txtMount_' + b_seq).val();
+							}
+							$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), dec(t_mount)), 0));
+						});
+						
+						$('#txtPrice_' + j).change(function() {
+							t_IdSeq = -1;
+							q_bodyId($(this).attr('id'));
+							b_seq = t_IdSeq;
+							var t_unit=trim($('#txtUnit_' + b_seq).val()),t_mount=0;
+							if (t_unit.length == 0 || t_unit == 'KG' || t_unit == 'M2' || t_unit == 'M' || t_unit == '批' || t_unit == '公斤' || t_unit == '噸' || t_unit == '頓' || t_unit == 'T') {
+								t_mount = $('#txtWeight_' + b_seq).val();
+							}else{
+								t_mount = $('#txtMount_' + b_seq).val();
+							}
+							$('#txtTotal_' + b_seq).val(round(q_mul(q_float('txtPrice_' + b_seq), dec(t_mount)), 0));
+						});
 						
 						$('#txtSize_' + j).change(function() {
 							 if ($(this).val().substr(0, 1) != '#')
@@ -508,18 +548,22 @@
 						<td style="display: none;"><select id="cmbKind" class="txt c1"> </select></td>
 					</tr>
 					<tr>
+						<td class='td1'><span> </span><a id="lblStoreno" class="lbl btn"> </a></td>
+						<td class='td2'>
+							<input id="txtStoreno" type="text" class="txt" style="width:30%"/>
+							<input id="txtStore" type="text" class="txt" style="width:65%"/>
+						</td>
+					</tr>
+					<tr>
 						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
 						<td><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
 						<td><input id="txtWorker2" type="text" class="txt c1"/></td>
 					</tr>
-					<tr>
-						<td colspan="3"><a class="lbl" style="color: red;">※件數和重量輸入值若為"正數"即【入庫】，"負數"即【領料】。</a></td>
-					</tr>
 				</table>
 			</div>
 		</div>
-		<div class='dbbs' style="min-width: 1200px;"><!--2150px-->
+		<div class='dbbs' style="min-width: 1900px;"><!--2150px-->
 			<table id="tbbs" class='tbbs' border="1" cellpadding='2' cellspacing='1' >
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:1%;">
@@ -527,13 +571,16 @@
 					</td>
 					<td align="center" style="width:200px;"><a id='lblStoreno_s'> </a></td>
 					<td align="center" style="width:150px;"><a id='lblProductno_s'> </a></td>
-					<td align="center" style="width:150px;display: none;"><a id='lblUcolor_s'> </a></td>
+					<td align="center" style="width:150px;"><a id='lblUcolor_s'> </a></td>
 					<td align="center" style="width:150px;"><a id='lblSpec_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblSize_s'> </a></td>
-					<td align="center" style="width:100px;display: none;"><a id='lblLengthb_s'> </a></td>
-					<td align="center" style="width:150px;display: none;"><a id='lblClass_s'> </a></td>
+					<td align="center" style="width:100px;"><a id='lblLengthb_s'> </a></td>
+					<td align="center" style="width:150px;"><a id='lblClass_s'> </a></td>
+					<td align="center" style="width:85px;"><a id='lblEmount2_s'> </a></td>
+					<td align="center" style="width:85px;"><a id='lblEweight2_s'> </a></td>
 					<td align="center" style="width:85px;"><a id='lblMount_s'> </a></td>
 					<td align="center" style="width:85px;"><a id='lblWeight_s'> </a></td>
+					<td align="center" style="width:85px;"><a id='lblPrice_s'> </a></td>
 					<td align="center" style="width:100px;"><a id='lblTotal_s'> </a></td>
 					<td align="center" style="width:200px;"><a id='lblMemo_s'> </a></td>
 				</tr>
@@ -548,7 +595,7 @@
 						<input id="txtProduct.*" type="text" class="txt c1" style="width: 70%;"/>
 						<select id="combProduct.*" class="txt" style="width: 20px;"> </select>
 					</td>
-					<td style="display:none;">
+					<td>
 						<input id="txtUcolor.*" type="text" class="txt c1" style="width: 110px;"/>
 						<select id="combUcolor.*" class="txt" style="width: 20px;"> </select>
 					</td>
@@ -557,13 +604,16 @@
 						<select id="combSpec.*" class="txt" style="width: 20px;"> </select>
 					</td>
 					<td><input id="txtSize.*" type="text" class="txt c1" /></td>
-					<td style="display:none;"><input id="txtLengthb.*" type="text" class="txt num c1" /></td>
-					<td style="display:none;">
+					<td><input id="txtLengthb.*" type="text" class="txt num c1" /></td>
+					<td>
 						<input id="txtClass.*" type="text" class="txt c1" style="width: 70%;"/>
 						<select id="combClass.*" class="txt" style="width: 20px;"> </select>
 					</td>
+					<td><input id="txtEmount2.*" type="text" class="txt num c1"/></td>
+					<td><input id="txtEweight2.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtMount.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtWeight.*" type="text" class="txt num c1"/></td>
+					<td><input id="txtPrice.*" type="text" class="txt num c1"/></td>
 					<td><input id="txtTotal.*" type="text" class="txt num c1"/></td>
 					<td>
 						<input class="txt c1" id="txtMemo.*"type="text" />

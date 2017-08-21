@@ -44,14 +44,17 @@
 				isupdate=true;
 				var bbsrow=document.getElementById("cucs_table").rows.length-1;
 				if(bbsrow>0){ //有資料再刷新
-					var new_where='1=0';
+					var noa_where='1=0';
+					var t_where2='1=0';
 					for(var i=0;i<bbsrow;i++){
-						if(!emp($('#cucs_noa'+i).text()) && new_where.indexOf($('#cucs_noa'+i).text()+$('#cucs_noq'+i).text())==-1)
-							new_where=new_where+" or (a.noa@^@'-'@^@b.noq='"+$('#cucs_noa'+i).text()+"-"+$('#cucs_noq'+i).text()+"' )";
+						if(!emp($('#cucs_noa'+i).text()) && noa_where.indexOf($('#cucs_noa'+i).text())==-1)
+							noa_where=noa_where+" or (a.noa='"+$('#cucs_noa'+i).text()+"' )";
+						if(!emp($('#cucs_noa'+i).text()) && t_where2.indexOf($('#cucs_noa'+i).text()+'-'+$('#cucs_noq'+i).text())==-1)
+							t_where2=t_where2+" or (noa@^@'-'@^@noq='"+$('#cucs_noa'+i).text()+"-"+$('#cucs_noq'+i).text()+"' )";
 					}
-					var t_where = "1=1 and ("+new_where+") and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0";
+					var t_where = "1=1 and ("+noa_where+") and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0";
 					var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
-					q_func('qtxt.query.cucs_importcucs', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';#non');
+					q_func('qtxt.query.cucs_importcucs', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';#non'+';'+t_where2);
 					Lock();
 				}
 			}
@@ -79,7 +82,7 @@
                 var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' "; 
                 var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
 				
-				q_func('qtxt.query.cucs_init', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';init');
+				q_func('qtxt.query.cucs_init', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';init'+';#non');
 				
 				q_cmbParse("combSize", ',#3,#4,#5,#6,#7,#8,#9,#10,#11,#12,#13,#14,#15,#16');
 				q_cmbParse("combOrder",' @ ,memo@備註(標籤)');
@@ -144,7 +147,7 @@
 	                    Lock();
 	                    isupdate=false;
 						
-						q_func('qtxt.query.cucs_importcucs', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';'+t_order);
+						q_func('qtxt.query.cucs_importcucs', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';'+t_order+';#non');
 						
 						if(chk_cucs.length==0){
 							intervalupdate = setInterval(";");
@@ -184,7 +187,7 @@
 	                var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' "; 
 	                var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
 					
-					q_func('qtxt.query.cucs_init', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';init');
+					q_func('qtxt.query.cucs_init', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';init'+';#non');
                 });
                 
                 //加工
@@ -319,7 +322,7 @@
 									x_lengthb=emp($('#textLengthb_'+n).val())?'#non':$('#textLengthb_'+n).val();
 									x_class=emp($('#textClass_'+n).val())?'#non':$('#textClass_'+n).val();
 									x_edate=emp($('#textDatea').val())?q_date():$('#textDatea').val();
-									q_func('qtxt.query.getweight_'+n, 'cuc_vu.txt,stk_vu,'+x_product+';'+x_ucolor+';'+x_spec+';'+x_size+';'+x_lengthb+';'+x_class+';'+x_edate+';1');
+									q_func('qtxt.query.getweight_'+n, 'cuc_sf.txt,stk_sf,'+x_product+';'+x_ucolor+';'+x_spec+';'+x_size+';'+x_lengthb+';'+x_class+';'+x_edate+';1');
 								}
 							}
 						});
@@ -369,7 +372,7 @@
 									x_lengthb=emp($('#textLengthb_'+n).val())?'#non':$('#textLengthb_'+n).val();
 									x_class=emp($('#textClass_'+n).val())?'#non':$('#textClass_'+n).val();
 									x_edate=emp($('#textDatea').val())?q_date():$('#textDatea').val();
-									q_func('qtxt.query.getweight_'+n, 'cuc_vu.txt,stk_vu,'+x_product+';'+x_ucolor+';'+x_spec+';'+x_size+';'+x_lengthb+';'+x_class+';'+x_edate+';1');
+									q_func('qtxt.query.getweight_'+n, 'cuc_sf.txt,stk_sf,'+x_product+';'+x_ucolor+';'+x_spec+';'+x_size+';'+x_lengthb+';'+x_class+';'+x_edate+';1');
 								}
 							});
 						}
@@ -392,7 +395,7 @@
 									x_lengthb=emp($('#textLengthb_'+n).val())?'#non':$('#textLengthb_'+n).val();
 									x_class=emp($('#textClass_'+n).val())?'#non':$('#textClass_'+n).val();
 									x_edate=emp($('#textDatea').val())?q_date():$('#textDatea').val();
-									q_func('qtxt.query.getweight_'+n, 'cuc_vu.txt,stk_vu,'+x_product+';'+x_ucolor+';'+x_spec+';'+x_size+';'+x_lengthb+';'+x_class+';'+x_edate+';1');
+									q_func('qtxt.query.getweight_'+n, 'cuc_sf.txt,stk_sf,'+x_product+';'+x_ucolor+';'+x_spec+';'+x_size+';'+x_lengthb+';'+x_class+';'+x_edate+';1');
 								}
 							}
 							//號數
@@ -446,7 +449,7 @@
 								x_lengthb=emp($('#textLengthb_'+j).val())?'#non':$('#textLengthb_'+j).val();
 								x_class=emp($('#textClass_'+j).val())?'#non':$('#textClass_'+j).val();
 								x_edate=emp($('#textDatea').val())?q_date():$('#textDatea').val();
-								q_func('qtxt.query.cuctstkupdate_'+j, 'cuc_vu.txt,stk_vu,'+x_product+';'+x_ucolor+';'+x_spec+';'+x_size+';'+x_lengthb+';'+x_class+';'+x_edate+';1');
+								q_func('qtxt.query.cuctstkupdate_'+j, 'cuc_sf.txt,stk_sf,'+x_product+';'+x_ucolor+';'+x_spec+';'+x_size+';'+x_lengthb+';'+x_class+';'+x_edate+';1');
 								stkupdate++;
 							}
 							has_get=true;
@@ -472,7 +475,7 @@
 				string+='<td id="cuct_gmount" align="center" style="width:80px; color:black;">領料件數</td>';
 				string+='<td id="cuct_gweight" align="center" style="width:90px; color:black;">領料重量</td>';
 				string+='<td id="cuct_avgweight" align="center" style="width:90px; color:black;">均重</td>';
-				string+='<td id="cuct_memo" align="center" style="width:220px; color:black;">備註&nbsp;&nbsp;<input id="btnCubt2" type="button" style="font-size: medium; font-weight: bold;" value="領料"/><input type="button" id="btnCub_nouno" value="條碼領料" style="width:80px;font-size: medium; font-weight: bold"/></td>';
+				string+='<td id="cuct_memo" align="center" style="width:220px; color:black;">備註&nbsp;&nbsp;<input id="btnCubt2" type="button" style="font-size: medium; font-weight: bold;" value="領料"/><input type="button" id="btnCub_nouno" value="條碼領料" style="width:80px;font-size: medium; font-weight: bold;"/></td>';
 				string+='</tr>';
 				string+='</table>';
 				$('#cuct').append(string);
@@ -506,13 +509,16 @@
 	                
 					var t_nouno=$.trim($('#textNouno').val());
 					if(t_nouno.length>0){
-						t_nouno=t_nouno.split(',');
+						/*t_nouno=t_nouno.split(',');
 						var t_where="";
 						for (var i=0;i<t_nouno.length;i++){
 							t_where=t_where+(t_where.length>0?" or ":"")+"uno='"+t_nouno[i]+"'";
 						}
 						var t_where = "where=^^ ("+t_where+") ^^";
-						q_gt('view_cubs', t_where, 0, 0, 0, "nouno_getuno", r_accy);
+						q_gt('view_cubs', t_where, 0, 0, 0, "nouno_getuno", r_accy);*/
+						
+						t_nouno=replaceAll(t_nouno,',','##');
+						q_func('qtxt.query.nouno_getuno', 'cuc_sf.txt,getmoreuno,'+t_nouno);
 					}
 				});
 				$('#btnClose_div_nouno').click(function() {
@@ -936,50 +942,6 @@
 						}
 						$('#combMechno').text();
 						q_cmbParse("combMechno", t_mech);
-						break;
-					case 'nouno_getuno':
-						var as = _q_appendData("view_cubs", "", true);
-						if (as[0] != undefined) {
-							var t_nouno='';
-							var bbtrow=document.getElementById("cuct_table").rows.length-1;
-							for(var j=0;j<bbtrow;j++){
-								if($('#textUno_'+j).val().length>0){
-									t_nouno=t_nouno+(t_nouno.length>0?',':'')+$('#textUno_'+j).val();
-								}
-							}
-							t_nouno=$.trim(t_nouno).split(',');
-							var tt_nouno='';
-							var t_mount=0,t_weight=0;
-							for (var i=0;i<t_nouno.length;i++){
-								var t_exists=false;
-								for (var j=0;j<as.length;j++){
-									if(as[j].uno==t_nouno[i]){
-										t_exists=true;
-										t_mount=q_add(t_mount,dec(as[j].mount));
-										t_weight=q_add(t_mount,dec(as[j].weight));
-									}
-								}
-								if(!t_exists){
-									alert("批號【"+t_nouno[i]+"】不存在或已領料!!")
-									tt_nouno='';
-									break;
-								}else if(t_mount<=0 && t_mount<=0){
-									alert("批號【"+t_nouno[i]+"】已領料!!")
-									tt_nouno='';
-									break;
-								}else{
-									tt_nouno=tt_nouno+t_nouno[i]+"#";
-								}
-							}
-							var t_mechno=emp($('#combMechno').val())?'#non':$('#combMechno').val();
-							
-							if(tt_nouno.length>0){
-								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI(t_mechno)+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+';1');
-								Lock();
-							}
-						}else{
-							alert("批號不存在!!");
-						}
 						break;
 					case q_name:
 						if (q_cur == 4)
@@ -1590,7 +1552,8 @@
 								
 								var t_err2='';
 								//105/08/15判斷是否已續接或成型
-	                			var t_where = "where=^^ 1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"'^^";
+								//106/03/20 不使用 現場成型和續接
+	                			/*var t_where = "where=^^ 1=1 and a.noa='"+$('#cucs_noa'+n).text()+"' and b.noq='"+$('#cucs_noq'+n).text()+"'^^";
 								var t_where1 = "where[1]=^^ d.productno2=b.noa and d.product2=b.noq and c.itype!='1' and (d.mount>0 or d.weight>0) ^^";
 								q_gt('cucs_sf', t_where+t_where1, 0, 0, 0,'getcubs', r_accy,1);
 								var cubs = _q_appendData("view_cuc", "", true);
@@ -1609,7 +1572,7 @@
 	                			}else{
 	                				alert('加工單遺失，請確認加工單是否存在!!');
 	                				t_err2='加工單遺失';
-	                			}
+	                			}*/
 								
 				                if (t_err.length > 0 || chk_cucs.length>=8 || t_err2.length>0) {
 				                	if(t_err.length>0)
@@ -1875,6 +1838,55 @@
 							$('#textUcolor_'+n).val('板料');
 	                    });
 						break;
+					case 'qtxt.query.nouno_getuno':
+						var as = _q_appendData("tmp0", "", true, true);
+						if (as[0] != undefined) {
+							/*var t_nouno='';
+							var bbtrow=document.getElementById("cuct_table").rows.length-1;
+							for(var j=0;j<bbtrow;j++){
+								if($('#textUno_'+j).val().length>0){
+									t_nouno=t_nouno+(t_nouno.length>0?',':'')+$('#textUno_'+j).val();
+								}
+							}
+							t_nouno=$.trim(t_nouno).split(',');*/
+							var t_nouno=$.trim($('#textNouno').val()).split(',');
+							var tt_nouno='';
+							var t_mount=0,t_weight=0,t_lengthc=0,t_noa='',t_noq='';
+							for (var i=0;i<t_nouno.length;i++){
+								var t_exists=false;
+								for (var j=0;j<as.length;j++){
+									if(as[j].uno==t_nouno[i]){
+										t_exists=true;
+										t_mount=dec(as[j].mount);
+										t_lengthc=dec(as[j].lengthc);
+										t_weight=dec(as[j].weight);
+										t_noa=as[j].noa;
+										t_noq=as[j].noq;
+										break;
+									}
+								}
+								if(!t_exists){
+									alert("批號【"+t_nouno[i]+"】不存在或已領料!!")
+									tt_nouno='';
+									break;
+								}else if(t_mount<=0 && t_mount<=0){
+									alert("批號【"+t_nouno[i]+"】已領料!!")
+									tt_nouno='';
+									break;
+								}else{
+									tt_nouno=tt_nouno+t_nouno[i]+"@"+t_mount+"@"+t_lengthc+"@"+t_weight+"@"+t_noa+"@"+t_noq+"#";
+								}
+							}
+							var t_mechno=emp($('#combMechno').val())?'#non':$('#combMechno').val();
+							
+							if(tt_nouno.length>0){
+								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI(t_mechno)+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+';1');
+								Lock();
+							}
+						}else{
+							alert("批號不存在!!");
+						}
+						break;
                 }
                 if(t_func.indexOf('qtxt.query.getweight_')>-1){
                 	var n=t_func.split('_')[1];
@@ -2015,7 +2027,7 @@
 	                    	alert('領料重量等於零。');
 	                    	Unlock();
 	                    }else{
-	                    	q_func('qtxt.query.cucttocubt', 'cuc_vu.txt,cucttocubt,'
+	                    	q_func('qtxt.query.cucttocubt', 'cuc_sf.txt,cucttocubt,'
 	                   		+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno+';'+r_name+';'+ts_bbt);
 	                    }
 					}

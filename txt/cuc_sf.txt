@@ -1140,6 +1140,7 @@ SET QUOTED_IDENTIFIER OFF
 declare @t_where nvarchar(max)=[1]
 declare @t_where1 nvarchar(max)=[2]
 declare @t_order nvarchar(max)=case when '#non'=[3] then '' else [3] end
+declare @t_where2 nvarchar(max)=[4]
 
 set @t_where=replace(@t_where,'~#^','''') --單引號
 set @t_where=replace(@t_where,'#^#',',') --逗號
@@ -1147,6 +1148,9 @@ set @t_where=replace(@t_where,'@^@','+') --加號
 set @t_where1=replace(@t_where1,'~#^','''')
 set @t_where1=replace(@t_where1,'#^#',',')
 set @t_where1=replace(@t_where1,'@^@','+')
+set @t_where2=replace(@t_where2,'~#^','''') 
+set @t_where2=replace(@t_where2,'#^#',',') 
+set @t_where2=replace(@t_where2,'@^@','+') 
 
 IF OBJECT_ID('tempdb..#tmpcucs')is not null
 BEGIN
@@ -1202,9 +1206,14 @@ select a.noa,MIN(b.noq),b.cubno
 from view_cuc a left join view_cucs b on a.noa=b.noa
 outer apply (select SUM(d.mount) cubmount,SUM(d.weight) cubweight,SUM(d.lengthc)cublengthc 
 from view_cub c left join view_cubs d on c.noa=d.noa where "+@t_where1+")c
-where "+@t_where+"
+where "+@t_where+" and isnull(b.noq,'')!=''
 group by a.noa,b.cubno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.imgbarcode
 ,b.memo,b.size,b.btime,b.etime,b.picno,b.picname,b.paraf,b.parag,a.custno,a.cust ")
+
+if(@t_where2!='#non')
+begin
+	EXEC(" delete #tmpcucs where not ("+@t_where2+")" )
+end
 
 if(@t_order='init')
 begin
@@ -1222,5 +1231,493 @@ end
 IF OBJECT_ID('tempdb..#tmpcucs')is not null
 BEGIN
 	drop table #tmpcucs
+END
+;
+-------------------------------------------------------------------------------------------------------------------------------
+stk_sf:--stk_sf
+declare @t_product nvarchar(50)=case when '#non'=[1] then '' else [1] end --品名
+declare @t_ucolor nvarchar(50)=case when '#non'=[2] then '' else [2] end --類別
+declare @t_spec nvarchar(50)=case when '#non'=[3] then '' else [3] end --材質
+declare @t_size nvarchar(50)=case when '#non'=[4] then '' else [4] end --號數
+declare @t_lengthb nvarchar(50)=case when '#non'=[5] then '' else [5] end--米數
+declare @t_class nvarchar(50)=case when '#non'=[6] then '' else [6] end --廠牌
+declare @t_edate nvarchar(20)=case when '#non'=[7] then char(255) else [7] end --終止日期
+
+declare @t_forcibly nvarchar(20)=case when '#non'=[8] then '0' else [8] end --判斷條件強制符合
+
+--declare @t_ucolor nvarchar(50) --類別 --不判讀
+
+SET QUOTED_IDENTIFIER OFF
+declare @cmd nvarchar(max)
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+
+create table #tmp(
+	tablea nvarchar(50),
+	datea nvarchar(50),
+	noa nvarchar(50),
+	product nvarchar(100),
+	ucolor nvarchar(100),
+	spec nvarchar(50),
+	size nvarchar(50),
+	lengthb float,
+	class nvarchar(50),
+	mount decimal(20,2),
+	weight decimal(20,2)
+)
+
+if(@t_forcibly='0') --判斷不強制
+begin
+	insert #tmp
+	select 'ucce',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.mount,b.weight
+	from view_ucce a left join view_ucces b on a.noa=b.noa 
+	where a.datea<=@t_edate 
+	and (len(@t_product)=0 or isnull(b.product,'')=@t_product) 
+	and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+	and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) 
+	and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+	and (len(@t_lengthb)=0 or isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and isnull(b.productno,'')=''
+	
+	delete a
+	from #tmp a outer apply (select MAX(datea) datea from #tmp 
+	where product=a.product and ucolor=a.ucolor and spec=a.spec and size=a.size and lengthb =a.lengthb and class =a.class)b
+	where a.datea!=b.datea
+	
+	--進貨
+	insert #tmp
+	select 'rc2s',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+	,case when a.typea='2' then -1 else 1 end*b.mount,case when a.typea='2' then -1 else 1 end*b.weight 
+	from view_rc2 a left join view_rc2s b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =isnull(b.lengthb,0) and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (len(@t_product)=0 or isnull(b.product,'')=@t_product) 
+	and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+	and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+	and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) 
+	and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+	and (len(@t_lengthb)=0 or isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and isnull(b.productno,'')=''
+	and b.storeno='A'
+	
+	insert #tmp
+	select 'inas',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.mount,b.weight 
+	from view_ina a left join view_inas b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =isnull(b.lengthb,0) and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (len(@t_product)=0 or isnull(b.product,'')=@t_product) 
+	and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+	and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) 
+	and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+	and (len(@t_lengthb)=0 or isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and isnull(b.productno,'')=''
+	and b.storeno='A'
+	
+	--領料
+	insert #tmp
+	select 'cubt',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,-1*b.gmount,-1*b.gweight 
+	from view_cub a left join view_cubt b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =isnull(b.lengthb,0) and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (len(@t_product)=0 or isnull(b.product,'')=@t_product) 
+	and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+	and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) 
+	and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+	and (len(@t_lengthb)=0 or isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and isnull(b.productno,'')=''
+	and b.storeno='A'
+		
+	insert #tmp
+	select 'gets',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,-1*b.mount,-1*b.weight 
+	from view_get a left join view_gets b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =isnull(b.lengthb,0) and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (len(@t_product)=0 or isnull(b.product,'')=@t_product) 
+	and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+	and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) 
+	and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+	and (len(@t_lengthb)=0 or isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and isnull(b.productno,'')=''
+	and b.storeno='A'
+	
+	insert #tmp
+	select 'vccs',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+	,case when a.typea='2' then -1 else 1 end*-1*b.mount
+	,case when a.typea='2' then -1 else 1 end*-1*b.weight 
+	from view_vcc a left join view_vccs b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (len(@t_product)=0 or isnull(b.product,'')=@t_product) 
+	and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
+	and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) 
+	and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
+	and (len(@t_lengthb)=0 or isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (len(@t_class)=0 or isnull(b.class,'')=@t_class) and isnull(b.productno,'')=''
+	and b.storeno='A'
+end
+else --強制
+begin
+	insert #tmp
+	select 'ucce',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.mount,b.weight
+	from view_ucce a left join view_ucces b on a.noa=b.noa 
+	where a.datea<=@t_edate 
+	and (isnull(b.product,'')=@t_product) 
+	and (isnull(b.ucolor,'')=@t_ucolor)
+	and (isnull(b.spec,'')=@t_spec) 
+	and (isnull(b.size,'')=@t_size)
+	and (isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (isnull(b.class,'')=@t_class)
+	and b.storeno='A' and isnull(b.productno,'')=''
+	
+	delete a
+	from #tmp a outer apply (select MAX(datea) datea from #tmp 
+	where product=a.product and ucolor=a.ucolor and spec=a.spec and size=a.size and lengthb =a.lengthb and class =a.class)b
+	where a.datea!=b.datea
+	
+	--進貨
+	insert #tmp
+	select 'rc2s',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+	,case when a.typea='2' then -1 else 1 end*b.mount,case when a.typea='2' then -1 else 1 end*b.weight 
+	from view_rc2 a left join view_rc2s b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =isnull(b.lengthb,0) and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (isnull(b.product,'')=@t_product) 
+	and (isnull(b.ucolor,'')=@t_ucolor)
+	and (isnull(b.spec,'')=@t_spec) 
+	and (isnull(b.size,'')=@t_size)
+	and (isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (isnull(b.class,'')=@t_class)
+	and b.storeno='A' and isnull(b.productno,'')=''
+	
+	insert #tmp
+	select 'inas',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.mount,b.weight 
+	from view_ina a left join view_inas b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =isnull(b.lengthb,0) and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (isnull(b.product,'')=@t_product) 
+	and (isnull(b.ucolor,'')=@t_ucolor)
+	and (isnull(b.spec,'')=@t_spec) 
+	and (isnull(b.size,'')=@t_size)
+	and (isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (isnull(b.class,'')=@t_class)
+	and b.storeno='A' and isnull(b.productno,'')=''
+	
+	--領料
+	insert #tmp
+	select 'cubt',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,-1*b.gmount,-1*b.gweight 
+	from view_cub a left join view_cubt b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =isnull(b.lengthb,0) and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (isnull(b.product,'')=@t_product) 
+	and (isnull(b.ucolor,'')=@t_ucolor)
+	and (isnull(b.spec,'')=@t_spec) 
+	and (isnull(b.size,'')=@t_size)
+	and (isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (isnull(b.class,'')=@t_class)
+	and b.storeno='A' and isnull(b.productno,'')=''
+		
+	insert #tmp
+	select 'gets',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,-1*b.mount,-1*b.weight 
+	from view_get a left join view_gets b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =isnull(b.lengthb,0) and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (isnull(b.product,'')=@t_product) 
+	and (isnull(b.ucolor,'')=@t_ucolor)
+	and (isnull(b.spec,'')=@t_spec) 
+	and (isnull(b.size,'')=@t_size)
+	and (isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (isnull(b.class,'')=@t_class)
+	and b.storeno='A' and isnull(b.productno,'')=''
+	
+	insert #tmp
+	select 'vccs',a.datea,a.noa,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+	,case when a.typea='2' then -1 else 1 end*-1*b.mount
+	,case when a.typea='2' then -1 else 1 end*-1*b.weight 
+	from view_vcc a left join view_vccs b on a.noa=b.noa
+	outer apply(select datea from #tmp where product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and lengthb =b.lengthb and class =b.class and tablea='ucce')c
+	where a.datea<=@t_edate and a.datea>=isnull(c.datea,'')
+	and (isnull(b.product,'')=@t_product)
+	and (isnull(b.ucolor,'')=@t_ucolor)
+	and (isnull(b.spec,'')=@t_spec)
+	and (isnull(b.size,'')=@t_size)
+	and (isnull(b.lengthb,0)=cast(@t_lengthb as float))
+	and (isnull(b.class,'')=@t_class)
+	and b.storeno='A' and isnull(b.productno,'')=''
+end
+
+select isnull(product,'')product,ISNULL(ucolor,'')ucolor,isnull(spec,'')spec,
+isnull(size,'')size,isnull(lengthb,0)lengthb,isnull(class,'')class,sum(mount)mount,sum(weight)weight
+from #tmp 
+group by isnull(product,''),ISNULL(ucolor,''),isnull(spec,''),isnull(size,''),isnull(lengthb,0),isnull(class,'')
+order by product,ucolor,spec,size,lengthb,class
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+;
+-------------------------------------------------------------------------------------------------------------------------------
+cucttocubt:--cucttocubt
+	SET QUOTED_IDENTIFIER OFF
+	declare @cmd nvarchar(max) = ''
+	declare @accy nvarchar(max) = [1]
+	declare @datea nvarchar(max) = case when '#non'=[2] then '' else [2] end
+	declare @mechno nvarchar(max) = case when '#non'=[3] then '' else [3] end
+	declare @memo nvarchar(max) = case when '#non'=[4] then '' else [4] end
+	declare @userno nvarchar(max) = [5]
+	declare @namea nvarchar(max) = [6]
+	--cuct資料
+	declare @xcuct nvarchar(max) = [7]
+	if(@xcuct='#non')
+	begin
+		set @xcuct=''
+	end
+	
+	declare @mech nvarchar(max) = isnull((select mech from mech where noa=@mechno),'')
+	declare @cubno nvarchar(100) --新加工單號
+	set @cubno=isnull((select MAX(noa) from view_cub where noa like 'M'+replace(@datea,'/','')+'%' ),'')
+	set @cubno='M'+REPLACE(@datea,'/','')+right('000'+cast(cast(right(@cubno,3) as int) +1 as nvarchar(50)),3)
+	
+	--時間
+	declare @now_datetime nvarchar(20)
+	set @now_datetime=replace(CONVERT (VARCHAR(20), GETDATE(),20 ),'-','/')
+
+	--*********************************************************************************************
+	
+	IF OBJECT_ID('tempdb..#tmpa')is not null
+	BEGIN
+		set @cmd = 'drop table #tmpa'
+		EXECUTE sp_executesql @cmd
+	END
+			
+	declare @bbtcount int=0
+	create table #tmpa( 
+		noq nvarchar(50),
+		product nvarchar(MAX),  
+		ucolor nvarchar(MAX),  
+		spec nvarchar(MAX),  
+		size nvarchar(MAX),  
+		lengthb float,  
+		class nvarchar(50),  
+		gmount float,
+		gweight float,
+		memo nvarchar(MAX)
+	) 
+	
+	--拆解字串
+	set @bbtcount=0
+	while (CHARINDEX('^#^',@xcuct)>0)
+	begin
+		set @bbtcount=@bbtcount+1
+		
+		insert #tmpa
+		select  right('000'+cast(@bbtcount as nvarchar(10)),3)
+		,dbo.split(@xcuct,'^@^',0)
+		,dbo.split(@xcuct,'^@^',1)
+		,dbo.split(@xcuct,'^@^',2)
+		,dbo.split(@xcuct,'^@^',3)
+		,cast(dbo.split(@xcuct,'^@^',4) as float)
+		,dbo.split(@xcuct,'^@^',5)
+		,cast(dbo.split(@xcuct,'^@^',6) as float)
+		,cast(dbo.split(@xcuct,'^@^',7) as float)
+		,dbo.split(@xcuct,'^@^',8)
+		
+		set @xcuct=SUBSTRING(@xcuct,CHARINDEX('^#^',@xcuct)+3,LEN(@xcuct))
+	end
+	
+	--產生cub
+	if((select count(*) from #tmpa)>0)
+	begin
+		--bbm
+		exec("
+			insert cub"+@accy+" (noa,datea,mechno,mech,memo,worker,kind)
+			select '"+@cubno+"','"+@datea+"','"+@mechno+"','"+@mech+"','"+@memo+"','"+@namea+"','"+@now_datetime+"' 
+		")
+		
+		--bbt
+		exec("
+			insert cubt"+@accy+" (noa,noq,product,ucolor,spec,size,lengthb,class,gmount,gweight,memo2,storeno,store)
+			select '"+@cubno+"',*,'7000',isnull((select top 1 store from store where noa='7000'),'') from #tmpa 
+		")
+	
+		insert dno (tablea,noa,usera)
+		select 'cub',@cubno,@userno
+	end
+	else
+	begin
+		set @cubno=''
+	end
+	
+	select @cubno cubno
+	
+	IF OBJECT_ID('tempdb..#tmpa')is not null
+	BEGIN
+		set @cmd = 'drop table #tmpa'
+		EXECUTE sp_executesql @cmd
+	END
+;
+-------------------------------------------------------------------------------------------------------------------------------
+getmoreuno:--getmoreuno
+SET QUOTED_IDENTIFIER OFF
+declare @cmd nvarchar(max) = ''
+declare @uno nvarchar(max) = [1] --uno
+
+declare @tmp table(
+	uno nvarchar(50)
+)
+set @uno=REPLACE(@uno,'##',',')
+insert @tmp 
+select n from fnSplit(@uno)
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
+END
+
+--106/03/29 多產品單一批號也要全部顯示出來，但會全部領料
+create table #tmp( 
+	accy nvarchar(50),
+	tablea nvarchar(50), 
+	noa nvarchar(50),
+	noq nvarchar(50),
+	datea nvarchar(50),
+	uno nvarchar(50),
+	product nvarchar(50),
+	ucolor nvarchar(50),
+	spec nvarchar(50),
+	size nvarchar(50),
+	lengthb float,
+	class nvarchar(50),
+	mount float,
+	weight float,
+	lengthc float,
+	storeno nvarchar(50),
+	store nvarchar(50),
+	memo nvarchar(MAX),
+	ordeno nvarchar(100),
+	no2 nvarchar(50),
+	typea nvarchar(10),
+) 
+--盤點
+insert #tmp
+select a.accy,'ucces' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'','','5'
+from view_ucces a left join view_ucce b on a.noa=b.noa
+where len(a.uno)>0 and exists(select * from @tmp where uno=a.uno)
+
+--進貨
+insert #tmp
+select a.accy,'rc2s' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,'','','6'
+from view_rc2s a left join view_rc2 b on a.noa = b.noa 
+where b.typea='1' and len(a.uno)>0 and exists(select * from @tmp where uno=a.uno)
+
+--入庫
+insert #tmp
+select a.accy,'cubs' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,a.ordeno,a.no2,'6'
+from view_cubs a left join view_cub b on a.noa=b.noa
+where len(a.uno)>0 and exists(select * from @tmp where uno=a.uno)
+
+--互換進
+insert #tmp
+select a.accy,'inas' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,a.mount,a.weight,0,b.storeno,b.store,a.memo,'','','6'
+from view_inas a left join view_ina b on a.noa=b.noa
+where len(a.uno)>0 and exists(select * from @tmp where uno=a.uno)
+
+--出貨退回
+insert #tmp
+select a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,b.mount,b.weight,b.lengthc,'','',b.memo,b.ordeno,b.no2,'6'
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='2' and len(b.uno)>0 and exists(select * from @tmp where uno=b.uno)
+
+--出貨
+insert #tmp
+select a.accy,'vcct' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+,-1*b.mount,-1*b.weight,-1*b.lengthc,'','',b.memo,b.ordeno,b.no2,'7'
+from view_vcc a left join view_vcct b on a.noa = b.noa 
+where a.typea='1' and len(b.uno)>0 and exists(select * from @tmp where uno=b.uno)
+
+--領料
+insert #tmp
+select a.accy,'cubt' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,-1*a.gmount,-1*a.gweight,-1*a.lengthc,'','',a.memo,'','','7'
+from view_cubt a left join view_cub b on a.noa=b.noa
+where len(a.uno)>0 and exists(select * from @tmp where uno=a.uno)
+
+--互換出
+insert #tmp
+select a.accy,'gets' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,-1*a.mount,-1*a.weight,0,b.storeno,b.store,a.memo,'','','7'
+from view_gett a left join view_get b on a.noa=b.noa
+where len(a.uno)>0 and exists(select * from @tmp where uno=a.uno)
+
+--退貨
+insert #tmp
+select a.accy,'rc2t' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+,-1*a.mount,-1*a.weight,-1*a.lengthc,a.storeno,a.store,a.memo,'','','7'
+from view_rc2s a left join view_rc2 b on a.noa = b.noa 
+where b.typea='2' and len(a.uno)>0 and exists(select * from @tmp where uno=a.uno)
+
+
+--批號一次會全部領 不會剩餘
+--update a
+--set mount=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.mount end
+--,weight=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.weight end
+--,lengthc=case when vget>((case when tablea='vcct' then 1 else 0 end)+0) or cget>0 or gget>0 or rget>0 then 0 else a.lengthc end
+--from #tmp a 
+--outer apply (select sum(case when va.typea!='2' then 1 else -1 end)vget from view_vcc va left join view_vcct vb on va.noa=vb.noa where vb.uno=a.uno and va.noa!=@noa)v
+--outer apply (select count(*)cget from view_cubt where uno=a.uno and noa!=@noa)c
+--outer apply (select count(*)gget from view_gets where uno=a.uno and noa!=@noa)g
+--outer apply (select sum(case when ra.typea='2' then 1 else 0 end)rget from view_rc2 ra left join view_rc2s rb on ra.noa=rb.noa where rb.uno=a.uno and ra.noa!=@noa)r
+
+--105/12/08 批號不會一次領完(批號只看總量)
+update #tmp
+set mount=ISNULL(mount,0),weight=ISNULL(weight,0),lengthc=ISNULL(lengthc,0)
+,storeno=ISNULL(storeno,''),store=ISNULL(store,'')
+
+insert #tmp(uno,typea,product,spec,size,ucolor,lengthb,class,memo)
+select uno,'0',product,spec,size,ucolor,lengthb,class,memo from #tmp group by uno,product,spec,size,ucolor,lengthb,class,memo
+
+update a
+set accy=b.accy,tablea=b.tablea,noa=b.noa,noq=b.noq,datea=b.datea
+,storeno=b.storeno,store=b.store,ordeno=b.ordeno,no2=b.no2
+from #tmp a outer apply (select top 1 * from #tmp where uno=a.uno and typea!='0' 
+and product=a.product and spec=a.spec and size=a.size 
+and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and memo=a.memo
+order by datea,typea,noa,noq) b
+where a.typea='0'
+
+delete a
+from #tmp a outer apply (select MAX(datea)datea,MAX(datea+'-'+typea+'-'+noa) maxnoa from #tmp where uno=a.uno and tablea='ucces' and typea!='0')b
+where a.tablea!='0' and a.datea<isnull(b.datea,'') and a.datea+'-'+a.typea+'-'+a.noa< ISNULL(b.maxnoa,'')
+
+update a
+set mount=isnull(b.mount,0),weight=isnull(b.weight,0),lengthc=isnull(b.lengthc,0)
+from #tmp a outer apply (select SUM(mount)mount,SUM(weight)weight,sum(lengthc)lengthc from #tmp 
+where uno=a.uno and typea!='0' and product=a.product and spec=a.spec and size=a.size 
+and ucolor=a.ucolor and lengthb=a.lengthb and class=a.class and memo=a.memo) b
+where a.typea='0'
+
+delete #tmp where typea!='0'
+
+--沒有排除單號 只顯示有數量和重量的批號
+--if(len(@noa)=0)
+--	delete #tmp where mount=0 and weight=0 and lengthc=0
+
+select * from #tmp a where exists(select * from @tmp where uno=a.uno)
+
+IF OBJECT_ID('tempdb..#tmp')is not null
+BEGIN
+	set @cmd = 'drop table #tmp'
+	EXECUTE sp_executesql @cmd
 END
 ;
