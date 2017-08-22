@@ -1552,7 +1552,7 @@
 						<td><span> </span><a id="lblTranstartno_sf" class="lbl btn">立帳單號</a></td>
 						<td><input id="txtTranstartno" type="text" class="txt c1"/></td>
 					</tr>
-					<tr>
+					<tr style="display: none;">
 						<td><span> </span><a id="lblMechno_sf" class="lbl">列印機台</a></td>
 						<td><select id="combMechno" class="txt c1"> </select></td>
 						<td colspan="2" style="text-align:center;"><input type="button" id="btnUnoprint" value="條碼列印" style="width:120px;"/></td>
@@ -1564,7 +1564,7 @@
 			<table id="tbbs" class='tbbs'  border="1"  cellpadding='2' cellspacing='1'  >
 				<tr style='color:White; background:#003366;' >
 					<td align="center" style="width:1%;"><input class="btn" id="btnPlus" type="button" value='＋' style="font-weight: bold;"  /></td>
-					<td align="center" style="width:35px;">列印<input class="checkAll" type="checkbox" onclick="checkAll()"/></td>
+					<td align="center" style="width:35px;display: none;">列印<input class="checkAll" type="checkbox" onclick="checkAll()"/></td>
 					<td align="center" style="width:35px;">項序</td>
 					<!--SF 106/08/17 取消批號入庫--->
 					<td style="width:120px; text-align: center;display: none;"><a id="lblUno_st" > </a></td>
@@ -1587,7 +1587,7 @@
 						<input class="btn"  id="btnMinus.*" type="button" value='－' style=" font-weight: bold;" />
 						<input id="txtNoq.*" type="text" style="display: none;" />
 					</td>
-					<td align="center"><input id="checkIsprint.*" class="isPrint" type="checkbox"/></td>
+					<td align="center" style="display: none;"><input id="checkIsprint.*" class="isPrint" type="checkbox"/></td>
 					<td><a id="lblNo.*" style="font-weight: bold;text-align: center;display: block;"> </a></td>
 					<td style="display: none;">
 						<input id="txtUno.*" type="text" class="txt c1"/>
