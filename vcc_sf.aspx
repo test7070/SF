@@ -1178,7 +1178,7 @@
 				for (var i = 0; i < q_bbsCount; i++) {
 					if(!emp($('#txtProduct_'+i).val()) && emp($('#txtStoreno_'+i).val())){
 						$('#txtStoreno_'+i).val('A');
-						$('#txtStore_'+i).val('三泰本倉');
+						$('#txtStore_'+i).val('三泰-板料');
 					}
 				}
 				

@@ -925,7 +925,7 @@ cucutocubs:--cucutocubs
 		--bbs
 		exec("
 			insert cubs"+@accy+" (noa,noq,product,ucolor,spec,size,lengthb,class,mount,lengthc,weight,memo,uno,date2,storeno,store)
-			select '"+@cubno+"',*,'"+@datea+"','A','三泰本倉' from #tmpa 
+			select '"+@cubno+"',*,'"+@datea+"','A2',(select top 1 store from store where noa='A2') from #tmpa 
 		")
 	
 		insert dno (tablea,noa,usera)
@@ -1165,7 +1165,7 @@ create table #tmpcucs(
 	ucolor nvarchar(MAX),--類別
 	spec nvarchar(MAX),--材質
 	size nvarchar(MAX),--號數
-	lengthb nvarchar(MAX),--米數
+	lengthb float,--米數
 	class nvarchar(MAX),--廠牌
 	imgbarcode nvarchar(MAX),--圖片
 	memo nvarchar(MAX),--備註(標籤)
