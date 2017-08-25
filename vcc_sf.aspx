@@ -1805,7 +1805,9 @@
 										mount:$('#txtMount__'+i).val(),
 										weight:$('#txtWeight__'+i).val(),
 										noa:'',//$('#txtOrdeno__'+i).val()
-										no2:''//$('#txtNo2__'+i).val()
+										no2:'',//$('#txtNo2__'+i).val()
+										storeno:'A2', //106/04/11
+										store:'三泰-成品', //106/04/11
 									});
 								}
 								
@@ -1815,8 +1817,8 @@
 						
 						as.sort(bbssort);
 						
-						q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtOrdeno,txtNo2'
-						, as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,noa,no2', 'txtOrdeno,txtNo2');
+						q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtOrdeno,txtNo2,txtStoreno,txtStore'
+						, as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,noa,no2,storeno,store', 'txtOrdeno,txtNo2');
 						
 						refreshBbs();
                 	}
