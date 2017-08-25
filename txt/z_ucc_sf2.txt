@@ -388,7 +388,7 @@ begin
 	--避免前期超領負數造成金額溢位
 	if(round(@tweight,0)<=0)
 	begin
-		set @ttotal=0
+		--set @ttotal=0 --月平均成本不處理負數歸零
 		--避免領用有小數點導致無法全部被領用
 		if(round(@tweight,0)=0)
 		begin
@@ -628,7 +628,7 @@ begin
 	--避免前期超領負數造成金額溢位
 	if(round(@tmount,0)<=0)
 	begin
-		set @ttotal=0
+		--set @ttotal=0 --月平均成本不處理負數歸零
 		--避免領用有小數點導致無法全部被領用
 		if(round(@tmount,0)=0)
 		begin
@@ -925,6 +925,8 @@ IF OBJECT_ID('tempdb..#tmpa')is not null
 BEGIN
 	drop table #tmpa
 END
+
+--此成本仍先以移動平均成本法 而非月平均成本
 
 create table #tmp(
 	typea nvarchar(2),
@@ -1348,7 +1350,7 @@ left join ucc d on a.product=d.product
 order by 
 case when isnull(a.product,'') like '%費' then 3 
 when UPPER(isnull(d.unit,''))!='KG' then 2 when isnull(a.product,'') like '%廢%' then 1 else 0 end
-,a.product,a.spec,dbo.get_num(a.size),a.storeno,a.datea,a.gno,a.typea,a.noa,a.noq
+,a.product,a.spec,dbo.get_num(a.size),a.size,a.storeno,a.datea,a.gno,a.typea,a.noa,a.noq
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN

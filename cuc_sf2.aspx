@@ -583,7 +583,7 @@
 							q_cmbParse("combProduct__"+n, q_getPara('vccs_vu.product'));
 						}
 						if(objname=='combUcolor'){
-							q_cmbParse("combUcolor__"+n, ',定尺,板料,亂尺');
+							q_cmbParse("combUcolor__"+n, ',定尺,板料,亂尺,籃料'); //106/08/25 黃 加入 籃料
 						}
 						if(objname=='combSpec'){
 							q_cmbParse("combSpec__"+n, t_spec);

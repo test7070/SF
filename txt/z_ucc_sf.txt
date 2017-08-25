@@ -392,7 +392,7 @@ select ROW_NUMBER() over (order by product,spec,cast(dbo.get_num(size) as int),u
 ,dbo.getComma(lengthc,-1)lengthc
 ,dbo.getComma(case when isnull(mount,0)=0 then 0 else round(isnull(weight,0)/isnull(mount,0),4) end,[3])avgweight
 ,*
-from #tmp order by product,spec,cast(dbo.get_num(size) as int),ucolor,lengthb,class,gno,rr
+from #tmp order by product,spec,cast(dbo.get_num(size) as int),size,ucolor,lengthb,class,gno,rr
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -1257,7 +1257,7 @@ gno,product,spec,size
 ,REPLACE(CONVERT (NVARCHAR(10), GETDATE(),20 ),'-','/') today
 ,case when @t_bstoreno='' then isnull((select top 1 store from store order by noa),'') else @t_bstoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end bstore
 ,case when @t_estoreno=char(255) then isnull((select top 1 store from store order by noa desc),'') else @t_estoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end estore
-from #tmpa order by gno,product,spec,dbo.get_num(size)
+from #tmpa order by gno,product,spec,cast(dbo.get_num(size) as int),size
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -1635,7 +1635,7 @@ a.gno,a.product,a.spec,a.size
 from #tmpa a left join ucc d on a.product=d.product
 order by case when isnull(a.product,'') like '%費' then 3 when UPPER(isnull(d.unit,''))!='KG' then 2
 when isnull(a.product,'') like '%廢%' then 1 else 0 end
-,a.product,a.spec,dbo.get_num(a.size),a.storeno,a.gno,a.datea,a.typea,a.noa,a.noq
+,a.product,a.spec,cast(dbo.get_num(a.size) as int),a.size,a.storeno,a.gno,a.datea,a.typea,a.noa,a.noq
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -1998,7 +1998,7 @@ a.gno,a.product,a.spec,a.size,a.ucolor,dbo.getComma(a.lengthb,-1)lengthb,a.class
 ,case when UPPER(isnull(d.unit,''))='KG' then '重量' else '件數' end utype
 from #tmpa a 
 left join ucc d on a.product=d.product
-order by a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class,a.storeno,a.datea,a.gno,a.typea,a.noa,a.noq
+order by a.product,a.ucolor,a.spec,cast(dbo.get_num(a.size) as int),a.size,a.lengthb,a.class,a.storeno,a.datea,a.gno,a.typea,a.noa,a.noq
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -2341,16 +2341,15 @@ update a
 set idno=rr,page=CEILING(cast(rr as float)/@pageline)
 from (select ROW_NUMBER() over (order by product,cast(dbo.get_num(size) as int),spec,cast(gno as int),tablea desc,ucolor,lengthb,class)rr,* from #tmp )a
 
---表頭
-insert #tmp(gno,tablea,datea,noa,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,money,avgweight,aprice,page,idno)
-select '1','title','','',MIN(product),MIN(ucolor),MIN(spec),MIN(size),MIN(lengthb),MIN(class),MIN(storeno),0,0,0,0,0,page,MIN(idno)-1
-from #tmp where gno!='1' and gno!='5' group by page
+--表頭 
+insert #tmp(gno,tablea,datea,noa,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,money,avgweight,aprice,page,idno) 
+select '1','title','','',MIN(product),MIN(ucolor),MIN(spec),MIN(size),MIN(lengthb),MIN(class),MIN(storeno),0,0,0,0,0,page,MIN(idno)-1 
+from #tmp group by page 
 
---分頁
-insert #tmp(gno,tablea,datea,noa,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,money,avgweight,aprice,page,idno)
-select '7','Paging','','',MAX(product),MAX(ucolor),MAX(spec),MAX(size),MAX(lengthb),MAX(class),MAX(storeno),0,0,0,0,0,page,MAX(idno)+1
-from #tmp where gno!='1' and gno!='5' group by page
-
+--分頁 
+insert #tmp(gno,tablea,datea,noa,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,money,avgweight,aprice,page,idno) 
+select '7','Paging','','',MAX(product),MAX(ucolor),MAX(spec),MAX(size),MAX(lengthb),MAX(class),MAX(storeno),0,0,0,0,0,page,MAX(idno)+1 
+from #tmp where gno!='1' group by page 
 
 declare @totpage int= isnull((select MAX(page) from #tmp),0)
 declare @today nvarchar(20)= replace(convert(varchar(19),getdate(),20),'-','/')
@@ -2367,7 +2366,7 @@ select ROW_NUMBER() over (partition by product,spec,size,gno order by page,produ
 ,case when tablea='cubs' then 'cub_sf?noa=$noa' else '' end ghref
 ,*
 from #tmp order by page,case when tablea='Paging' then 3 when tablea='title' then 1 else 2 end
-,product,cast(dbo.get_num(size) as int),spec,cast(gno as int),tablea desc,ucolor,lengthb,class,idno
+,product,cast(dbo.get_num(size) as int),size,spec,cast(gno as int),tablea desc,ucolor,lengthb,class,idno
 
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
