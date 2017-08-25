@@ -192,7 +192,7 @@
 				});
 				
 				$('#txtXstore1a').val('A').change();
-				$('#txtXstore2a').val('A').change();
+				$('#txtXstore2a').val('A3').change();
             }
 
             function q_popPost(s1) {
