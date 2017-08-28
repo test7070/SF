@@ -17,7 +17,7 @@
 
             q_tables = 's';
             var q_name = "ina";
-            var q_readonly = ['txtNoa','txtWorker','txtWorker2','txtTranstartno','txtStoreno','txtStore'];
+            var q_readonly = ['txtNoa','txtWorker','txtWorker2','txtTranstartno','txtStore'];
             var q_readonlys = [];
             var bbmNum = [];
             var bbsNum = [];
@@ -860,8 +860,8 @@
                 $('#txt' + bbmKey[0].substr(0, 1).toUpperCase() + bbmKey[0].substr(1)).val('AUTO');
                 $('#txtDatea').val(q_date());
                 $('#txtDatea').focus();
-                //105/12/08空白倉庫預設A
-				$('#txtStoreno').val('A').change();
+                //105/12/08空白倉庫預設A //SF 106/08/17 取消批號入庫 因此倉庫區分互換入庫
+				$('#txtStoreno').val('A3').change();
             }
 
             function btnModi() {

@@ -17,7 +17,7 @@
 
 			q_tables = 't';
 			var q_name = "get";
-			var q_readonly = ['txtNoa', 'txtWorker','txtWorker2','txtTranstartno','txtStoreno','txtStore'];
+			var q_readonly = ['txtNoa', 'txtWorker','txtWorker2','txtTranstartno','txtStore'];
 			var q_readonlys = [];
 			var q_readonlyt = [];
 			var bbmNum = [];
@@ -922,8 +922,8 @@
                 var dd = ('0'+ RightNow.getHours()).substr(-2);
                 var h= ('0'+RightNow.getMinutes()).substr(-2);
                 $('#txtTranstart').val((dd+":"+h));
-				//105/12/08空白倉庫預設A
-				$('#txtStoreno').val('A').change();
+				//105/12/08空白倉庫預設A //SF 106/08/17 取消批號入庫 因此倉庫區分互換入庫
+				$('#txtStoreno').val('A3').change();
 			}
 
 			function btnModi() {
