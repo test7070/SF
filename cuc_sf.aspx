@@ -71,7 +71,7 @@
 				q_cmbParse("cmbBtime", ',棕,紅,白,黃,綠,灰,藍','s');
 				q_cmbParse("cmbEtime", ',棕,紅,白,黃,綠,灰,藍','s');
 				
-				var t_where = "where=^^ 1=1 ^^";
+				var t_where = "where=^^ 1=1 and unit='KG' ^^";
 				q_gt('ucc', t_where, 0, 0, 0, "");
 				
 				$('#txtNoa').change(function() {
