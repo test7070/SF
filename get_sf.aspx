@@ -19,7 +19,7 @@
 			var q_name = "get";
 			var q_readonly = ['txtNoa', 'txtWorker','txtWorker2','txtTranstartno','txtStore'];
 			var q_readonlys = [];
-			var q_readonlyt = [];
+			var q_readonlyt = ['txtMount','txtWeight'];
 			var bbmNum = [];
 			var bbsNum = [];
 			var bbtNum = [];
@@ -424,7 +424,7 @@
 						//q_gt('view_cubs', t_where, 0, 0, 0, "getunocubs_"+n);
 						//106/05/23 多判斷get是否出貨
 						var t_where = "where=^^ uno='" + $('#txtUno__' + n).val() + "' and noa!='"+$('#txtNoa').val()+"' ^^";
-						q_gt('view_gett', t_where, 0, 0, 0, "getunogett_"+b_seq);
+						q_gt('view_gett', t_where, 0, 0, 0, "getunogett_"+n);
 					}
 				}else if(t_name.substring(0,10)=='getunogett'){
 					var n=t_name.split('_')[1];
@@ -440,6 +440,17 @@
 				}else if (t_name.substring(0,10)=='getunocubs'){
 					var n=t_name.split('_')[1];
 					var as = _q_appendData('view_cubs', '', true);
+					if (as[0] != undefined) {
+						alert('該批號已被領料!!');
+						$('#btnMinut__'+n).click();
+					}else{
+						//106/08/29 加上判斷cubt 被領料
+						var t_where = "where=^^ uno='" + $('#txtUno__' + n).val() + "' ^^";
+						q_gt('view_cubt', t_where, 0, 0, 0, "getunocubt_"+n);
+					}
+				}else if (t_name.substring(0,10)=='getunocubt'){
+					var n=t_name.split('_')[1];
+					var as = _q_appendData('view_cubt', '', true);
 					if (as[0] != undefined) {
 						alert('該批號已被領料!!');
 						$('#btnMinut__'+n).click();
@@ -1338,6 +1349,11 @@
                         
                         q_gridAddRow(bbsHtm, 'tbbs', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtNor'
                         , as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,nor','');
+                        
+                        //成品互出
+                        if(as.length>0){
+                        	$('#txtStoreno').val('A2').change();
+                        }
                         
                         refreshBbs();
                     }
