@@ -1706,6 +1706,19 @@
 						//chgimg(j);
 					}
 				}
+				
+				for (var i = 0; i < brwCount2; i++) {
+					if(!emp($('#vtapvmemo_'+i).text())){
+						var t_quat=$('#vtapvmemo_'+i).text().split('##');
+						if(t_quat[0]!=undefined){
+							var r_quat=t_quat[0].split('@');
+							if(r_quat[0]!=undefined)
+								$('#vtapvmemo_'+i).text(r_quat[0]);
+							else
+								$('#vtapvmemo_'+i).text('');
+						}
+					}
+				}
 			}
 			
 			function bbssum() {
@@ -2245,7 +2258,7 @@
 			}
 			.dview {
 				float: left;
-				width: 38%;
+				width: 42%;
 				border-width: 0px;
 			}
 			.tview {
@@ -2266,7 +2279,7 @@
 			}
 			.dbbm {
 				float: left;
-				width: 62%;
+				width: 58%;
 				border-radius: 5px;
 			}
 			.tbbm {
@@ -2387,6 +2400,7 @@
 						<td align="center" style="width:105px;"><a id='vewNoa'> </a></td>
 						<td align="center" style="width:75px;"><a id='vewComp'> </a></td>
 						<td align="center"><a id='vewAddr2'>工地名稱</a></td>
+						<td align="center" style="width:85px;"><a id='vewQno1'>合約號碼</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox" style=''/></td>
@@ -2395,6 +2409,7 @@
 						<td align="center" id='noa'>~noa</td>
 						<td align="center" id='comp,4'>~comp,4</td>
 						<td align="center" id='addr2'>~addr2</td>
+						<td align="center" id='apvmemo'>~apvmemo</td>
 					</tr>
 				</table>
 			</div>
@@ -2402,7 +2417,7 @@
 				<table class="tbbm" id="tbbm">
 					<tr>
 						<td style="width: 108px;"><span> </span><a id='lblType' class="lbl"> </a></td>
-						<td style="width: 108px;"><select id="cmbTypea"> </select></td>
+						<td style="width: 65px;"><select id="cmbTypea"> </select></td>
 						<td style="width: 118px;">
 							<a id='lblStype' class="lbl" style="float: left;"> </a>
 							<span style="float: left;"> </span>

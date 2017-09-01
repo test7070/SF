@@ -1428,6 +1428,19 @@
 						//chgcombClass(j);
 					}
 				}
+				
+				for (var i = 0; i < brwCount2; i++) {
+					if(!emp($('#vttranstart_'+i).text())){
+						var t_quat=$('#vttranstart_'+i).text().split('##');
+						if(t_quat[0]!=undefined){
+							var r_quat=t_quat[0].split('@');
+							if(r_quat[0]!=undefined)
+								$('#vttranstart_'+i).text(r_quat[0]);
+							else
+								$('#vttranstart_'+i).text('');
+						}
+					}
+				}
 			}
 			
 			function chgcombSpec(n) {
@@ -1852,7 +1865,7 @@
 			}
 			.dview {
 				float: left;
-				width: 30%;
+				width: 40%;
 				border-width: 0px;
 			}
 			.tview {
@@ -1872,7 +1885,7 @@
 			}
 			.dbbm {
 				float: left;
-				width: 70%;
+				width: 60%;
 				border-radius: 5px;
 			}
 			.tbbm {
@@ -1986,9 +1999,10 @@
 					<tr>
 						<td align="center" style="width:5%"><a id='vewChk'> </a></td>
 						<td align="center" style="width:5%"><a id='vewTypea'> </a></td>
-						<td align="center" style="width:25%"><a id='vewDatea'> </a></td>
-						<td align="center" style="width:25%"><a id='vewNoa'> </a></td>
-						<td align="center" style="width:40%"><a id='vewTgg'> </a></td>
+						<td align="center" style="width:20%"><a id='vewDatea'> </a></td>
+						<td align="center" style="width:20%"><a id='vewNoa'> </a></td>
+						<td align="center" style="width:30%"><a id='vewTgg'> </a></td>
+						<td align="center" style="width:20%"><a id='vewQno1'>合約號碼</a></td>
 					</tr>
 					<tr>
 						<td><input id="chkBrow.*" type="checkbox" style=''/></td>
@@ -1996,6 +2010,7 @@
 						<td align="center" id='datea'>~datea</td>
 						<td align="center" id='noa'>~noa</td>
 						<td align="center" id='tggno tgg,4' style="text-align: left;">~tggno ~tgg,4</td>
+						<td align="center" id='transtart'>~transtart</td>
 					</tr>
 				</table>
 			</div>
