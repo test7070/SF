@@ -15,6 +15,8 @@
 			var intervalupdate;
 			var chk_cucs=[]; //儲存要加工的cucs資料
 			var dialog_rep=false;
+			//106/09/01 鎖定針對員工 鎖定 機台與加工單
+			//C006 A剪 //C002 B剪
 			
 			$(document).ready(function() {
 				_q_boxClose();
@@ -23,7 +25,14 @@
                 q_gt('spec', '1=1 ', 0, 0, 0, "");
                 q_gt('color', '1=1 ', 0, 0, 0, "");
 				q_gt('class', '1=1 ', 0, 0, 0, "");
-				q_gt('mech', '1=1 ', 0, 0, 0, "");
+				
+				if(r_userno=='C006'){ //A剪
+					q_gt('mech', "where=^^ noa='C1' ^^", 0, 0, 0, "");
+				}else if(r_userno=='C002'){ //B剪
+					q_gt('mech', "where=^^ noa='C2' ^^", 0, 0, 0, "");
+				}else{
+					q_gt('mech', '1=1 ', 0, 0, 0, "");
+				}
 				
 				setInterval("dialog_show()",1000*5);
 			});
@@ -53,6 +62,13 @@
 							t_where2=t_where2+" or (noa@^@'-'@^@noq='"+$('#cucs_noa'+i).text()+"-"+$('#cucs_noq'+i).text()+"' )";
 					}
 					var t_where = "1=1 and ("+noa_where+") and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0";
+					
+					if(r_userno=='C006'){ //A剪
+						t_where+=" and isnull(b.mins#^#'')='C1' or isnull(b.mins#^#'')='') "
+					}
+					if(r_userno=='C002'){ //B剪
+						t_where+=" and isnull(b.mins#^#'')='C2' or isnull(b.mins#^#'')='') "
+					}
 					var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
 					q_func('qtxt.query.cucs_importcucs', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';#non'+';'+t_where2);
 					Lock();
@@ -79,7 +95,13 @@
 				//載入案號 資料
                 
                 //106/08/08 避免載入太多資料 只取最後一筆表身 與 不讀取NOA空白
-                var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' "; 
+                var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' ";
+                if(r_userno=='C006'){ //A剪
+					t_where+=" and isnull(b.mins#^#'')='C1' or isnull(b.mins#^#'')='') "
+				}
+				if(r_userno=='C002'){ //B剪
+					t_where+=" and isnull(b.mins#^#'')='C2' or isnull(b.mins#^#'')='') "
+				} 
                 var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
 				
 				q_func('qtxt.query.cucs_init', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';init'+';#non');
@@ -141,6 +163,14 @@
 	                    t_where += q_sqlPara2("b.size", t_size);
 	                    t_where += q_sqlPara2("b.spec", tx_spec);
 	                    t_where=replaceAll(t_where,',','#^#');
+	                    
+	                    if(r_userno=='C006'){ //A剪
+							t_where+=" and isnull(b.mins#^#'')='C1' or isnull(b.mins#^#'')='') "
+						}
+						if(r_userno=='C002'){ //B剪
+							t_where+=" and isnull(b.mins#^#'')='C2' or isnull(b.mins#^#'')='') "
+						}
+	                    
 	                    var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
 	                    var t_order=emp($('#combOrder').val())?'#non':$('#combOrder').val();
 	                    
@@ -184,7 +214,15 @@
                    	
                 	//初始化cucs
 					
-	                var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' "; 
+	                var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' ";
+	                
+	                if(r_userno=='C006'){ //A剪
+						t_where+=" and isnull(b.mins#^#'')='C1' or isnull(b.mins#^#'')='') "
+					}
+					if(r_userno=='C002'){ //B剪
+						t_where+=" and isnull(b.mins#^#'')='C2' or isnull(b.mins#^#'')='') "
+					}
+	                 
 	                var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
 					
 					q_func('qtxt.query.cucs_init', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';init'+';#non');

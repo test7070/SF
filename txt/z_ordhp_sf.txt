@@ -143,6 +143,8 @@ declare @t_typea nvarchar(30)
 declare @t_btggno nvarchar(30)
 declare @t_etggno nvarchar(30)
 declare @t_noa nvarchar(30)
+declare @t_btdate nvarchar(30)
+declare @t_etdate nvarchar(30)
 
 set @t_bdate = case when '#non'=[1] then '' else [1] end 
 set @t_edate = case when '#non'=[2] then char(255) else [2] end 
@@ -150,6 +152,8 @@ set @t_typea = case when '#non'=[3] then '' else [3] end
 set @t_btggno = case when '#non'=[4] then '' else [4] end 
 set @t_etggno = case when '#non'=[5] then char(255) else [5] end 
 set @t_noa = case when '#non'=[6] then '' else [6] end 
+set @t_btdate = case when '#non'=[7] then '' else [7] end 
+set @t_etdate = case when '#non'=[8] then char(255) else [8] end 
 -----------------------------------------------------------------------------------
 IF OBJECT_ID('tempdb..#tmp')is not null
 BEGIN
@@ -216,6 +220,7 @@ from ordh a outer apply (
 	,sum(case when ib.size='#10' and ib.spec='SD420W' then ib.weight else 0 end)n
 	,sum(case when ib.size='#11' and ib.spec='SD420W' then ib.weight else 0 end)o
 	from view_ina ia left join view_inas ib on ia.noa=ib.noa where ia.ordeno=a.noa
+	and ia.datea between @t_btdate and @t_etdate
 )xb
 where (datea between @t_bdate and @t_edate) and (len(@t_typea)=0 or typea=@t_typea)
 and (tggno between @t_btggno and @t_etggno) and (len(@t_noa)=0 or noa=@t_noa)
@@ -247,6 +252,7 @@ from ordh a outer apply (
 	,sum(case when gb.size='#10' and gb.spec='SD420W' then gb.weight else 0 end)n
 	,sum(case when gb.size='#11' and gb.spec='SD420W' then gb.weight else 0 end)o
 	from view_get ga left join view_gets gb on ga.noa=gb.noa where ga.idno=a.noa
+	and ga.datea between @t_btdate and @t_etdate
 )xb
 where (datea between @t_bdate and @t_edate) and (len(@t_typea)=0 or typea=@t_typea)
 and (tggno between @t_btggno and @t_etggno) and (len(@t_noa)=0 or noa=@t_noa)

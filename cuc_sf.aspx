@@ -174,7 +174,7 @@
             }
             
             function bbswidth() {
-				var t_width=1750;
+				var t_width=1900;
 				if($('#btnImg').val()=='圖型關閉'){ //圖型顯示
 					t_width=t_width+200;
 				}
@@ -1519,8 +1519,6 @@
 							<a id='lblSize2_s'> </a>
 							<input class="btn"  id="btnSize2Copy" type="button" value='≡' style="font-weight: bold;"  />
 						</td>
-						<!--<td style="width:150px;"><a id='lblMech_s'>剪裁機台</a></td>
-						<td style="width:150px;"><a id='lblMech2_s'>成型機台</a></td>-->
 						<td style="width:90px;">
 							<a id='lblBtime_s'> </a>
 							<input class="btn" id="btnBtimeCopy" type="button" value='≡' style="font-weight: bold;"  />
@@ -1529,6 +1527,8 @@
 							<a id='lblEtime_s'> </a>
 							<input class="btn" id="btnEtimeCopy" type="button" value='≡' style="font-weight: bold;"  />
 						</td>
+						<td style="width:150px;"><a id='lblMech_s'>剪裁機台</a></td>
+						<!--<td style="width:150px;"><a id='lblMech2_s'>成型機台</a></td>-->
 						<!--<td style="width:40px;"><a id='lblRadius_s'> </a></td>
 						<td style="width:40px;"><a id='lblWidth_s'> </a></td>
 						<td style="width:40px;"><a id='lblDime_s'> </a></td>-->
@@ -1593,18 +1593,18 @@
 						</td>
 						<td><input id="txtMemo.*" type="text" class="txt c1"/></td>
 						<td><input id="txtSize2.*" type="text" class="txt c1"/></td>
-						<!--<td>
+						<td><select id="cmbBtime.*" class="txt c1"> </select></td>
+						<td><select id="cmbEtime.*" class="txt c1"> </select></td>
+						<td>
 							<input id="txtMechno.*" type="text" class="txt c1"/>
 							<input id="txtMech.*" type="text" class="txt c1"/>
 							<input id="btnMechno.*" type="button" style="display:none;">
 						</td>
-						<td>
+						<!--<td>
 							<input id="txtMechno2.*" type="text" class="txt c1"/>
 							<input id="txtMech2.*" type="text" class="txt c1"/>
 							<input id="btnMechno2.*" type="button" style="display:none;">
 						</td>-->
-						<td><select id="cmbBtime.*" class="txt c1"> </select></td>
-						<td><select id="cmbEtime.*" class="txt c1"> </select></td>
 						<!--<td>
 							<input id="checkRadius.*" type="checkbox"/>
 							<input id="txtRadius.*" type="hidden"/>

@@ -13,7 +13,7 @@
 		<link href="css/jquery/themes/redmond/jquery.ui.all.css" rel="stylesheet" type="text/css" />
 		<script src="css/jquery/ui/jquery.ui.core.js"></script>
 		<script src="css/jquery/ui/jquery.ui.widget.js"></script>
-		<script src="css/jquery/ui/jquery.ui.datepicker.js"></script>
+		<script src="css/jquery/ui/jquery.ui.datepicker_tw.js"></script>
 		<script type="text/javascript">
             if (location.href.indexOf('?') < 0) {
                 location.href = location.href + "?;;;;" + ((new Date()).getUTCFullYear() - 1911);
@@ -21,19 +21,6 @@
             $(document).ready(function() {
                 q_getId();
                 q_gf('', 'z_ordhp_sf');
-                
-                $.datepicker.regional['zh-TW']={
-				   dayNames:["星期日","星期一","星期二","星期三","星期四","星期五","星期六"],
-				   dayNamesMin:["日","一","二","三","四","五","六"],
-				   monthNames:["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
-				   monthNamesShort:["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"],
-				   prevText:"上月",
-				   nextText:"次月",
-				   weekHeader:"週"
-				};
-				//將預設語系設定為中文
-				$.datepicker.setDefaults($.datepicker.regional["zh-TW"]);
-				
             });
 
             function q_gfPost() {
@@ -55,16 +42,31 @@
                     }, {
                         type : '6',
                         name : 'xnoa'
+                    },{
+                        type : '1',
+                        name : 'ydate'
                     }]
                 });
                 q_popAssign();
                 q_getFormat();
                 q_langShow();
+                
+                if(r_len==4){                	
+                	$.datepicker.r_len=r_len;
+                	//格式(有設定格式要在重新設定模板，否則格式無效)
+                	//$.datepicker.r_dateformat=q_getPara('sys.dateformat');
+                	//民國模板(預設)
+                	//$.datepicker.setDefaults($.datepicker.regional[""]);
+                	//英文模板
+					//$.datepicker.setDefaults($.datepicker.regional["ENG"]);
+                }
     			
     			$('#txtXdate1').mask(r_picd);
                 $('#txtXdate1').val(q_date().substr(0, r_lenm)+'/01');
                 $('#txtXdate2').mask(r_picd);
                 $('#txtXdate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',35).substr(0,r_lenm)+'/01',-1));
+                $('#txtYdate1').mask(r_picd);
+                $('#txtYdate2').mask(r_picd);
                 
                 var t_report=q_getHref()[1];
 				var t_index=-1;

@@ -35,6 +35,18 @@
                     }]
                 });
                 q_popAssign();
+				q_getFormat();
+				q_langShow();
+                
+                if(r_len==4){                	
+                	$.datepicker.r_len=r_len;
+                	//格式(有設定格式要在重新設定模板，否則格式無效)
+                	//$.datepicker.r_dateformat=q_getPara('sys.dateformat');
+                	//民國模板(預設)
+                	//$.datepicker.setDefaults($.datepicker.regional[""]);
+                	//英文模板
+					//$.datepicker.setDefaults($.datepicker.regional["ENG"]);
+                }
 
                 var t_noa = typeof (q_getId()[5]) == 'undefined' ? '' : q_getId()[5];
                 t_noa = t_noa.replace('noa=', '');
