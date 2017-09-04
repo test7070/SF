@@ -64,10 +64,10 @@
 					var t_where = "1=1 and ("+noa_where+") and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0";
 					
 					if(r_userno=='C006'){ //A剪
-						t_where+=" and isnull(b.mins#^#'')='C1' or isnull(b.mins#^#'')='') "
+						t_where+=" and (isnull(b.mechno#^#'')='C1' or isnull(b.mechno#^#'')='') "
 					}
 					if(r_userno=='C002'){ //B剪
-						t_where+=" and isnull(b.mins#^#'')='C2' or isnull(b.mins#^#'')='') "
+						t_where+=" and (isnull(b.mechno#^#'')='C2' or isnull(b.mechno#^#'')='') "
 					}
 					var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
 					q_func('qtxt.query.cucs_importcucs', 'cuc_sf.txt,importcucs,'+t_where+';'+t_where1+';#non'+';'+t_where2);
@@ -97,10 +97,10 @@
                 //106/08/08 避免載入太多資料 只取最後一筆表身 與 不讀取NOA空白
                 var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' ";
                 if(r_userno=='C006'){ //A剪
-					t_where+=" and isnull(b.mins#^#'')='C1' or isnull(b.mins#^#'')='') "
+					t_where+=" and (isnull(b.mechno#^#'')='C1' or isnull(b.mechno#^#'')='') "
 				}
 				if(r_userno=='C002'){ //B剪
-					t_where+=" and isnull(b.mins#^#'')='C2' or isnull(b.mins#^#'')='') "
+					t_where+=" and (isnull(b.mechno#^#'')='C2' or isnull(b.mechno#^#'')='') "
 				} 
                 var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
 				
@@ -143,7 +143,13 @@
 				});*/
 				
 				$('#lblCucnoa').click(function() {
-					q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
+					if(r_userno=='C006'){ //A剪
+						q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0 and (isnull(mechno,'')='C1' or isnull(mechno,'')='') ) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
+					}else if(r_userno=='C002'){ //B剪
+						q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0 and (isnull(mechno,'')='C2' or isnull(mechno,'')='') ) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
+					}else{
+						q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
+					}
 				});
 				
 				//匯入
@@ -165,10 +171,10 @@
 	                    t_where=replaceAll(t_where,',','#^#');
 	                    
 	                    if(r_userno=='C006'){ //A剪
-							t_where+=" and isnull(b.mins#^#'')='C1' or isnull(b.mins#^#'')='') "
+							t_where+=" and (isnull(b.mechno#^#'')='C1' or isnull(b.mechno#^#'')='') "
 						}
 						if(r_userno=='C002'){ //B剪
-							t_where+=" and isnull(b.mins#^#'')='C2' or isnull(b.mins#^#'')='') "
+							t_where+=" and (isnull(b.mechno#^#'')='C2' or isnull(b.mechno#^#'')='') "
 						}
 	                    
 	                    var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
@@ -217,10 +223,10 @@
 	                var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' ";
 	                
 	                if(r_userno=='C006'){ //A剪
-						t_where+=" and isnull(b.mins#^#'')='C1' or isnull(b.mins#^#'')='') "
+						t_where+=" and (isnull(b.mechno#^#'')='C1' or isnull(b.mechno#^#'')='') "
 					}
 					if(r_userno=='C002'){ //B剪
-						t_where+=" and isnull(b.mins#^#'')='C2' or isnull(b.mins#^#'')='') "
+						t_where+=" and (isnull(b.mechno#^#'')='C2' or isnull(b.mechno#^#'')='') "
 					}
 	                 
 	                var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
@@ -980,6 +986,14 @@
 						}
 						$('#combMechno').text();
 						q_cmbParse("combMechno", t_mech);
+						
+						if(r_userno=='C006'){ //A剪
+							$('#combMechno').val('C1');
+						}
+						if(r_userno=='C002'){ //B剪
+							$('#combMechno').val('C2');
+						}
+						
 						break;
 					case q_name:
 						if (q_cur == 4)
