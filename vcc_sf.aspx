@@ -804,9 +804,8 @@
 							}
 							if (z_msg.length > 0) {
 								alert('已沖帳:' + z_msg);
-								//1060908 暫時先開放可修改前期出貨單
-								//Unlock(1);
-								//return;
+								Unlock(1);
+								return;
 							}
 						}
 						_btnModi();
