@@ -169,7 +169,7 @@ not ((len(@t_pno)=0 or isnull(product,'')=@t_pno)
 )
 
 delete #tmp where mount<=0 and weight<=0
-delete #tmp where storeno!='A'
+--delete #tmp where storeno!='A'
 
 if((select count(*) from #tmp)>0)
 begin
@@ -1734,7 +1734,7 @@ from view_rc2 a left join view_rc2s b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
-and b.storeno='A' --106/04/05
+--and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
 
 --加工入
@@ -1746,7 +1746,7 @@ from view_cub a left join view_cubs b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
-and b.storeno='A' --106/04/05
+--and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
 
 --互換入
@@ -1758,7 +1758,7 @@ from view_ina a left join view_inas b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
-and b.storeno='A' --106/04/05
+--and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
 
 --銷
@@ -1772,7 +1772,7 @@ left join ucc d on b.product=d.product
 outer apply (select top 1 * from view_vccs where noa=a.noa and product=b.product and ucolor=b.ucolor and spec=b.spec and size=b.size and class=b.class)c
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate 
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
-and b.storeno='A' --106/04/05
+--and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
 
 --加工領
@@ -1784,7 +1784,7 @@ from view_cub a left join view_cubt b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
-and b.storeno='A' --106/04/05
+--and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
 
 --互換出
@@ -1796,7 +1796,7 @@ from view_get a left join view_gett b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
-and b.storeno='A' --106/04/05
+--and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
 
 update  a
