@@ -804,8 +804,9 @@
 							}
 							if (z_msg.length > 0) {
 								alert('已沖帳:' + z_msg);
-								Unlock(1);
-								return;
+								//106/09/15 暫時開放
+								//Unlock(1);
+								//return;
 							}
 						}
 						_btnModi();

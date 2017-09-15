@@ -859,7 +859,7 @@ gno,product,spec,size
 ,dbo.getComma(lm,2)lm
 ,REPLACE(CONVERT (NVARCHAR(10), GETDATE(),20 ),'-','/') today
 ,case when @t_bstoreno='' then isnull((select top 1 store from store order by noa),'') else @t_bstoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end bstore
-,case when @t_estoreno=char(255) then isnull((select top 1 store from store order by noa desc),'') else @t_estoreno+' '+isnull((select top 1 store from store where noa=@t_bstoreno),'') end estore
+,case when @t_estoreno=char(255) then isnull((select top 1 store from store order by noa desc),'') else @t_estoreno+' '+isnull((select top 1 store from store where noa=@t_estoreno),'') end estore
 from #tmpa order by gno,product,spec,cast(dbo.get_num(size) as int),size
 
 IF OBJECT_ID('tempdb..#tmp')is not null
