@@ -228,6 +228,7 @@ declare @t_path nvarchar(max) = '[1]'
 declare @t_xnoa nvarchar(100) = case when '#non'= [2] then '' else [2] end
 declare @t_spec nvarchar(100) = case when '#non'= [8] then '' else [8] end
 declare @t_size nvarchar(100) = case when '#non'= [9] then '' else [9] end
+declare @t_memo nvarchar(100) = case when '#non'= [10] then '' else [10] end
 ----------------------------------------------------------------------------------------------------------------------------
 
 declare @tmp table(
@@ -267,6 +268,7 @@ declare @tmp table(
 
 --106/07/14 黃小姐 需合併內容 公令 備註 等 都會打一模一樣
 --106/07/17 黃小姐 照106/07/17 傳真排序方式
+--106/07/28 黃 加備註篩選
 insert @tmp
 select '0',0,a.noa,a.datea,a.mech,a.cust,a.bdate,a.memo,'',''
 		,MIN(b.noq),b.productno,b.product,b.ucolor,b.spec,b.size,b.picno,b.picno,b.picname
@@ -276,6 +278,7 @@ from  view_cuc a left join view_cucs b on a.noa=b.noa
 where a.noa=@t_xnoa 
 and (len(@t_spec)=0 or b.spec=@t_spec)
 and (len(@t_size)=0 or b.size=@t_size)
+and (len(@t_memo)=0 or b.memo like '%'+@t_memo+'%')
 group by a.noa,a.datea,a.mech,a.cust,a.bdate,a.memo
 ,b.productno,b.product,b.ucolor,b.spec,b.size,b.picno,b.picno,b.picname
 ,b.imgdata,b.paraf,b.parag,b.lengthb,b.class,b.memo,b.size2,b.btime,b.etime
