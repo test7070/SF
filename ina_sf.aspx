@@ -861,7 +861,8 @@
                 $('#txtDatea').val(q_date());
                 $('#txtDatea').focus();
                 //105/12/08空白倉庫預設A //SF 106/08/17 取消批號入庫 因此倉庫區分互換入庫
-				$('#txtStoreno').val('A3').change();
+                //106/09/30 大部分都是委外加工 預設A
+				$('#txtStoreno').val('A').change();
             }
 
             function btnModi() {

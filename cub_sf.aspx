@@ -19,7 +19,7 @@
             var q_name = "cub";
             var q_readonly = ['txtNoa','txtWorker','txtWorker2'];
             var q_readonlys = ['txtOrdeno', 'txtNo2','txtProductno2','txtProduct2'];
-            var q_readonlyt = ['txtLengthc','txtGmount','txtGweight'];
+            var q_readonlyt = [];
             var bbmNum = [];
             var bbsNum = [];
             var bbtNum = [];
@@ -530,6 +530,17 @@
 					if(!emp($('#txtProduct_'+i).val()) && emp($('#txtStoreno_'+i).val())){
 						$('#txtStoreno_'+i).val('A');
 						$('#txtStore_'+i).val('三泰-板料');
+					}
+				}
+				
+				//106/09/30
+				for (var i = 0; i < q_bbtCount; i++) {
+					if(!emp($('#txtUno__'+i).val())){
+						$('#txtStoreno__'+i).val('A2');
+						$('#txtStore__'+i).val('三泰-成品');
+					}else{
+						$('#txtStoreno__'+i).val('A');
+						$('#txtStore__'+i).val('三泰-板料');
 					}
 				}
                 
@@ -1222,11 +1233,11 @@
 					<td><input id="txtLengthc..*" type="text" class="txt c1 num"/></td>
 					<td><input id="txtGmount..*" type="text" class="txt c1 num"/></td>
 					<td><input id="txtGweight..*" type="text" class="txt c1 num"/></td>
-					<!--<td>
+					<td style="display: none;">
 						<input id="txtStoreno..*" type="text" class="txt c1" style="width: 30%"/>
 						<input class="btn"  id="btnStoreno..*" type="button" value='.' style=" font-weight: bold;float: left;" />
 						<input id="txtStore..*" type="text" class="txt c1" style="width: 50%"/>
-					</td>-->
+					</td>
 					<td><input id="txtMemo..*" type="text" class="txt c1"/></td>
 				</tr>
 			</table>
