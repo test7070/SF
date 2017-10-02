@@ -2605,12 +2605,8 @@
 						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
 						<td><input id="txtCardealno" type="text" class="txt c1"/></td>
 						<td><input id="txtCardeal" type="text" class="txt c1"/></td>
-						<td colspan="2">
-							<input id="txtCartrips" type="hidden" class="txt num c1"/><!--表示案號是否最後一次出貨-->
-							<input id="btnCubs" type="button" class="txt" value="領料自動匯入" style="float: right;">
-							<span style="float: right;"> </span>
-							<a class="lbl">領完</a><input id="checkCartrips" type="checkbox" style="float: right;">
-						</td>
+						<td><span> </span><a id='lblZipcode_sf' class="lbl">案號</a></td>
+                        <td><input id="txtZipcode" type="text" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblPrice_sf" class="lbl">運費單價</a></td>
@@ -2619,8 +2615,12 @@
                         <td><span> </span><a id='lblTranmoney' class="lbl"> </a></td>
                         <td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
                         <td> </td>
-                        <td><span> </span><a id='lblZipcode_sf' class="lbl">案號</a></td>
-                        <td><input id="txtZipcode" type="text" class="txt c1"/></td>
+                        <td colspan="2">
+							<input id="txtCartrips" type="hidden" class="txt num c1"/><!--表示案號是否最後一次出貨-->
+							<input id="btnCubs" type="button" class="txt" value="領料自動匯入" style="float: right;">
+							<span style="float: right;"> </span>
+							<a class="lbl" style="color:fuchsia; ">領完</a><input id="checkCartrips" type="checkbox" style="float: right;">
+						</td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMoney" class="lbl"> </a></td>

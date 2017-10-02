@@ -19,7 +19,7 @@
 			var q_name = "get";
 			var q_readonly = ['txtNoa', 'txtWorker','txtWorker2','txtTranstartno','txtStore'];
 			var q_readonlys = [];
-			var q_readonlyt = ['txtMount','txtWeight'];
+			var q_readonlyt = ['txtMount','txtWeight','txtLengthc'];
 			var bbmNum = [];
 			var bbsNum = [];
 			var bbtNum = [];
@@ -191,6 +191,88 @@
 					sum();
 				});
 				
+				//106/09/30 匯入批號 依據 表頭 案號 表身重量,材質,號數 自動匯入 ，當最後一次出貨就全部領料
+				$('#btnCubs').click(function() {
+					if(q_cur==1 || q_cur==2){
+						if(!emp($('#txtWorkno').val())){
+							var tbs=[];
+							//合併bbs材質號數
+							for (var i = 0; i < q_bbsCount; i++) {
+								if($('#txtProduct_'+i).val()=='鋼筋' && dec($('#txtWeight_'+i).val())!=0 ){
+									var t_exists=false;
+									for (var j = 0; j < tbs.length; j++) {
+										if($('#txtSpec_'+i).val()==tbs[j].spec && $('#txtSize_'+i).val()==tbs[j].size){
+											t_exists=true;
+											tbs[j].weight=q_add(dec(tbs[j].weight),dec($('#txtWeight_'+i).val()));
+											break;
+										}
+									}
+									if(!t_exists){
+										tbs.push({
+											'spec':$('#txtSpec_'+i).val(),
+											'size':$('#txtSize_'+i).val(),
+											'weight':dec($('#txtWeight_'+i).val())
+										});	
+									}
+								}
+							}
+							//抓取cubs
+							if(tbs.length>0){
+								//清除bbt
+								for (var i = 0; i < q_bbtCount; i++) {
+									$('#btnMinut__'+i).click();
+								}
+								var t_uno=$('#txtWorkno').val();
+								var t_spec='#non';
+								var t_size='#non';
+								var t_weight='#non';
+								var t_enda=$('#checkWaste').prop('checked')==true?'Y':'#non';
+								var t_noa=!emp($('#txtNoa').val())?$('#txtNoa').val():'#non';
+								
+								if(t_enda=='Y'){
+									q_func('qtxt.query.getvccuno', 'cuc_sf.txt,getvccuno,' 
+									+ encodeURI(t_uno)+';'+encodeURI(t_spec)+';'+encodeURI(t_size)
+									+';'+encodeURI(t_weight)+';'+encodeURI(t_enda)+';'+encodeURI(t_noa)
+									+';'+encodeURI(r_userno)+';'+encodeURI(r_name),r_accy,1);
+				                	var as = _q_appendData("tmp0", "", true, true);
+				                	if (as[0] != undefined) {
+				                		q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtMount,txtWeight,txtUno,txtMemo,txtOrdeno,txtNo2,txtItemno,txtItem,txtStoreno,txtStore'
+										, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno,memo,ordeno,no2,noa,noq,storeno,store', 'txtUno');
+				                	}else{
+				                		alert('無可領料批號!!');
+				                	}
+								}else{
+									var tcount=0;
+									for (var j = 0; j < tbs.length; j++) {
+										if(dec(tbs[j].weight)>0){
+											t_spec=tbs[j].spec;
+											t_size=tbs[j].size;
+											t_weight=dec(tbs[j].weight);
+											
+											q_func('qtxt.query.getvccuno', 'cuc_sf.txt,getvccuno,' 
+											+ encodeURI(t_uno)+';'+encodeURI(t_spec)+';'+encodeURI(t_size)
+											+';'+encodeURI(t_weight)+';'+encodeURI(t_enda)+';'+encodeURI(t_noa)
+											+';'+encodeURI(r_userno)+';'+encodeURI(r_name),r_accy,1);
+						                	var as = _q_appendData("tmp0", "", true, true);
+						                	if (as[0] != undefined) {
+						                		q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtMount,txtWeight,txtUno,txtMemo,txtOrdeno,txtNo2,txtItemno,txtItem,txtStoreno,txtStore'
+												, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno,memo,ordeno,no2,noa,noq,storeno,store', 'txtUno');
+												tcount++;
+						                	}
+										}
+									}
+									if(tcount==0){
+										alert('無可領料批號!!');
+									}
+								}
+							}else{
+								alert('表身無鋼筋資料!!');
+							}
+						}else{
+							alert('請輸入【案號】!!');
+						}
+					}
+				});
 			}
 			
 			function q_popPost(s1) {
@@ -494,8 +576,8 @@
 					var as = _q_appendData('view_cubs', '', true);
 					if (as[0] != undefined) {
 						$('#btnMinut__'+n).click();
-						q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtMount,txtWeight,txtUno,txtMemo,txtOrdeno,txtNo2,txtItemno,txtItem'
-							, as.length, as, 'product,ucolor,spec,size,lengthb,class,mount,weight,uno,memo,ordeno,no2,noa,noq', 'txtUno');
+						q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtMount,txtWeight,txtUno,txtMemo,txtOrdeno,txtNo2,txtItemno,txtItem'
+							, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno,memo,ordeno,no2,noa,noq', 'txtUno');
 						
 						if(dec(n)+as.length>=q_bbtCount){
 							$('#btnPlut').click();
@@ -544,6 +626,11 @@
 				check_ordh=false;
 				t_nordhno=$('#txtIdno').val();
 				
+				if($('#checkWaste').prop('checked')){
+					$('#txtWaste').val(1);
+				}else{
+					$('#txtWaste').val(0);
+				}
 				
                 if (q_cur == 1){
                     $('#txtWorker').val(r_name);
@@ -902,7 +989,7 @@
             }
             
             function bbtsum() {
-                var tot_mount=0,tot_weight=0,tot_uno='';
+                var tot_mount=0,tot_weight=0,tot_lengthc=0,tot_uno='';
                 for (var i = 0; i < q_bbtCount; i++) {
                     //105/04/07 改成批號計1件
                     if(!emp($('#txtUno__'+i).val())&& tot_uno.indexOf($('#txtUno__'+i).val())==-1){
@@ -912,7 +999,12 @@
                     
                     //tot_mount=q_add(tot_mount,dec($('#txtMount__'+i).val()));
                     tot_weight=q_add(tot_weight,dec($('#txtWeight__'+i).val()));
+                    tot_lengthc=q_add(tot_lengthc,dec($('#txtLengthc__'+i).val()));
                 }
+                if(tot_mount!=0)
+					$('#lblTot_lengthc').text(FormatNumber(tot_lengthc));
+				else
+					$('#lblTot_lengthc').text('');
                 if(tot_mount!=0)
                     $('#lblTot_mount').text(FormatNumber(tot_mount));
                 else
@@ -1068,6 +1160,8 @@
 				_readonly(t_para, empty);
 				if(t_para){
                 	$('#combAccount').attr('disabled', 'disabled');
+                	$('#btnCubs').attr('disabled', 'disabled');
+					$('#checkWaste').attr('disabled', 'disabled');
                 	for (var i = 0; i < q_bbsCount; i++) {
                 		$('#combProduct_'+i).attr('disabled', 'disabled');
                 		$('#combUcolor_'+i).attr('disabled', 'disabled');
@@ -1076,6 +1170,8 @@
                 	}
                 }else{
                 	$('#combAccount').removeAttr('disabled');
+                	$('#btnCubs').removeAttr('disabled');
+					$('#checkWaste').removeAttr('disabled');
                 	for (var i = 0; i < q_bbsCount; i++) {
                 		$('#combProduct_'+i).removeAttr('disabled');
                 		$('#combUcolor_'+i).removeAttr('disabled');
@@ -1191,6 +1287,12 @@
 						$('#txtTax').css('color', 'black').css('background', 'white').removeAttr('readonly');  
                 }else{
                 	$('#txtTax').css('color', 'green').css('background', 'RGB(237,237,237)').attr('readonly', 'readonly');
+                }
+                
+                if(dec($('#txtWaste').val())!=0){
+                	$('#checkWaste').prop('checked',true);
+                }else{
+                	$('#checkWaste').prop('checked',false);
                 }
             }
             
@@ -1751,6 +1853,16 @@
 						</td>
 					</tr>
 					<tr>
+						<td><span> </span><a id='lblWorkno_sf' class="lbl">案號</a></td>
+                        <td><input id="txtWorkno" type="text" class="txt c1"/></td>
+                        <td colspan="2">
+							<input id="txtWaste" type="hidden" class="txt num c1"/><!--表示案號是否最後一次出貨-->
+							<input id="btnCubs" type="button" class="txt" value="領料自動匯入" style="float: right;">
+							<span style="float: right;"> </span>
+							<a class="lbl" style="color:fuchsia; ">領完</a><input id="checkWaste" type="checkbox" style="float: right;">
+						</td>
+					</tr>	
+					<tr>
 						<td><span> </span><a id="lblWorker" class="lbl"> </a></td>
 						<td><input id="txtWorker" type="text" class="txt c1"/></td>
 						<td><span> </span><a id="lblWorker2" class="lbl"> </a></td>
@@ -1818,7 +1930,7 @@
 			</table>
 		</div>
 		<input id="q_sys" type="hidden" />
-        <div id="dbbt" class='dbbt'>
+        <div id="dbbt" class='dbbt' style="width: 1260px;">
             <table id="tbbt" class="tbbt">
                 <tr class="head" style="color:white; background:#003366;">
                     <td style="width:20px;"><input id="btnPlut" type="button" style="font-size: medium; font-weight: bold;" value="＋"/></td>
@@ -1835,6 +1947,10 @@
                     <td style="width:70px;"><a id='lblLengthb_t'>米數</a></td>
                     <td style="width:100px;"><a id='lblClass_t'>廠牌</a></td>
                     <!--<td style="width:55px;"><a id='lblUnit_t'> </a></td>-->
+                    <td style="width:80px;">
+                        <a id='lblLengthc_t'>領料支數</a>
+                        <BR><a id='lblTot_lengthc'> </a>
+                    </td>
                     <td style="width:80px;">
                         <a id='lblMount_t'>領料數</a>
                         <BR><a id='lblTot_mount'> </a>
@@ -1875,6 +1991,7 @@
                         <select id="combClass..*" class="txt" style="width: 20px;display: none;"> </select>
                     </td>
                     <!--<td><input id="txtUnit..*" type="text" class="txt c1"/></td>-->
+                    <td><input id="txtLengthc..*" type="text" class="txt c1 num"/></td>
                     <td><input id="txtMount..*" type="text" class="txt c1 num"/></td>
                     <td><input id="txtWeight..*" type="text" class="txt c1 num"/></td>
                     <td>
