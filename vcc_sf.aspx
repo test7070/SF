@@ -207,10 +207,6 @@
 				$('#lblOrdeno').click(function() {
 					q_pop('txtOrdeno', "orde_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";charindex(noa,'" + $('#txtOrdeno').val() + "')>0;" + r_accy + '_' + r_cno, 'orde', 'noa', '', "92%", "1024px", '訂單作業', true);
 				});
-				
-				$('#lblZipcode').click(function() {
-					q_pop('txtZipcode', "quat_sf.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";charindex(noa,'" + $('#txtZipcode').val() + "')>0;" + r_accy + '_' + r_cno, 'quat', 'noa', '', "92%", "1024px", '出貨合約', true);
-				});
 
 				$('#lblAccc').click(function() {
 					q_pop('txtAccno', "accc.aspx?" + r_userno + ";" + r_name + ";" + q_time + ";accc3='" + $('#txtAccno').val() + "';" + $('#txtDatea').val().substring(0, 3) + '_' + r_cno, 'accc', 'accc3', 'accc2', "92%", "1054px", q_getMsg('lblAccc'), true);
@@ -353,6 +349,93 @@
 						sum();	
 					}
 				});
+				
+				//106/09/30 匯入批號 依據 表頭 案號 表身重量,材質,號數 自動匯入 ，當最後一次出貨就全部領料
+				$('#btnCubs').click(function() {
+					if(q_cur==1 || q_cur==2){
+						if($('#cmbTypea').val()!='1'){
+							alert('非出貨單無法自動領料!!');
+							return;
+						}
+						if(!emp($('#txtZipcode').val())){
+							var tbs=[];
+							//合併bbs材質號數
+							for (var i = 0; i < q_bbsCount; i++) {
+								if($('#txtProduct_'+i).val()=='鋼筋' && dec($('#txtWeight_'+i).val())!=0 ){
+									var t_exists=false;
+									for (var j = 0; j < tbs.length; j++) {
+										if($('#txtSpec_'+i).val()==tbs[j].spec && $('#txtSize_'+i).val()==tbs[j].size){
+											t_exists=true;
+											tbs[j].weight=q_add(dec(tbs[j].weight),dec($('#txtWeight_'+i).val()));
+											break;
+										}
+									}
+									if(!t_exists){
+										tbs.push({
+											'spec':$('#txtSpec_'+i).val(),
+											'size':$('#txtSize_'+i).val(),
+											'weight':dec($('#txtWeight_'+i).val())
+										});	
+									}
+								}
+							}
+							//抓取cubs
+							if(tbs.length>0){
+								//清除bbt
+								for (var i = 0; i < q_bbtCount; i++) {
+									$('#btnMinut__'+i).click();
+								}
+								var t_uno=$('#txtZipcode').val();
+								var t_spec='#non';
+								var t_size='#non';
+								var t_weight='#non';
+								var t_enda=$('#checkCartrips').prop('checked')==true?'Y':'#non';
+								var t_noa=!emp($('#txtNoa').val())?$('#txtNoa').val():'#non';
+								
+								if(t_enda=='Y'){
+									q_func('qtxt.query.getvccuno', 'cuc_sf.txt,getvccuno,' 
+									+ encodeURI(t_uno)+';'+encodeURI(t_spec)+';'+encodeURI(t_size)
+									+';'+encodeURI(t_weight)+';'+encodeURI(t_enda)+';'+encodeURI(t_noa)
+									+';'+encodeURI(r_userno)+';'+encodeURI(r_name),r_accy,1);
+				                	var as = _q_appendData("tmp0", "", true, true);
+				                	if (as[0] != undefined) {
+				                		q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtMount,txtWeight,txtUno,txtMemo,txtOrdeno,txtNo2,txtItemno,txtItem,txtStoreno,txtStore'
+										, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno,memo,ordeno,no2,noa,noq,storeno,store', 'txtUno');
+				                	}else{
+				                		alert('無可領料批號!!');
+				                	}
+								}else{
+									var tcount=0;
+									for (var j = 0; j < tbs.length; j++) {
+										if(dec(tbs[j].weight)>0){
+											t_spec=tbs[j].spec;
+											t_size=tbs[j].size;
+											t_weight=dec(tbs[j].weight);
+											
+											q_func('qtxt.query.getvccuno', 'cuc_sf.txt,getvccuno,' 
+											+ encodeURI(t_uno)+';'+encodeURI(t_spec)+';'+encodeURI(t_size)
+											+';'+encodeURI(t_weight)+';'+encodeURI(t_enda)+';'+encodeURI(t_noa)
+											+';'+encodeURI(r_userno)+';'+encodeURI(r_name),r_accy,1);
+						                	var as = _q_appendData("tmp0", "", true, true);
+						                	if (as[0] != undefined) {
+						                		q_gridAddRow(bbtHtm, 'tbbt', 'txtProduct,txtUcolor,txtSpec,txtSize,txtLengthb,txtClass,txtLengthc,txtMount,txtWeight,txtUno,txtMemo,txtOrdeno,txtNo2,txtItemno,txtItem,txtStoreno,txtStore'
+												, as.length, as, 'product,ucolor,spec,size,lengthb,class,lengthc,mount,weight,uno,memo,ordeno,no2,noa,noq,storeno,store', 'txtUno');
+												tcount++;
+						                	}
+										}
+									}
+									if(tcount==0){
+										alert('無可領料批號!!');
+									}
+								}
+							}else{
+								alert('表身無鋼筋資料!!');
+							}
+						}else{
+							alert('請輸入【案號】!!');
+						}
+					}
+				});
 			}
 			
 			function refreshBbm() {
@@ -368,6 +451,12 @@
                     $('#txtNoa').css('color', 'black').css('background', 'white').removeAttr('readonly');
                 } else {
                     $('#txtNoa').css('color', 'green').css('background', 'RGB(237,237,237)').attr('readonly', 'readonly');
+                }
+                
+                if(dec($('#txtCartrips').val())!=0){
+                	$('#checkCartrips').prop('checked',true);
+                }else{
+                	$('#checkCartrips').prop('checked',false);
                 }
             }
             
@@ -491,12 +580,10 @@
 							}
 							
 							//寫入訂單號碼
-							var t_oredeno = '',t_quatno='';
+							var t_oredeno = '';
 							for (var i = 0; i < b_ret.length; i++) {
 								if (t_oredeno.indexOf(b_ret[i].noa) == -1)
 									t_oredeno = t_oredeno + (t_oredeno.length > 0 ? (',' + b_ret[i].noa) : b_ret[i].noa);
-								if (t_quatno.indexOf(b_ret[i].quatno) == -1)
-									t_quatno = t_quatno + (t_quatno.length > 0 ? (',' + b_ret[i].quatno) : b_ret[i].quatno);
 							}
 							//取得訂單備註 + 指定地址
 							if (t_oredeno.length > 0) {
@@ -505,7 +592,6 @@
 							}
 
 							$('#txtOrdeno').val(t_oredeno);
-							$('#txtZipcode').val(t_quatno);
 							bbssum();
 							sum();
 						}
@@ -1220,10 +1306,16 @@
 				}
 				
 				//105/12/08空白倉庫預設A
+				//106/09/30 自動領料匯入倉庫調整
 				for (var i = 0; i < q_bbsCount; i++) {
 					if(!emp($('#txtProduct_'+i).val()) && emp($('#txtStoreno_'+i).val())){
-						$('#txtStoreno_'+i).val('A');
-						$('#txtStore_'+i).val('三泰-板料');
+						if(emp($('#txtUcolor_'+i).val()) || $('#txtUcolor_'+i).val()=='板料'){
+							$('#txtStoreno_'+i).val('A');
+							$('#txtStore_'+i).val('三泰-板料');
+						}else{
+							$('#txtStoreno_'+i).val('A2');
+							$('#txtStore_'+i).val('三泰-成品');
+						}
 					}
 				}
 				
@@ -1258,6 +1350,12 @@
 				check_startdate=false;
 				
 				$('#txtApvmemo').val($('#textQno1').val()+'@'+dec($('#textQweight1').val())+'##'+$('#textQno2').val()+'@'+dec($('#textQweight2').val()));
+				
+				if($('#checkCartrips').prop('checked')){
+					$('#txtCartrips').val(1);
+				}else{
+					$('#txtCartrips').val(0);
+				}
 				
 				if (q_cur == 1){
 					$('#txtWorker').val(r_name);
@@ -2138,9 +2236,13 @@
 				_readonly(t_para, empty);
 				if (t_para) {
 					$('#combAddr').attr('disabled', 'disabled');
+					$('#btnCubs').attr('disabled', 'disabled');
+					$('#checkCartrips').attr('disabled', 'disabled');
 					$('#btnPack').removeAttr('disabled');
 				} else {
 					$('#combAddr').removeAttr('disabled');
+					$('#btnCubs').removeAttr('disabled');
+					$('#checkCartrips').removeAttr('disabled');
 					if(q_cur==1)
 						$('#btnPack').attr('disabled','disabled');
 				}
@@ -2475,7 +2577,7 @@
 							<select id="combAddr" style="width: 20px" onchange='combAddr_chg()'> </select>
 							<span> </span><a id='lblZipname_sf' class="lbl">聯絡人</a>
 						</td>
-						<td colspan="2"><input id="txtZipname" type="text" class="txt num c1"/></td>
+						<td colspan="2"><input id="txtZipname" type="text" class="txt c1"/></td>
 						<td><span> </span><a id='lblInvono' class="lbl btn"> </a></td>
 						<td><input id="txtInvono" type="text" class="txt c1"/></td>
 					</tr>
@@ -2503,6 +2605,12 @@
 						<td><span> </span><a id="lblCardeal" class="lbl btn"> </a></td>
 						<td><input id="txtCardealno" type="text" class="txt c1"/></td>
 						<td><input id="txtCardeal" type="text" class="txt c1"/></td>
+						<td colspan="2">
+							<input id="txtCartrips" type="hidden" class="txt num c1"/><!--表示案號是否最後一次出貨-->
+							<input id="btnCubs" type="button" class="txt" value="領料自動匯入" style="float: right;">
+							<span style="float: right;"> </span>
+							<a class="lbl">領完</a><input id="checkCartrips" type="checkbox" style="float: right;">
+						</td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblPrice_sf" class="lbl">運費單價</a></td>
@@ -2510,6 +2618,9 @@
                         <td>/KG</td>
                         <td><span> </span><a id='lblTranmoney' class="lbl"> </a></td>
                         <td><input id="txtTranmoney" type="text" class="txt num c1"/></td>
+                        <td> </td>
+                        <td><span> </span><a id='lblZipcode_sf' class="lbl">案號</a></td>
+                        <td><input id="txtZipcode" type="text" class="txt c1"/></td>
 					</tr>
 					<tr>
 						<td><span> </span><a id="lblMoney" class="lbl"> </a></td>
