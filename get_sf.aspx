@@ -1057,7 +1057,8 @@
 						}
 						if (z_msg.length > 0) {
 							alert('已沖帳:' + z_msg +' 禁止修改!!');
-							return;
+							//106/10/19 暫時開放
+							//return;
 						}
 					}
 				}
