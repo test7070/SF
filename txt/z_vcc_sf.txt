@@ -95,6 +95,7 @@ begin
 		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 		  and not exists(select noa from view_get where noa=a.noa)
 		  and (len(@t_addr2)=0 or a.addr2 like '%'+@t_addr2+'%')
+		  and exists (select * from view_vccs where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
 end
 else
 begin
@@ -122,6 +123,7 @@ begin
 		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
 		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 		  and (len(@t_addr2)=0 or a.addr2 like '%'+@t_addr2+'%')
+		  and exists (select * from view_vccs where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
 end 
 
 --小計	  
@@ -1159,6 +1161,7 @@ begin
 		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 		  and not exists(select noa from view_get where noa=a.noa)
 		  and (len(@t_addr2)=0 or a.addr2 like '%'+@t_addr2+'%')
+		  and exists (select * from view_vccs where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
 end
 else
 begin
@@ -1188,6 +1191,7 @@ begin
 		  and (len(@t_qno)=0 or a.apvmemo like @t_qno+'%')
 		  and (isnull(b.storeno,'') between @t_bstoreno and @t_estoreno)
 		  and (len(@t_addr2)=0 or a.addr2 like '%'+@t_addr2+'%')
+		  and exists (select * from view_vccs where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
 end
 
 if(@t_couplers='1')

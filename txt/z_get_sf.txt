@@ -89,6 +89,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 	  and (len(@t_qno)=0 or a.idno like @t_qno+'%')
 	  and (b.storeno between @t_bstoreno and @t_estoreno)
 	  and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
+	  and exists (select * from view_gets where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
 
 --小計
 insert @tmp
@@ -1083,6 +1084,7 @@ where (a.datea between @t_bdate and @t_edate) and
 	  and (b.storeno between @t_bstoreno and @t_estoreno)
 	  and (len(@t_addr2)=0 or a.addr like '%'+@t_addr2+'%')
 	  and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
+	  and exists (select * from view_gets where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
 
 --小計
 insert @tmp
