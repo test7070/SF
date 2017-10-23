@@ -217,7 +217,7 @@
 								}
 							}
 							//抓取cubs
-							if(tbs.length>0){
+							//if(tbs.length>0){//106/10/23 取消
 								//清除bbt
 								for (var i = 0; i < q_bbtCount; i++) {
 									$('#btnMinut__'+i).click();
@@ -265,9 +265,9 @@
 										alert('無可領料批號!!');
 									}
 								}
-							}else{
+							/*}else{
 								alert('表身無鋼筋資料!!');
-							}
+							}*/
 						}else{
 							alert('請輸入【案號】!!');
 						}
