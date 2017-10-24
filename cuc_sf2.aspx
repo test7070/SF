@@ -26,9 +26,9 @@
                 q_gt('color', '1=1 ', 0, 0, 0, "");
 				q_gt('class', '1=1 ', 0, 0, 0, "");
 				
-				if(r_userno=='C006'){ //A剪
+				if(r_userno.toUpperCase()=='C006'){ //A剪
 					q_gt('mech', "where=^^ noa='C1' ^^", 0, 0, 0, "");
-				}else if(r_userno=='C002'){ //B剪
+				}else if(r_userno.toUpperCase()=='C002'){ //B剪
 					q_gt('mech', "where=^^ noa='C2' ^^", 0, 0, 0, "");
 				}else{
 					q_gt('mech', '1=1 ', 0, 0, 0, "");
@@ -63,10 +63,10 @@
 					}
 					var t_where = "1=1 and ("+noa_where+") and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0";
 					
-					if(r_userno=='C006'){ //A剪
+					if(r_userno.toUpperCase()=='C006'){ //A剪
 						t_where+=" and (isnull(b.mechno#^#'')='C1' or isnull(b.mechno#^#'')='') "
 					}
-					if(r_userno=='C002'){ //B剪
+					if(r_userno.toUpperCase()=='C002'){ //B剪
 						t_where+=" and (isnull(b.mechno#^#'')='C2' or isnull(b.mechno#^#'')='') "
 					}
 					var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
@@ -96,10 +96,10 @@
                 
                 //106/08/08 避免載入太多資料 只取最後一筆表身 與 不讀取NOA空白
                 var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' ";
-                if(r_userno=='C006'){ //A剪
+                if(r_userno.toUpperCase()=='C006'){ //A剪
 					t_where+=" and (isnull(b.mechno#^#'')='C1' or isnull(b.mechno#^#'')='') "
 				}
-				if(r_userno=='C002'){ //B剪
+				if(r_userno.toUpperCase()=='C002'){ //B剪
 					t_where+=" and (isnull(b.mechno#^#'')='C2' or isnull(b.mechno#^#'')='') "
 				} 
                 var t_where1 = "d.productno2=b.noa and d.product2=b.noq and c.itype='1'";
@@ -143,9 +143,9 @@
 				});*/
 				
 				$('#lblCucnoa').click(function() {
-					if(r_userno=='C006'){ //A剪
+					if(r_userno.toUpperCase()=='C006'){ //A剪
 						q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0 and (isnull(mechno,'')='C1' or isnull(mechno,'')='') ) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
-					}else if(r_userno=='C002'){ //B剪
+					}else if(r_userno.toUpperCase()=='C002'){ //B剪
 						q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0 and (isnull(mechno,'')='C2' or isnull(mechno,'')='') ) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
 					}else{
 						q_box("cuc_sf_b.aspx?"+ r_userno + ";" + r_name + ";" + q_id +";1=1 and isnull(gen,0)=0 and exists (select * from view_cucs where noa=a.noa and isnull(mins,0)=0) ;" + r_accy, 'cuc_sf_b', "95%", "95%", '加工單');
@@ -170,10 +170,10 @@
 	                    t_where += q_sqlPara2("b.spec", tx_spec);
 	                    t_where=replaceAll(t_where,',','#^#');
 	                    
-	                    if(r_userno=='C006'){ //A剪
+	                    if(r_userno.toUpperCase()=='C006'){ //A剪
 							t_where+=" and (isnull(b.mechno#^#'')='C1' or isnull(b.mechno#^#'')='') "
 						}
-						if(r_userno=='C002'){ //B剪
+						if(r_userno.toUpperCase()=='C002'){ //B剪
 							t_where+=" and (isnull(b.mechno#^#'')='C2' or isnull(b.mechno#^#'')='') "
 						}
 	                    
@@ -199,7 +199,7 @@
                 //解除鎖定
                 $('#btnCancels').click(function(e) {
                 	chk_cucs=new Array();
-					q_func('qtxt.query.unlockall', 'cuc_sf.txt,unlockall,'+r_userno+';'+r_name);
+					q_func('qtxt.query.unlockall', 'cuc_sf.txt,unlockall,'+r_userno.toUpperCase()+';'+r_name);
 					intervalupdate = setInterval(";");
 					for (var i = 0 ; i < intervalupdate ; i++) {
 					    clearInterval(i); 
@@ -222,10 +222,10 @@
 					
 	                var t_where = "1=1 and isnull(a.gen#^#0)=0 and isnull(b.mins#^#0)=0 and isnull(a.noa#^#'')!='' ";
 	                
-	                if(r_userno=='C006'){ //A剪
+	                if(r_userno.toUpperCase()=='C006'){ //A剪
 						t_where+=" and (isnull(b.mechno#^#'')='C1' or isnull(b.mechno#^#'')='') "
 					}
-					if(r_userno=='C002'){ //B剪
+					if(r_userno.toUpperCase()=='C002'){ //B剪
 						t_where+=" and (isnull(b.mechno#^#'')='C2' or isnull(b.mechno#^#'')='') "
 					}
 	                 
@@ -782,7 +782,7 @@
 	                   	if(confirm("確認要入庫?")){
 	                   		Lock();
 		                   	q_func('qtxt.query.cucutocubs', 'cuc_sf.txt,cucutocubs,'
-							+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno+';'+r_name+';'+ts_bbu+';1');
+							+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno.toUpperCase()+';'+r_name+';'+ts_bbu+';1');
 						}
 					}
 				});
@@ -852,7 +852,7 @@
                     			var t_exists=false;
                     			for (var j=0;j<as.length;j++){
                     				if(chk_cucs[i]['noa']==as[j]['noa'] && chk_cucs[i]['noq']==as[j]['noq']){//表示加工排程單存在
-                    					if(as[j]['cubno'].split('##')[0]!=r_userno){
+                    					if(as[j]['cubno'].split('##')[0].toUpperCase()!=r_userno.toUpperCase()){
                     						t_err+=chk_cucs[i]['ordeno']+'-'+chk_cucs[i]['no2']+"鎖定人員非自己本人!!";
                     					}
                     					t_exists=true;
@@ -891,7 +891,7 @@
 	                    		}
 	                    		q_func('qtxt.query.cucstocub', 'cuc_sf.txt,cucstocub,'
 	                    		+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'
-	                    		+r_userno+';'+r_name+';'+t_noa+';'+t_noq+';'+t_xmount+';'+t_xcount+';'+t_xweight+';1');
+	                    		+r_userno.toUpperCase()+';'+r_name+';'+t_noa+';'+t_noq+';'+t_xmount+';'+t_xcount+';'+t_xweight+';1');
 	                    		//取消刷新
 	                    		//clearInterval(intervalupdate);
 							}
@@ -987,10 +987,10 @@
 						$('#combMechno').text();
 						q_cmbParse("combMechno", t_mech);
 						
-						if(r_userno=='C006'){ //A剪
+						if(r_userno.toUpperCase()=='C006'){ //A剪
 							$('#combMechno').val('C1');
 						}
-						if(r_userno=='C002'){ //B剪
+						if(r_userno.toUpperCase()=='C002'){ //B剪
 							$('#combMechno').val('C2');
 						}
 						
@@ -1017,7 +1017,7 @@
 									islock=false;
 							}
 						}
-						if(islock && cubno!='' && cubno.split('##')[0] != r_userno){//其他人被鎖定
+						if(islock && cubno!='' && cubno.split('##')[0].toUpperCase() != r_userno.toUpperCase()){//其他人被鎖定
 							var mechno=cubno.split('##')[2]!=undefined?cubno.split('##')[2]:'';
 							var tt_mech=t_mech.split(',');
 							for(var k=0;k<tt_mech.length;k++){
@@ -1048,14 +1048,14 @@
 						}else{//未鎖定資料
 							$('#cucs_chk'+n).prop("checked",true).parent().parent().find('td').css('background', 'darkturquoise');
 							//鎖定資料
-                        	q_func('qtxt.query.lock', 'cuc_sf.txt,lock,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name+';'+$('#combMechno').val());
+                        	q_func('qtxt.query.lock', 'cuc_sf.txt,lock,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name+';'+$('#combMechno').val());
                         	var t_datea=new Date();
                         	t_datea=t_datea.getFullYear()+'-'+(t_datea.getMonth()+1>9?t_datea.getMonth():'0'+(t_datea.getMonth()+1))
                         	+'-'+(t_datea.getDate()+1>9?t_datea.getDate():'0'+t_datea.getDate())
                         	+' '+(t_datea.getHours()+1>9?t_datea.getHours():'0'+t_datea.getHours())
                         	+':'+(t_datea.getMinutes()+1>9?t_datea.getMinutes():'0'+t_datea.getMinutes())
                         	+':'+(t_datea.getSeconds()+1>9?t_datea.getSeconds():'0'+t_datea.getSeconds())
-                        	$('#cucs_cubno'+n).text(r_userno+"##"+r_name+"##"+$('#combMechno').val()+"##"+t_datea);
+                        	$('#cucs_cubno'+n).text(r_userno.toUpperCase()+"##"+r_name+"##"+$('#combMechno').val()+"##"+t_datea);
                         	//暫存資料
                         	chk_cucs.push({
 								noa : $('#cucs_noa'+n).text(),
@@ -1108,7 +1108,7 @@
                             $('#cucs_tr'+n+' .co2').css('background-color', 'lightpink');
                             $('#cucs_tr'+n+' .co3').css('background-color', 'lightsalmon');
 							alert('該筆排程已被解除鎖定!!');
-						}else if(as[0].cubno!='' && as[0].cubno.split('##')[0] != r_userno){//其他人被鎖定
+						}else if(as[0].cubno!='' && as[0].cubno.split('##')[0].toUpperCase() != r_userno.toUpperCase()){//其他人被鎖定
 							$('#cucs_cubno'+n).text(as[0].cubno);
 							$('#cucs_chk'+n).prop("checked",false).attr('disabled', 'disabled').parent().parent().find('td').css('background', 'lavender');
 							$('#cucs_tr'+n+' .co1').css('background-color', 'antiquewhite');
@@ -1117,7 +1117,7 @@
 							alert('該筆排程已被鎖定!!');
 						}else{//自己鎖定的資料
                         	//取消鎖定資料
-                            q_func('qtxt.query.unlock', 'cuc_sf.txt,unlock,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name);
+                            q_func('qtxt.query.unlock', 'cuc_sf.txt,unlock,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name);
                             $('#cucs_chk'+n).prop("checked",false).parent().parent().find('td').css('background', 'lavender');
                             $('#cucs_tr'+n+' .co1').css('background-color', 'antiquewhite');
                             $('#cucs_tr'+n+' .co2').css('background-color', 'lightpink');
@@ -1278,7 +1278,7 @@
                         
                         if(isclear){
                         	//清空該使用者的全部鎖定
-							q_func('qtxt.query.unlockall', 'cuc_sf.txt,unlockall,'+r_userno+';'+r_name);
+							q_func('qtxt.query.unlockall', 'cuc_sf.txt,unlockall,'+r_userno.toUpperCase()+';'+r_name);
                         }
                         
                         //intervalupdate=setInterval("cucsupdata()",1000*60);
@@ -1315,7 +1315,7 @@
 											var n=$(this).attr('id').replace('cucs_mins','')
 											t_endanoa=$('#cucs_noa'+n).text();
 											t_endanoq=$('#cucs_noq'+n).text();
-											q_func('qtxt.query.enda', 'cuc_sf.txt,enda,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name);
+											q_func('qtxt.query.enda', 'cuc_sf.txt,enda,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name);
 										}
 									});
 								}else{
@@ -1354,7 +1354,7 @@
 										islock=false;
 								}
 								
-								if(islock && cubno.split('##')[0]==r_userno){ //自己的鎖定資料
+								if(islock && cubno.split('##')[0].toUpperCase()==r_userno.toUpperCase()){ //自己的鎖定資料
 									var t_exists=false;
 		                    		for(var j=0;j<chk_cucs.length;j++){
 		                    			if(as[i]['noa']==chk_cucs[j]['noa'] && as[i]['noq']==chk_cucs[j]['noq']){
@@ -1590,7 +1590,7 @@
                     		
                     		$(this).change(function() {
                     			//1113 更新廠牌到cucs
-                    			q_func('qtxt.query.cucs_class_update', 'cuc_sf.txt,updateclass,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name+';'+$(this).val());
+                    			q_func('qtxt.query.cucs_class_update', 'cuc_sf.txt,updateclass,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name+';'+$(this).val());
                     			$('#lblCucs_class'+n).text($(this).val());
 							});
                     	})
@@ -1932,7 +1932,7 @@
 							var t_mechno=emp($('#combMechno').val())?'#non':$('#combMechno').val();
 							
 							if(tt_nouno.length>0){
-								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI(t_mechno)+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+';1');
+								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI(t_mechno)+ ';' + encodeURI(r_userno.toUpperCase())+ ';' + encodeURI(r_name)+';1');
 								Lock();
 							}
 						}else{
@@ -2080,7 +2080,7 @@
 	                    	Unlock();
 	                    }else{
 	                    	q_func('qtxt.query.cucttocubt', 'cuc_sf.txt,cucttocubt,'
-	                   		+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno+';'+r_name+';'+ts_bbt);
+	                   		+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno.toUpperCase()+';'+r_name+';'+ts_bbt);
 	                    }
 					}
                 }
@@ -2245,7 +2245,7 @@
 							if(diff>1000 * 60 * 15) //超過15分表示已解除鎖定
 								islock=false;
 						}
-						if(islock && cubno.split('##')[0]!=r_userno){//其他人鎖定
+						if(islock && cubno.split('##')[0].toUpperCase()!=r_userno.toUpperCase()){//其他人鎖定
 							var mechno=cubno.split('##')[2]!=undefined?cubno.split('##')[2]:'';
 							var tt_mech=t_mech.split(',');
 							for(var k=0;k<tt_mech.length;k++){
@@ -2262,7 +2262,7 @@
                             $('#cucs_tr'+i+' .co2').css('background-color', 'lightpink');
                             $('#cucs_tr'+i+' .co3').css('background-color', 'lightsalmon');
                             $('#cucs_mins' + i).attr('disabled', 'disabled');
-						}else if (islock && cubno.split('##')[0]==r_userno){//自己鎖定
+						}else if (islock && cubno.split('##')[0].toUpperCase()==r_userno.toUpperCase()){//自己鎖定
 							$('#cucs_lbla'+i).text('');
 							$('#cucs_chk' + i).removeAttr('disabled');
                             $('#cucs_chk'+i).prop('checked',true).parent().parent().find('td').css('background', 'darkturquoise');

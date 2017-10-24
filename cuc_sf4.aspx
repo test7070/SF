@@ -188,7 +188,7 @@
                 //解除鎖定
                 $('#btnCancels').click(function(e) {
                 	chk_cucs=new Array();
-					q_func('qtxt.query.unlockall', 'cuc_sf.txt,unlockall,'+r_userno+';'+r_name);
+					q_func('qtxt.query.unlockall', 'cuc_sf.txt,unlockall,'+r_userno.toUpperCase()+';'+r_name);
 					intervalupdate = setInterval(";");
 					for (var i = 0 ; i < intervalupdate ; i++) {
 					    clearInterval(i); 
@@ -671,7 +671,7 @@
 	                   	if(confirm("確認要入庫?")){
 	                   		Lock();
 		                   	q_func('qtxt.query.cucutocubs', 'cuc_sf.txt,cucutocubs,'
-							+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno+';'+r_name+';'+ts_bbu+';3');
+							+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'+r_userno.toUpperCase()+';'+r_name+';'+ts_bbu+';3');
 						}
 					}
 				});
@@ -835,7 +835,7 @@
                         
                         if(isclear){
                         	//清空該使用者的全部鎖定
-							q_func('qtxt.query.unlockall', 'cuc_sf.txt,unlockall,'+r_userno+';'+r_name);
+							q_func('qtxt.query.unlockall', 'cuc_sf.txt,unlockall,'+r_userno.toUpperCase()+';'+r_name);
                         }
                         
                         //intervalupdate=setInterval("cucsupdata()",1000*60);
@@ -872,7 +872,7 @@
 											var n=$(this).attr('id').replace('cucs_hours','')
 											t_endanoa=$('#cucs_noa'+n).text();
 											t_endanoq=$('#cucs_noq'+n).text();
-											q_func('qtxt.query.enda', 'cuc_sf.txt,hours,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name);
+											q_func('qtxt.query.enda', 'cuc_sf.txt,hours,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name);
 										}
 									});
 								}else{
@@ -911,7 +911,7 @@
 										islock=false;
 								}
 								
-								if(islock && cubno.split('##')[0]==r_userno){ //自己的鎖定資料
+								if(islock && cubno.split('##')[0]==r_userno.toUpperCase()){ //自己的鎖定資料
 									var t_exists=false;
 		                    		for(var j=0;j<chk_cucs.length;j++){
 		                    			if(as[i]['noa']==chk_cucs[j]['noa'] && as[i]['noq']==chk_cucs[j]['noq']){
@@ -1151,7 +1151,7 @@
                     		
                     		$(this).change(function() {
                     			//1113 更新廠牌到cucs
-                    			q_func('qtxt.query.cucs_class_update', 'cuc_sf.txt,updateclass,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name+';'+$(this).val());
+                    			q_func('qtxt.query.cucs_class_update', 'cuc_sf.txt,updateclass,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name+';'+$(this).val());
                     			$('#lblCucs_class'+n).text($(this).val());
 							});
                     	})
@@ -1321,7 +1321,7 @@
                     			var t_exists=false;
                     			for (var j=0;j<as.length;j++){
                     				if(chk_cucs[i]['noa']==as[j]['noa'] && chk_cucs[i]['noq']==as[j]['noq']){//表示加工排程單存在
-                    					if(as[j]['cubno'].split('##')[0]!=r_userno){
+                    					if(as[j]['cubno'].split('##')[0].toUpperCase()!=r_userno.toUpperCase()){
                     						t_err+=chk_cucs[i]['ordeno']+'-'+chk_cucs[i]['no2']+"鎖定人員非自己本人!!";
                     					}
                     					t_exists=true;
@@ -1360,7 +1360,7 @@
 	                    		}
 	                    		q_func('qtxt.query.cucstocub', 'cuc_sf.txt,cucstocub,'
 	                    		+r_accy+';'+t_datea+';'+t_mechno+';'+t_memo+';'
-	                    		+r_userno+';'+r_name+';'+t_noa+';'+t_noq+';'+t_xmount+';'+t_xcount+';'+t_xweight+';3');
+	                    		+r_userno.toUpperCase()+';'+r_name+';'+t_noa+';'+t_noq+';'+t_xmount+';'+t_xcount+';'+t_xweight+';3');
 	                    		//取消刷新
 	                    		//clearInterval(intervalupdate);
 							}
@@ -1536,7 +1536,7 @@
 									islock=false;
 							}
 						}
-						if(islock && cubno!='' && cubno.split('##')[0] != r_userno){//其他人被鎖定
+						if(islock && cubno!='' && cubno.split('##')[0].toUpperCase() != r_userno.toUpperCase()){//其他人被鎖定
 							var mechno=cubno.split('##')[2]!=undefined?cubno.split('##')[2]:'';
 							var tt_mech=t_mech.split(',');
 							for(var k=0;k<tt_mech.length;k++){
@@ -1567,14 +1567,14 @@
 						}else{//未鎖定資料
 							$('#cucs_chk'+n).prop("checked",true).parent().parent().find('td').css('background', 'darkturquoise');
 							//鎖定資料
-                        	q_func('qtxt.query.lock', 'cuc_sf.txt,lock,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name+';'+$('#combMechno').val());
+                        	q_func('qtxt.query.lock', 'cuc_sf.txt,lock,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name+';'+$('#combMechno').val());
                         	var t_datea=new Date();
                         	t_datea=t_datea.getFullYear()+'-'+(t_datea.getMonth()+1>9?t_datea.getMonth():'0'+(t_datea.getMonth()+1))
                         	+'-'+(t_datea.getDate()+1>9?t_datea.getDate():'0'+t_datea.getDate())
                         	+' '+(t_datea.getHours()+1>9?t_datea.getHours():'0'+t_datea.getHours())
                         	+':'+(t_datea.getMinutes()+1>9?t_datea.getMinutes():'0'+t_datea.getMinutes())
                         	+':'+(t_datea.getSeconds()+1>9?t_datea.getSeconds():'0'+t_datea.getSeconds())
-                        	$('#cucs_cubno'+n).text(r_userno+"##"+r_name+"##"+$('#combMechno').val()+"##"+t_datea);
+                        	$('#cucs_cubno'+n).text(r_userno.toUpperCase()+"##"+r_name+"##"+$('#combMechno').val()+"##"+t_datea);
                         	//暫存資料
                         	chk_cucs.push({
 								noa : $('#cucs_noa'+n).text(),
@@ -1627,7 +1627,7 @@
                             $('#cucs_tr'+n+' .co2').css('background-color', 'lightpink');
                             $('#cucs_tr'+n+' .co3').css('background-color', 'lightsalmon');
 							alert('該筆排程已被解除鎖定!!');
-						}else if(as[0].cubno!='' && as[0].cubno.split('##')[0] != r_userno){//其他人被鎖定
+						}else if(as[0].cubno!='' && as[0].cubno.split('##')[0].toUpperCase() != r_userno.toUpperCase()){//其他人被鎖定
 							$('#cucs_cubno'+n).text(as[0].cubno);
 							$('#cucs_chk'+n).prop("checked",false).attr('disabled', 'disabled').parent().parent().find('td').css('background', 'lavender');
 							$('#cucs_tr'+n+' .co1').css('background-color', 'antiquewhite');
@@ -1636,7 +1636,7 @@
 							alert('該筆排程已被鎖定!!');
 						}else{//自己鎖定的資料
                         	//取消鎖定資料
-                            q_func('qtxt.query.unlock', 'cuc_sf.txt,unlock,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno+';'+r_name);
+                            q_func('qtxt.query.unlock', 'cuc_sf.txt,unlock,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name);
                             $('#cucs_chk'+n).prop("checked",false).parent().parent().find('td').css('background', 'lavender');
                             $('#cucs_tr'+n+' .co1').css('background-color', 'antiquewhite');
                             $('#cucs_tr'+n+' .co2').css('background-color', 'lightpink');
@@ -1832,7 +1832,7 @@
 								}
 							}
 							if(t_nouno.length>0){
-								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_nouno)+ ';' + encodeURI(t_mechno)+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+';3');
+								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(t_nouno)+ ';' + encodeURI(t_mechno)+ ';' + encodeURI(r_userno.toUpperCase())+ ';' + encodeURI(r_name)+';3');
 								Lock();
 							}
                 		}
@@ -1999,7 +1999,7 @@
 							if(diff>1000 * 60 * 15) //超過15分表示已解除鎖定
 								islock=false;
 						}
-						if(islock && cubno.split('##')[0]!=r_userno){//其他人鎖定
+						if(islock && cubno.split('##')[0].toUpperCase()!=r_userno.toUpperCase()){//其他人鎖定
 							var mechno=cubno.split('##')[2]!=undefined?cubno.split('##')[2]:'';
 							var tt_mech=t_mech.split(',');
 							for(var k=0;k<tt_mech.length;k++){
@@ -2016,7 +2016,7 @@
                             $('#cucs_tr'+i+' .co2').css('background-color', 'lightpink');
                             $('#cucs_tr'+i+' .co3').css('background-color', 'lightsalmon');
                             $('#cucs_hours' + i).attr('disabled', 'disabled');
-						}else if (islock && cubno.split('##')[0]==r_userno){//自己鎖定
+						}else if (islock && cubno.split('##')[0].toUpperCase()==r_userno.toUpperCase()){//自己鎖定
 							$('#cucs_lbla'+i).text('');
 							$('#cucs_chk' + i).removeAttr('disabled');
                             $('#cucs_chk'+i).prop('checked',true).parent().parent().find('td').css('background', 'darkturquoise');

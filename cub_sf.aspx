@@ -305,7 +305,7 @@
 							alert(t_err);
 						}else{
 							//條碼領料轉庫存
-							q_func('qtxt.query.gettostore', 'cuc_sf.txt,gettostore,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
+							q_func('qtxt.query.gettostore', 'cuc_sf.txt,gettostore,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(r_userno.toUpperCase())+ ';' + encodeURI(r_name));
 						}
 						break;
 					case 'qtxt.query.gettostore':
@@ -348,7 +348,7 @@
 						}
 						break;	
 					case 'cub_post.post.del1':
-						q_func('qtxt.query.deltostore', 'cuc_sf.txt,deltostore,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name));
+						q_func('qtxt.query.deltostore', 'cuc_sf.txt,deltostore,' + encodeURI(r_accy) + ';' + encodeURI($('#txtNoa').val())+ ';' + encodeURI(r_userno.toUpperCase())+ ';' + encodeURI(r_name));
 						break;
 					case 'qtxt.query.deltostore':
 						var as = _q_appendData("tmp0", "", true, true);
@@ -442,7 +442,7 @@
 								}
 							}
 							if(tt_nouno.length>0){
-								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI($('#combMechno2').val())+ ';' + encodeURI(r_userno)+ ';' + encodeURI(r_name)+';1');
+								q_func('qtxt.query.cubnouno', 'cuc_sf.txt,cubnouno_sf,' + encodeURI(r_accy) + ';' + encodeURI(tt_nouno)+ ';' + encodeURI($('#combMechno2').val())+ ';' + encodeURI(r_userno.toUpperCase())+ ';' + encodeURI(r_name)+';1');
 								Lock();
 							}
                 		}
