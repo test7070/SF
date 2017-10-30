@@ -86,6 +86,9 @@
 						type : '5',
 						name : 'xorder',//[19]
 						value :('noa@案號,comp@客戶,bdate@預交日').split(',')
+					}, {//[20]
+						type : '6',
+						name : 'xyear'
 					}]
 				});
                 q_popAssign();
@@ -100,13 +103,15 @@
 				$('#txtXdate1').datepicker();
 				$('#txtXdate2').datepicker();
                  
-                 $('#txtXdate1').mask(r_picd);
-	             $('#txtXdate2').mask(r_picd);
-	             $('#txtXmon1').mask(r_picm);
-	             $('#txtXmon2').mask(r_picm);
-	             $('#txtXtime1').mask('99:99');
-	             $('#txtXtime2').mask('99:99');
-           
+                $('#txtXdate1').mask(r_picd);
+	            $('#txtXdate2').mask(r_picd);
+	            $('#txtXmon1').mask(r_picm);
+	            $('#txtXmon2').mask(r_picm);
+	            $('#txtXtime1').mask('99:99');
+	            $('#txtXtime2').mask('99:99');
+           		
+           		$('#txtXyear').mask(r_pic);
+           		$('#txtXyear').val(q_date().substr(0,r_len));
                 
                //1201 日期預設 當天
                 $('#txtXdate1').val(q_date());

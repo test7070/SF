@@ -122,6 +122,162 @@ from @result order by mechno,gno,dno;
 --------------------------------------------------------------------------------------------------------------------------
 z_cubp_sf03:--z_cubp_sf03
 SET QUOTED_IDENTIFIER OFF 
+declare @t_year nvarchar(30)
+set @t_year = case when '#non'=[20] then '' else [20] end 
+
+declare @result table(
+	gno nvarchar(1),
+	idno int,
+	mon nvarchar(10),
+	c01 float, --A剪
+	c02 float, --B剪
+	c03 float, --C剪
+	c04 float, --加工成型(D)
+	c05 float, --盤元成型(E)
+	c06 float, --切割成型(F)
+	total float --生產合計
+)
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',1,'01月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/01'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',2,'02月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/02'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',3,'03月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/03'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',4,'04月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/04'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',5,'05月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/05'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',6,'06月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/06'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',7,'07月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/07'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',8,'08月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/08'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',9,'09月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/09'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',10,'10月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/10'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',11,'11月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/11'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result (gno,idno,mon,c01,c02,c03,total)
+select '0',12,'12月'
+,SUM(case when isnull(a.mechno,'')='C1' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C2' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C3' then b.weight else 0 end)
+,SUM(case when isnull(a.mechno,'')='C1' or isnull(a.mechno,'')='C2' or isnull(a.mechno,'')='C3' then b.weight else 0 end)
+from view_cub a left join view_cubs b on a.noa=b.noa and a.accy=b.accy
+where left(isnull(a.datea,''),len(@t_year)+3) =@t_year+'/12'
+and isnull(b.productno2,'')!='' --加工 沒有值表示餘料入庫
+
+insert @result(gno,idno,mon,c01,c02,c03,total)
+select '1',13,char(255),SUM(c01),SUM(c02),SUM(c03),SUM(total)
+from @result where gno='0'
+
+insert @result(gno,idno,mon,c01,c02,c03,total)
+select '2',14,char(255),avg(c01),avg(c02),avg(c03),avg(total)
+from @result where gno='0'
+
+select 
+dbo.getComma(c01,-1)c01,
+dbo.getComma(c02,-1)c02,
+dbo.getComma(c03,-1)c03,
+dbo.getComma(c04,-1)c04,
+dbo.getComma(c05,-1)c05,
+dbo.getComma(c06,-1)c06,
+* from @result order by idno,gno
+;
+--------------------------------------------------------------------------------------------------------------------------
+z_cubp_sf03bk:--z_cubp_sf03 0x89
+SET QUOTED_IDENTIFIER OFF 
 declare @t_bdate nvarchar(30)
 declare @t_edate nvarchar(30)
 declare @t_bmechno nvarchar(30)
