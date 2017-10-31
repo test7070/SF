@@ -553,6 +553,8 @@ and isnull(a.storeno,'')!='A' and isnull(a.storeno,'') !='A2' --106/03/29不顯�
 
 ------------------------------------------------------------------------------------------
 declare @tablea nvarchar(100)
+declare @datea nvarchar(100)
+declare @x_datea nvarchar(100)
 declare @storeno nvarchar(100)
 declare @x_storeno nvarchar(100)
 declare @product nvarchar(100)
@@ -583,11 +585,11 @@ set @avgweight=0
 set @aprice=0
 
 declare cursor_table cursor for
-select tablea,isnull(storeno,''),isnull(product,''),isnull(ucolor,''),isnull(spec,''),isnull(size,''),isnull(lengthb,''),isnull(class,''),isnull(mount,0),isnull(weight,0) from #tmp 
+select tablea,isnull(storeno,''),isnull(product,''),isnull(ucolor,''),isnull(spec,''),isnull(size,''),isnull(lengthb,''),isnull(class,''),isnull(datea,''),isnull(mount,0),isnull(weight,0) from #tmp 
 order by isnull(storeno,''),isnull(product,''),isnull(ucolor,''),isnull(size,''),isnull(spec,''),isnull(lengthb,''),isnull(class,''),isnull(datea,''),gno,noa
 open cursor_table
 fetch next from cursor_table
-into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@mount,@weight
+into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@datea,@mount,@weight
 while(@@FETCH_STATUS <> -1)
 begin
 	
@@ -598,12 +600,21 @@ begin
 	
 		set @t_mount=0
 		set @t_weight=0
+		set @x_datea=''
 	end
 	
 	if(@tablea='ucce')
 	begin
-		set @t_mount=@mount
-		set @t_weight=@weight
+		if(@x_datea=@datea)
+		begin
+			set @t_mount=@t_mount+@mount
+			set @t_weight=@t_weight+@weight
+		end
+		else
+		begin
+			set @t_mount=@mount
+			set @t_weight=@weight
+		end
 		set @avgweight=case when @t_mount=0 then 0 else round(@t_weight/@t_mount,0) end
 	end
 	else if(@tablea in ('rc2s','inas','cubs'))
@@ -626,9 +637,10 @@ begin
 	set @x_spec=@spec
 	set @x_lengthb=@lengthb
 	set @x_class=@class
+	set @x_datea=@datea
 	
 	fetch next from cursor_table
-	into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@mount,@weight
+	into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@datea,@mount,@weight
 end
 close cursor_table
 deallocate cursor_table
@@ -771,7 +783,7 @@ and case when b.storeno='A' or b.storeno='A2' then 'A' else b.storeno end betwee
 --刪除多次盤點的資料 只保留最後一次盤點
 delete a
 from #tmp a outer apply (select MAX(datea) datea from #tmp 
-where product=a.product and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class and storeno=a.storeno)b
+where product=a.product and ucolor=a.ucolor and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class and storeno=a.storeno)b
 where a.datea!=b.datea
 
 --進
@@ -848,7 +860,7 @@ CREATE INDEX tmpindex2 on #tmp (tablea,noa,noq)
 
 delete a
 from #tmp a
-outer apply(select top 1 datea from #tmp where product=a.product and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class and storeno=a.storeno and tablea='ucce' order by datea desc)b
+outer apply(select top 1 datea from #tmp where product=a.product and ucolor=a.ucolor and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class and storeno=a.storeno and tablea='ucce' order by datea desc)b
 where tablea!='ucce' and a.datea<isnull(b.datea,'')
 
 --------------------------------------------------------------------
@@ -935,12 +947,16 @@ begin
 	if(@tproduct!=@product or @tspec!=@spec or @tsize!=@size or @tucolor!=@ucolor or @tlengthb!=@lengthb or @tclass!=@class or @tstoreno!=@storeno )
 	begin
 		set @tweight=0
+		set @t_datea=''
 	end
 	
 	--盤點
 	if(@tablea='ucce')
 	begin
-		set @tweight=@weight
+		if(@datea=@t_datea)
+			set @tweight=@tweight+@weight
+		else
+			set @tweight=@weight
 	end
 
 	--進貨--入庫--生產
@@ -982,6 +998,7 @@ begin
 	set @tucolor=@ucolor
 	set @tlengthb=@lengthb
 	set @tclass=@class
+	set @t_datea=@datea
 	
 	fetch next from cursor_table
 	into @tablea,@datea,@product,@spec,@size,@ucolor,@lengthb,@class,@storeno,@weight
@@ -1038,7 +1055,7 @@ and case when b.storeno='A' or b.storeno='A2' then 'A' else b.storeno end betwee
 --刪除多次盤點的資料 只保留最後一次盤點
 delete a
 from #tmp a outer apply (select MAX(datea) datea from #tmp 
-where product=a.product and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class and storeno=a.storeno)b
+where product=a.product and ucolor=a.ucolor and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class and storeno=a.storeno)b
 where a.datea!=b.datea
 
 --進
@@ -1109,7 +1126,7 @@ and case when a.storeno='A' or a.storeno='A2' then 'A' else a.storeno end betwee
 
 delete a
 from #tmp a
-outer apply(select top 1 datea from #tmp where product=a.product and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class and storeno=a.storeno and tablea='ucce' order by datea desc)b
+outer apply(select top 1 datea from #tmp where product=a.product and ucolor=a.ucolor and spec=a.spec and size=a.size and lengthb=a.lengthb and class=a.class and storeno=a.storeno and tablea='ucce' order by datea desc)b
 where tablea!='ucce' and a.datea<isnull(b.datea,'')
 
 --------------------------------------------------------------------
@@ -1150,12 +1167,16 @@ begin
 	if(@tproduct!=@product or @tspec!=@spec or @tsize!=@size or @tucolor!=@ucolor or @tlengthb!=@lengthb or @tclass!=@class or @tstoreno!=@storeno)
 	begin
 		set @tmount=0
+		set @t_datea=''
 	end
 	
 	--盤點
 	if(@tablea='ucce')
 	begin
-		set @tmount=@mount
+		if(@datea=@t_datea)
+			set @tmount=@tmount+@mount
+		else
+			set @tmount=@mount
 	end
 	
 	--進貨--入庫
@@ -1198,6 +1219,7 @@ begin
 	set @tlengthb=@lengthb
 	set @tclass=@class
 	set @tstoreno=@storeno
+	set @t_datea=@datea
 	
 	fetch next from cursor_table
 	into @tablea,@datea,@product,@spec,@size,@ucolor,@lengthb,@class,@storeno,@mount
@@ -1550,10 +1572,19 @@ begin
 	--盤點
 	if(@tablea='ucce')
 	begin
-		set @sweight=@weight-@aweight --盤點數量-帳面量=差異
-		set @tweight=@tweight+@sweight
-	
-		set @aweight=@weight
+		if(@t_datea=@datea and @tucolor=@ucolor and @tlengthb=@lengthb and @tclass=@class)
+		begin
+			--同一天同一種類別長度廠牌
+			set @tweight=@tweight+@weight
+		end
+		else
+		begin
+			--同一種號數材質
+			set @sweight=@weight-@aweight --盤點數量-帳面量=差異
+			set @tweight=@tweight+@sweight
+		
+			set @aweight=@weight
+		end
 	end
 
 	--進貨--入庫
@@ -1596,6 +1627,11 @@ begin
 	set @tspec=@spec
 	set @tsize=@size
 	set @tstoreno=@storeno
+	
+	set @t_datea=@datea
+	set @tucolor=@ucolor 
+	set @tlengthb=@lengthb 
+	set @tclass=@class 
 	
 	fetch next from cursor_table
 	into @tablea,@typea,@noa,@noq,@datea,@storeno,@product,@spec,@size,@ucolor,@lengthb,@class,@weight,@qhref,@uno
@@ -2200,6 +2236,8 @@ and (len(@t_class)=0 or isnull(b.class,'')=@t_class)
 and b.storeno='A' and isnull(b.productno,'')=''
 
 declare @tablea nvarchar(100)
+declare @datea nvarchar(100)
+declare @x_datea nvarchar(100)
 declare @storeno nvarchar(100)
 declare @x_storeno nvarchar(100)
 declare @product nvarchar(100)
@@ -2231,11 +2269,11 @@ set @aprice=0
 
 --板料倉庫在7000
 declare cursor_table cursor for
-select tablea,isnull(storeno,''),isnull(product,''),isnull(ucolor,''),isnull(spec,''),isnull(size,''),isnull(lengthb,''),isnull(class,''),isnull(mount,0),isnull(weight,0),isnull(money,0) from #tmp where tablea!='cubs' 
+select tablea,isnull(storeno,''),isnull(product,''),isnull(ucolor,''),isnull(spec,''),isnull(size,''),isnull(lengthb,''),isnull(class,''),isnull(datea,''),isnull(mount,0),isnull(weight,0),isnull(money,0) from #tmp where tablea!='cubs' 
 order by isnull(storeno,''),isnull(product,''),isnull(ucolor,''),isnull(size,''),isnull(spec,''),isnull(lengthb,''),isnull(class,''),isnull(datea,''),gno,noa,noq
 open cursor_table
 fetch next from cursor_table
-into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@mount,@weight,@money
+into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@datea,@mount,@weight,@money
 while(@@FETCH_STATUS <> -1)
 begin
 	
@@ -2248,13 +2286,23 @@ begin
 		set @t_weight=0
 		set @t_money=0
 		set @aprice=0
+		set @x_datea=''
 	end
 	
 	if(@tablea='ucce')
 	begin
-		set @t_mount=@mount
-		set @t_weight=@weight
-		set @t_money=@money
+		if(@x_datea=@datea)
+		begin
+			set @t_mount=@t_mount+@mount
+			set @t_weight=@t_weight+@weight
+			set @t_money=@t_money+@money
+		end
+		else
+		begin
+			set @t_mount=@mount
+			set @t_weight=@weight
+			set @t_money=@money
+		end
 		set @avgweight=case when @t_mount=0 then 0 else round(@t_weight/@t_mount,0) end
 		set @aprice=case when @t_weight=0 then 0 else round(@t_money/@t_weight,2) end
 	end
@@ -2285,9 +2333,10 @@ begin
 	set @x_spec=@spec
 	set @x_lengthb=@lengthb
 	set @x_class=@class
+	set @x_datea=@datea
 	
 	fetch next from cursor_table
-	into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@mount,@weight,@money
+	into @tablea,@storeno,@product,@ucolor,@spec,@size,@lengthb,@class,@datea,@mount,@weight,@money
 end
 close cursor_table
 deallocate cursor_table
