@@ -1542,7 +1542,7 @@ cucttocubt:--cucttocubt
 		--bbt
 		exec("
 			insert cubt"+@accy+" (noa,noq,product,ucolor,spec,size,lengthb,class,gmount,gweight,memo2,storeno,store)
-			select '"+@cubno+"',*,'7000',isnull((select top 1 store from store where noa='7000'),'') from #tmpa 
+			select '"+@cubno+"',*,'A',isnull((select top 1 store from store where noa='A'),'') from #tmpa 
 		")
 	
 		insert dno (tablea,noa,usera)
