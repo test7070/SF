@@ -627,7 +627,7 @@
 							q_cmbParse("combProduct__"+n, q_getPara('vccs_vu.product'));
 						}
 						if(objname=='combUcolor'){
-							q_cmbParse("combUcolor__"+n, ',定尺,板料,亂尺,籃料'); //106/08/25 黃 加入 籃料
+							q_cmbParse("combUcolor__"+n, ',定尺品,板料,亂尺,籃料'); //106/08/25 黃 加入 籃料
 						}
 						if(objname=='combSpec'){
 							q_cmbParse("combSpec__"+n, t_spec);
@@ -752,7 +752,7 @@
 																
 						if(!emp(ts_product) || !emp(ts_ucolor) || !emp(ts_spec) || !emp(ts_size) || !emp(ts_lengthb) || !emp(ts_class)){
 							hasbbu=true; //有資料
-							if((ts_ucolor=='定尺' || ts_ucolor=='板料') && dec(ts_lengthb)==0){
+							if((ts_ucolor=='定尺品' || ts_ucolor=='板料') && dec(ts_lengthb)==0){
 								t_err=t_err+(t_err.length>0?'\n':'')+('第'+(j+1)+'項 '+ts_product+' '+ts_ucolor+' 米數為0');
 							}
 							
@@ -948,7 +948,7 @@
 							var objname=$(this).attr('id').split('__')[0];
 							if(objname=='combUcolor'){
 								$(this).text(''); //清空資料
-								q_cmbParse("combUcolor__"+n, ',定尺,板料,亂尺');
+								q_cmbParse("combUcolor__"+n, ',定尺品,板料,亂尺');
 							}
 						});
 						break;
