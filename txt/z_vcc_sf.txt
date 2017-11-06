@@ -1234,7 +1234,7 @@ set recno=recno2
 from (select recno,ROW_NUMBER()over (partition by custno,ordeno order by noa,gno,rr)recno2 from @tmp)a
 
 --插入換頁
-declare @pageline float=37
+declare @pageline float=36
 declare @page int=ceiling(cast((select count(*) from @tmp) as float)/@pageline)
 declare @tpage int=0
 

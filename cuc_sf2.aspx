@@ -948,7 +948,7 @@
 							var objname=$(this).attr('id').split('__')[0];
 							if(objname=='combUcolor'){
 								$(this).text(''); //清空資料
-								q_cmbParse("combUcolor__"+n, ',定尺品,板料,亂尺');
+								q_cmbParse("combUcolor__"+n, ',定尺品,板料,亂尺,籃料');
 							}
 						});
 						break;
