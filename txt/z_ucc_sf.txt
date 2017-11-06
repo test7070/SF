@@ -80,10 +80,10 @@ from view_rc2 a left join view_rc2s b on a.noa = b.noa
 where a.typea!='2' and len(b.uno)>0 and a.datea<=@t_edate 
 
 insert #tmp
-select '6',a.accy,'cubs' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+select '6',a.accy,'cubs' tablea,a.noa,b.noq,b.date2,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
 ,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,b.custno,b.comp,b.ordeno
 from view_cub a left join view_cubs b on a.noa=b.noa
-where len(b.uno)>0 and a.datea<=@t_edate 
+where len(b.uno)>0 and b.date2<=@t_edate 
 
 insert #tmp
 select '6',a.accy,'inas' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
@@ -283,10 +283,10 @@ from view_rc2 a left join view_rc2s b on a.noa = b.noa
 where a.typea!='2' and len(b.uno)>0 and a.datea<=@t_edate 
 
 insert #tmp
-select '6',a.accy,'cubs' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+select '6',a.accy,'cubs' tablea,a.noa,b.noq,b.date2,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
 ,b.mount,b.weight,b.lengthc,b.storeno,b.store,b.memo,b.custno,b.comp,b.ordeno
 from view_cub a left join view_cubs b on a.noa=b.noa
-where len(b.uno)>0 and a.datea<=@t_edate 
+where len(b.uno)>0 and b.date2<=@t_edate 
 
 insert #tmp
 select '6',a.accy,'inas' tablea,a.noa,b.noq,a.datea,b.uno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
@@ -493,9 +493,9 @@ and isnull(b.productno,'')='' and b.noa is not null
 --and isnull(b.storeno,'')!='A' and isnull(b.storeno,'') !='A2' --106/03/29不顯示三泰板料和三泰成品
 	
 insert #tmp(gno,tablea,datea,noa,noq,product,ucolor,spec,size,lengthb,class,storeno,mount,weight,avgweight,uno)
-select '13','cubs',a.datea,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno,b.mount,b.weight,0,b.uno
+select '13','cubs',b.date2,a.noa,b.noq,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.storeno,b.mount,b.weight,0,b.uno
 from view_cub a left join view_cubs b on a.noa=b.noa
-where a.datea<=@t_edate 
+where b.date2<=@t_edate 
 and (len(@t_pno)=0 or isnull(b.product,'')=@t_pno) and (len(@t_ucolor)=0 or isnull(b.ucolor,'')=@t_ucolor)
 and (len(@t_spec)=0 or isnull(b.spec,'')=@t_spec) and (len(@t_size)=0 or isnull(b.size,'')=@t_size)
 and ((@t_blengthb='' and  @t_elengthb=char(255))  or isnull(b.lengthb,0) between cast(@t_blengthb as float) and cast(@t_elengthb as float))
@@ -830,12 +830,12 @@ and case when b.storeno='A' or b.storeno='A2' then 'A' else b.storeno end betwee
 
 --產
 insert #tmp
-select '4','cubs',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,0
+select '4','cubs',a.accy,a.noa,b.noq,b.date2,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,0
 ,b.weight,0,0,0,0,b.storeno
 from view_cub a left join view_cubs b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and b.noq is not null 
-and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+and isnull(b.date2,'') <=@t_edate and isnull(b.weight,0)!=0
 and UPPER(isnull(d.unit,''))='KG'
 and case when b.storeno='A' or b.storeno='A2' then 'A' else b.storeno end between @t_bstoreno and @t_estoreno
 
@@ -1102,12 +1102,12 @@ and case when b.storeno='A' or b.storeno='A2' then 'A' else b.storeno end betwee
 
 --產
 insert #tmp
-select '4','cubs',a.accy,a.noa,b.noq,a.datea,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+select '4','cubs',a.accy,a.noa,b.noq,b.date2,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
 ,b.mount,0,0,0,0,0,b.storeno
 from view_cub a left join view_cubs b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and b.noq is not null 
-and isnull(a.datea,'') <=@t_edate and isnull(b.mount,0)!=0
+and isnull(b.date2,'') <=@t_edate and isnull(b.mount,0)!=0
 and UPPER(isnull(d.unit,''))!='KG'
 and case when b.storeno='A' or b.storeno='A2' then 'A' else b.storeno end between @t_bstoreno and @t_estoreno
 
@@ -1420,13 +1420,13 @@ and UPPER(isnull(d.unit,''))='KG'
 
 --產
 insert #tmp
-select '4','cubs',a.accy,a.noa,b.noq,a.datea,ISNULL(b.uno,''),b.product,isnull(b.ucolor,''),isnull(b.spec,''),isnull(b.size,''),isnull(b.lengthb,0),isnull(b.class,'')
+select '4','cubs',a.accy,a.noa,b.noq,b.date2,ISNULL(b.uno,''),b.product,isnull(b.ucolor,''),isnull(b.spec,''),isnull(b.size,''),isnull(b.lengthb,0),isnull(b.class,'')
 ,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end,0
 ,0,b.storeno,0,0,'cub_sf?noa=$noa'
 from view_cub a left join view_cubs b on a.noa=b.noa
 left join ucc d on b.product=d.product
 where isnull(b.productno,'')='' and isnull(b.product,'')!='' and b.noq is not null 
-and isnull(a.datea,'') <=@t_edate and isnull(b.weight,0)!=0
+and isnull(b.date2,'') <=@t_edate and isnull(b.weight,0)!=0
 and UPPER(isnull(d.unit,''))='KG'
 
 --互換
@@ -1783,12 +1783,12 @@ and len(isnull(b.uno,''))>0 --106/04/11
 
 --加工入
 insert #tmp
-select '6','cubs' tablea,a.accy,a.noa,b.noq,a.datea,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
+select '6','cubs' tablea,a.accy,a.noa,b.noq,b.date2,isnull(b.uno,''),b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class
 ,case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 ,0,0,b.storeno,'cub_sf?noa=$noa?'+a.accy
 from view_cub a left join view_cubs b on a.noa=b.noa
 left join ucc d on b.product=d.product
-where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(a.datea,'') <=@t_edate
+where isnull(b.productno,'')='' and isnull(b.product,'')!='' and isnull(b.date2,'') <=@t_edate
 and (len(@x_uno)=0 or @x_uno=isnull(b.uno,''))
 --and b.storeno='A' --106/04/05
 and len(isnull(b.uno,''))>0 --106/04/11
@@ -2200,7 +2200,7 @@ begin
 	outer apply(select datea,mount umount,weight uweight from view_ucces us where uno=b.uno and exists (select * from view_ucces where uno=us.uno having MAX(datea)=us.datea) )c
 	where b.ucolor='板料'  --散把只顯示板料
 	and not exists (select * from #tmpa where b.uno=uno) 
-	and	a.datea<='"+@t_edate+"' and isnull(a.datea,'')>=isnull(c.datea,'')"
+	and	b.date2<='"+@t_edate+"' and isnull(b.date2,'')>=isnull(c.datea,'')"
 	
 	if(len(@t_pno)>0)
 		set @cmd = @cmd+" and isnull(b.product,'')='"+@t_pno+"'"

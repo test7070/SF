@@ -163,7 +163,7 @@ where b.typea='1' and len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@n
 
 --入庫
 insert #tmp
-select a.accy,'cubs' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+select a.accy,'cubs' tablea,a.noa,a.noq,a.date2,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,a.ordeno,a.no2,'6'
 from view_cubs a left join view_cub b on a.noa=b.noa
 where len(a.uno)>0 and (len(@uno)=0 or a.uno=@uno) and a.noa!=@noa
@@ -526,12 +526,12 @@ cucstocub:--cucstocub
 			--,'02','成品倉'
 			exec("
 				insert cubs"+@accy+" (noa,noq,custno,comp,product,ucolor,spec,size,lengthb,class
-				,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store)
+				,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store,w01,w02,w03)
 				select '"+@cubno+"',right('000'+cast(ROW_NUMBER() over(order by a.noa,a.noq) as nvarchar(50)),3)
 				,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
 				,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
 				(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
-				,'A2','三泰-成品'
+				,'A2','三泰-成品',a.xcount,a.xmount,a.xweight
 				from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
 			")
 		end
@@ -543,12 +543,12 @@ cucstocub:--cucstocub
 				--,case when (isnull(c.picname,'')!='直料' and isnull(c.picname,'')!='板料' and isnull(c.picname,'')!='') or (isnull(c.paraf,'')!='' or isnull(c.parag,'')!='') then '半成品倉' else '成品倉' end
 				exec("
 					insert cubs"+@accy+" (noa,noq,custno,comp,product,ucolor,spec,size,lengthb,class
-					,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store)
+					,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store,w01,w02,w03)
 					select '"+@cubno+"',right('000'+cast(ROW_NUMBER() over(order by a.noa,a.noq) as nvarchar(50)),3)
 					,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
 					,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
 					(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
-					,'A2','三泰-成品'
+					,'A2','三泰-成品',a.xcount,a.xmount,a.xweight
 					from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
 				")
 			end
@@ -558,12 +558,12 @@ cucstocub:--cucstocub
 				--,case when isnull(c.picname,'')!='直料' and isnull(c.picname,'')!='板料' and isnull(c.picname,'')!='' then '半成品倉' else '成品倉' end
 				exec("
 					insert cubs"+@accy+" (noa,noq,custno,comp,product,ucolor,spec,size,lengthb,class
-					,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store)
+					,lengthc,mount,weight,need,memo,date2,ordeno,no2,datea,productno2,product2,uno,storeno,store,w01,w02,w03)
 					select '"+@cubno+"',right('000'+cast(ROW_NUMBER() over(order by a.noa,a.noq) as nvarchar(50)),3)
 					,b.custno,b.cust,c.product,c.ucolor,c.spec,c.size,c.lengthb,c.class,a.xcount,a.xmount,a.xweight,'',c.memo,'"+@datea+"',c.ordeno,c.no2,d.datea,a.noa,a.noq
 					,isnull(c.ordeno,'')+'-'+'"+@mechno+"'+
 					(right('000'+cast(1+cast(right(isnull((select MAX(uno) from view_cubs where uno like isnull(c.ordeno,'')+'-'+'"+@mechno+"'+'%'),'000'),3) as int) as nvarchar(10)),3))
-					,'A2','三泰-成品'
+					,'A2','三泰-成品',a.xcount,a.xmount,a.xweight
 					from #tmp a left join view_cuc b on a.noa=b.noa left join view_cucs c on a.noa=c.noa and a.noq=c.noq left join view_orde d on d.noa=c.ordeno
 				")
 			end
@@ -665,7 +665,7 @@ where b.typea='1' and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
 
 --入庫
 insert #unotable
-select a.accy,'cubs' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+select a.accy,'cubs' tablea,a.noa,a.noq,a.date2,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,a.mount,a.weight,a.lengthc,a.storeno,a.store,'6',a.memo
 from view_cubs a left join view_cub b on a.noa=b.noa
 where len(a.uno)>0 and exists (select * from dbo.fnSplit(@uno) where n=a.uno)
@@ -1620,7 +1620,7 @@ where b.typea='1' and len(a.uno)>0 and exists(select * from @tmp where uno=a.uno
 
 --入庫
 insert #tmp
-select a.accy,'cubs' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+select a.accy,'cubs' tablea,a.noa,a.noq,a.date2,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,a.ordeno,a.no2,'6'
 from view_cubs a left join view_cub b on a.noa=b.noa
 where len(a.uno)>0 and exists(select * from @tmp where uno=a.uno)
@@ -1781,7 +1781,7 @@ where b.typea='1' and len(a.uno)>0 and left(a.uno,len(@uno))=@uno and a.noa!=@no
 
 --入庫
 insert #tmp(accy,tablea,noa,noq,datea,uno,product,ucolor,spec,size,lengthb,class,mount,weight,lengthc,storeno,store,memo,ordeno,no2,typea)
-select a.accy,'cubs' tablea,a.noa,a.noq,b.datea,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
+select a.accy,'cubs' tablea,a.noa,a.noq,a.date2,a.uno,a.product,a.ucolor,a.spec,a.size,a.lengthb,a.class
 ,a.mount,a.weight,a.lengthc,a.storeno,a.store,a.memo,a.ordeno,a.no2,'6'
 from view_cubs a left join view_cub b on a.noa=b.noa
 where len(a.uno)>0 and left(a.uno,len(@uno))=@uno and a.noa!=@noa
@@ -1893,4 +1893,46 @@ BEGIN
 	set @cmd = 'drop table #tmp'
 	EXECUTE sp_executesql @cmd
 END
+;
+-----------------------------------------------
+spec_cubs:--spec_cubs 106/11/06 完工才入庫-暫不入庫
+SET QUOTED_IDENTIFIER OFF
+declare @cmd nvarchar(max) = ''
+declare @accy nvarchar(max) = [1]
+declare @noa nvarchar(max) = [2]
+declare @userno nvarchar(max) = [3]
+declare @namea nvarchar(max) = [4]
+
+set @accy=isnull((select accy from view_cub where noa=@noa),@accy)
+EXEC(" update cubs"+@accy+" set mount=0,lengthc=0,weight=0 where noa='"+@noa+"' ")
+
+;
+-----------------------------------------------
+end_cubs:--end_cubs 106/11/06 完工才入庫-完工入庫
+SET QUOTED_IDENTIFIER OFF
+declare @cmd nvarchar(max) = ''
+declare @accy nvarchar(max) = [1]
+declare @noa nvarchar(max) = [2]
+declare @noq nvarchar(max) = [3]
+declare @userno nvarchar(max) = [4]
+declare @namea nvarchar(max) = [5]
+declare @datea nvarchar(max) = case when '#non'=[6] then '' else [6] end --完工日
+
+declare cursor_table cursor for 
+select accy from view_cubs where productno2=@noa and product2=@noq group by accy
+open cursor_table 
+fetch next from cursor_table 
+into @accy
+while(@@FETCH_STATUS <> -1) 
+begin 
+		
+	EXEC(" update cubs"+@accy+" set lengthc=w01,mount=w02,weight=w03,date2='"+@datea+"' 
+	where productno2='"+@noa+"' and product2='"+@noq+"' ")
+
+	fetch next from cursor_table 
+	into @accy
+end 
+close cursor_table 
+deallocate cursor_table
+
 ;
