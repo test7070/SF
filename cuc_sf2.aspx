@@ -1315,7 +1315,10 @@
 											var n=$(this).attr('id').replace('cucs_mins','')
 											t_endanoa=$('#cucs_noa'+n).text();
 											t_endanoq=$('#cucs_noq'+n).text();
-											q_func('qtxt.query.enda', 'cuc_sf.txt,enda,'+r_accy+';'+$('#cucs_noa'+n).text()+';'+$('#cucs_noq'+n).text()+';'+r_userno.toUpperCase()+';'+r_name);
+											var t_date=emp($('#textDatea').val())?q_date():$('#textDatea').val();
+											q_func('qtxt.query.enda', 'cuc_sf.txt,enda,'+encodeURI(r_accy)+';'+encodeURI(t_endanoa)+';'+encodeURI(t_endanoq)+';'+r_userno.toUpperCase()+';'+r_name);
+											//106/11/06 增加完工才入庫-完工入庫
+											q_func('qtxt.query.end_cubs', 'cuc_sf.txt,end_cubs,' + encodeURI(r_accy)+';'+encodeURI(t_endanoa)+';'+encodeURI(t_endanoq)+ ';' + encodeURI($('#combMechno').val())+ ';' + encodeURI(r_userno.toUpperCase())+ ';' + encodeURI(r_name)+ ';' + encodeURI(t_date));
 										}
 									});
 								}else{
@@ -1772,6 +1775,12 @@
 	                        	//if(confirm("是否要列印條碼?")){//106/05/31 不詢問直接列印
 	                        		q_func( 'barvu.gen1', func_cubno+','+$('#combMechno').val());
 	                        	//}
+	                        	
+	                        	//等待1秒
+	                        	sleep(1000);
+	                        	//106/11/06 增加完工才入庫-暫不入庫
+	                        	q_func('qtxt.query.spec_cubs', 'cuc_sf.txt,spec_cubs,' + encodeURI(r_accy) + ';' + encodeURI(func_cubno)+ ';' + encodeURI($('#combMechno').val())+ ';' + encodeURI(r_userno.toUpperCase())+ ';' + encodeURI(r_name));
+	                        	
 	                        	func_cubno='';
                         	}else{
                         		alert('加工單產生失敗!!');
@@ -2304,7 +2313,15 @@
 					}
 				}
 			}
-
+			
+			function sleep(milliseconds) {
+                var start = new Date().getTime();
+                for (var i = 0; i < 1e7; i++) {
+                    if ((new Date().getTime() - start) > milliseconds) {
+                        break;
+                    }
+                }
+            }
 		</script>
 		<style type="text/css">
 			#dmain {

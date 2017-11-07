@@ -1900,8 +1900,9 @@ SET QUOTED_IDENTIFIER OFF
 declare @cmd nvarchar(max) = ''
 declare @accy nvarchar(max) = [1]
 declare @noa nvarchar(max) = [2]
-declare @userno nvarchar(max) = [3]
-declare @namea nvarchar(max) = [4]
+declare @mech nvarchar(max) = [3]
+declare @userno nvarchar(max) = [4]
+declare @namea nvarchar(max) = [5]
 
 set @accy=isnull((select accy from view_cub where noa=@noa),@accy)
 EXEC(" update cubs"+@accy+" set mount=0,lengthc=0,weight=0 where noa='"+@noa+"' ")
@@ -1914,9 +1915,10 @@ declare @cmd nvarchar(max) = ''
 declare @accy nvarchar(max) = [1]
 declare @noa nvarchar(max) = [2]
 declare @noq nvarchar(max) = [3]
-declare @userno nvarchar(max) = [4]
-declare @namea nvarchar(max) = [5]
-declare @datea nvarchar(max) = case when '#non'=[6] then '' else [6] end --完工日
+declare @mech nvarchar(max) = [4]
+declare @userno nvarchar(max) = [5]
+declare @namea nvarchar(max) = [6]
+declare @datea nvarchar(max) = case when '#non'=[7] then '' else [7] end --完工日
 
 declare cursor_table cursor for 
 select accy from view_cubs where productno2=@noa and product2=@noq group by accy
@@ -1926,7 +1928,7 @@ into @accy
 while(@@FETCH_STATUS <> -1) 
 begin 
 		
-	EXEC(" update cubs"+@accy+" set lengthc=w01,mount=w02,weight=w03,date2='"+@datea+"' 
+	EXEC(" update cubs"+@accy+" set lengthc=w01,mount=w02,weight=w03,date2='"+@datea+"',flower='"+@userno+"'
 	where productno2='"+@noa+"' and product2='"+@noq+"' ")
 
 	fetch next from cursor_table 
