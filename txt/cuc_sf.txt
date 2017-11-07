@@ -1204,7 +1204,7 @@ select a.noa,MIN(b.noq),b.cubno
 ,ISNULL(SUM(c.cubmount),0),ISNULL(SUM(c.cublengthc),0),ISNULL(SUM(c.cubweight),0)
 ,a.custno,a.cust,MIN(b.ordeno),MIN(b.no2)
 from view_cuc a left join view_cucs b on a.noa=b.noa
-outer apply (select SUM(d.mount) cubmount,SUM(d.weight) cubweight,SUM(d.lengthc)cublengthc 
+outer apply (select SUM(d.w02) cubmount,SUM(d.w03) cubweight,SUM(d.w01)cublengthc
 from view_cub c left join view_cubs d on c.noa=d.noa where "+@t_where1+")c
 where "+@t_where+" and isnull(b.noq,'')!=''
 group by a.noa,b.cubno,b.product,b.ucolor,b.spec,b.size,b.lengthb,b.class,b.imgbarcode
