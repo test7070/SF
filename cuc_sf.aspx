@@ -17,7 +17,7 @@
 			q_desc=1;
             q_tables = 's';
             var q_name = "cuc";
-            var q_readonly = ['txtNoa','txtWorker', 'txtWorker2','textWeight','txtCust'];
+            var q_readonly = ['txtWorker', 'txtWorker2','textWeight','txtCust']; //'txtNoa'
             var q_readonlys = ['txtPicname','txtMech','txtMech2'];
             var bbmNum = [];
             var bbsNum = [];
