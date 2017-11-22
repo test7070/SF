@@ -267,9 +267,9 @@ select '2',14,char(255),avg(c01),avg(c02),avg(c03),avg(total)
 from @result where gno='0'
 
 select 
-dbo.getComma(c01,-1)c01,
-dbo.getComma(c02,-1)c02,
-dbo.getComma(c03,-1)c03,
+dbo.getComma(round(c01,2),-1)c01,
+dbo.getComma(round(c02,2),-1)c02,
+dbo.getComma(round(c03,2),-1)c03,
 dbo.getComma(c04,-1)c04,
 dbo.getComma(c05,-1)c05,
 dbo.getComma(c06,-1)c06,
