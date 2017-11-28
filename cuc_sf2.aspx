@@ -1481,6 +1481,9 @@
 									$('#cucs_mins'+j).remove();
 									$('#cucs_waste'+j).text('');
 									$('#cucs_hours'+j).text('');
+									
+									//106/11/20 隱藏
+									$('#cucs_tr'+j).hide();
 								}
 							}
 							table_noa=$('#cucs_noa'+(bbsrow-1)).text();

@@ -101,6 +101,10 @@
 					}, {
                         type : '1',
                         name : 'xdate' //[23][24]
+                    }, {
+                        type : '5',
+                        name : 'yorder', //[25]
+                        value:("0@材質-號數-類別-米數,1@材質-號數-批號-米數").split(',')
                     }]
                 });
                 q_popAssign();
@@ -190,6 +194,8 @@
                 $('#combUcolor').change(function() {
 					$('#txtXucolor').val($('#combUcolor').find("option:selected").text());
 				});
+				
+				$('#Yorder select').css('width','65%')
             }
 
             function q_popPost(s1) {
