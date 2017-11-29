@@ -190,7 +190,16 @@ end
 
 if(@t_yorder='1')
 begin
-	select ROW_NUMBER() over (partition by product,spec,size order by product,spec,cast(dbo.get_num(size) as int),ucolor,lengthb,class,gno,uno,datea) rr
+	if(LEN(@t_ordeno)>0 and @t_xorde='1')
+	begin
+		--批號合計
+		insert #tmp
+		select '3','','','','',char(255),uno,product,char(255),spec,size,999,char(255)
+		,sum(mount),sum(weight),sum(lengthc),'','','','','',''
+		from #tmp where gno='0' group by product,spec,size,uno
+	end
+
+	select ROW_NUMBER() over (partition by product,spec,size order by product,spec,cast(dbo.get_num(size) as int),size,uno,lengthb,class,gno,uno,datea) rr
 	,dbo.getComma(mount,[2])mount
 	,dbo.getComma(weight,[3])weight
 	,dbo.getComma(lengthc,-1)lengthc
@@ -200,7 +209,7 @@ begin
 end
 else
 begin
-	select ROW_NUMBER() over (partition by product,spec,size order by product,spec,cast(dbo.get_num(size) as int),ucolor,lengthb,class,gno,uno,datea) rr
+	select ROW_NUMBER() over (partition by product,spec,size order by product,spec,cast(dbo.get_num(size) as int),size,ucolor,lengthb,class,gno,uno,datea) rr
 	,dbo.getComma(mount,[2])mount
 	,dbo.getComma(weight,[3])weight
 	,dbo.getComma(lengthc,-1)lengthc
