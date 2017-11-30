@@ -1926,7 +1926,9 @@
 										t_weight=dec(as[j].weight);
 										t_noa=as[j].noa;
 										t_noq=as[j].noq;
-										break;
+										//break;
+										//106/11/30 一張入庫會用同一個批號，以前方法不適用
+										tt_nouno=tt_nouno+t_nouno[i]+"@"+t_mount+"@"+t_lengthc+"@"+t_weight+"@"+t_noa+"@"+t_noq+"#";
 									}
 								}
 								if(!t_exists){
@@ -1937,9 +1939,9 @@
 									alert("批號【"+t_nouno[i]+"】已領料!!")
 									tt_nouno='';
 									break;
-								}else{
+								}/*else{
 									tt_nouno=tt_nouno+t_nouno[i]+"@"+t_mount+"@"+t_lengthc+"@"+t_weight+"@"+t_noa+"@"+t_noq+"#";
-								}
+								}*/
 							}
 							var t_mechno=emp($('#combMechno').val())?'#non':$('#combMechno').val();
 							
