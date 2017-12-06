@@ -63,7 +63,8 @@ declare @tmp table(
 	ghref nvarchar(max), 
 	carno nvarchar(50), 
 	ucolor nvarchar(50), 
-	memo nvarchar(max) 
+	memo nvarchar(max),
+	amemo nvarchar(MAX)
 ) 
 
 --106/07/20 根據品名的單位去顯示 (*最後一次調整)
@@ -80,7 +81,7 @@ begin
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,a.carno
-	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo
+	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo,a.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
@@ -109,7 +110,7 @@ begin
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,a.carno
-	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo
+	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo,a.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
@@ -131,18 +132,20 @@ insert @tmp
 select '1',0,0,0,max(datea),noa,custno,max(nick),addr2,ordeno,max(transtyle)
 ,max(tranmoney),'','',null,null,null
 ,SUM(case when ucolor='其他' then 0 else mount end)
-,sum(total),'',MAX(ghref),MAX(carno),'',''
+,sum(total),'',MAX(ghref),MAX(carno),'','',''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
 group by noa,custno,addr2,ordeno
 
 insert @tmp
 select '2',rr,0,0,datea,noa,custno,nick,addr2,ordeno,transtyle
-,tranmoney,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno,ucolor,memo
+,tranmoney,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno,ucolor,memo,replace(amemo,'chr(10)',' ')
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
 
-update @tmp set ordeno='' where gno='2' and rr>1
+update @tmp set ordeno='',amemo='' where gno='2' and rr>1
+
+update @tmp set memo=case when len(memo)>0 and len(amemo)>0 then isnull(amemo,'')+','+isnull(memo,'') else isnull(amemo,'')+isnull(memo,'') end where gno='2' and rr=1
 
 --項次
 update a

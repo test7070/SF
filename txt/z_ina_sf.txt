@@ -75,7 +75,9 @@ else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case whe
 +b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 ,case when UPPER(isnull(e.unit,''))='KG' then b.weight else b.mount end
 ,b.mweight,b.lengthc,null,null
-,'ina_sf?noa=$noa?'+a.accy,a.carno,case when UPPER(isnull(e.unit,''))='KG' then b.ucolor else '其他' end,b.memo 
+,'ina_sf?noa=$noa?'+a.accy
+,case when len(a.memo)>0 then replace(a.memo,'chr(10)',' ') else a.carno end--,a.carno
+,case when UPPER(isnull(e.unit,''))='KG' then b.ucolor else '其他' end,b.memo 
 from view_ina a left join view_inas b on a.noa=b.noa 
 left join tgg c on a.tggno=c.noa 
 left join ordh d on a.ordeno=d.noa
@@ -172,7 +174,7 @@ from (select page,recno from @tmp)a
 
 select 
 @t_bxdate bxdate,@t_exdate exdate
-,case when @t_bdate=@t_edate then '互換進貨日報表' else '互換進貨月報表' end title  
+,case when @t_bdate=@t_edate then '來料加工進貨日報表' else '來料加工進貨月報表' end title  
 ,dbo.getComma(total,0) total 
 ,dbo.getComma(ttotal,0) ttotal
 ,dbo.getComma(tmount,0) tmount

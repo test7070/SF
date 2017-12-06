@@ -18,10 +18,30 @@
             if (location.href.indexOf('?') < 0) {
                 location.href = location.href + "?;;;;" + ((new Date()).getUTCFullYear() - 1911);
             }
+            var intervalupdate;
             $(document).ready(function() {
                 q_getId();
                 q_gf('', 'z_inap_sf');
+                //106/12/06 預設BOSS中一刀 印表機
+				intervalupdate=setInterval("selectprint()",1000);
             });
+            
+            function selectprint() {
+				if($('#cmbPcPrinter').val()!=null){
+					$('#cmbPcPrinter option').each(function(index){
+						if($(this).val().indexOf('BOSS') > 0 && $(this).val().indexOf('中一刀') > 0){
+							$('#cmbPcPrinter option:eq('+index+')').prop('selected', true);
+						}
+					});
+					
+					//清除
+					intervalupdate = setInterval(";");
+					for (var i = 0 ; i < intervalupdate ; i++) {
+					    clearInterval(i); 
+					}
+				}
+            }
+            
             function q_gfPost() {
                 $('#q_report').q_report({
                     fileName : 'z_inap_sf',

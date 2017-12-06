@@ -246,7 +246,7 @@ begin
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
-	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then a.memo else a.carno end
+	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then replace(a.memo,'chr(10)',' ') else a.carno end
 	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end
 	,b.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
