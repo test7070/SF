@@ -94,7 +94,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 
 --小計
 insert @tmp
-select '1',0,'','',MAX(datea),noa,custno,MAX(nick),MAX(addr2),ordeno,MAX(transtyle)
+select '1',0,0,0,MAX(datea),noa,custno,MAX(nick),MAX(addr2),ordeno,MAX(transtyle)
 ,MAX(tranmoney),'','','',null,null,null
 ,SUM(case when ucolor='其他' then 0 else mount end)
 ,SUM(total),MAX(ghref),MAX(carno),'','',''
@@ -104,7 +104,7 @@ group by noa,custno,ordeno
 
 --顯示明細
 insert @tmp
-select '2','','',rr,datea,noa,custno,nick,addr2,ordeno,transtyle
+select '2',rr,0,0,datea,noa,custno,nick,addr2,ordeno,transtyle
 ,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo,replace(amemo,'chr(10)',' ')
 from @tmp where datea between @t_bdate and @t_edate and gno ='9'
 
