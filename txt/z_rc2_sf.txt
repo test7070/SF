@@ -247,7 +247,7 @@ begin
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then replace(a.memo,'chr(10)',' ') else a.carno end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end
+	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor when b.product='加工費-定尺' or b.product='加工費-成型' then b.product else '其他' end
 	,b.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	left join tgg c on a.tggno=c.noa 
@@ -277,7 +277,7 @@ begin
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,'rc2_sf?noa=$noa?'+a.accy,case when len(a.memo)>0 then a.memo else a.carno end
-	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end
+	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor when b.product='加工費-定尺' or b.product='加工費-成型' then b.product else '其他' end
 	,b.memo
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
 	left join tgg c on a.tggno=c.noa 
@@ -359,7 +359,7 @@ delete @tmp where gno='9'
 --重新排序
 update a
 set recno=recno2
-from (select recno,ROW_NUMBER()over (order by noa,gno,rr,case when ucolor='其他' then 9 else 0 end)recno2 from @tmp)a
+from (select recno,ROW_NUMBER()over (order by noa,gno,rr,case when ucolor like '%加工費-定尺%' then 7 when ucolor like '%加工費-成型%' then 8 when ucolor='其他' then 9 else 0 end)recno2 from @tmp)a
 
 --插入換頁
 declare @pageline float=37
