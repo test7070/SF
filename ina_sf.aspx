@@ -434,6 +434,15 @@
 					return;
 				}*/
 				
+				//106/12/18 判斷淨重與表身重量
+				var tt_weight=0;
+				for (var i = 0; i < q_bbsCount; i++) {
+					tt_weight=q_add(tt_weight,dec($('#txtWeight_'+i).val()));
+				}
+				if(tt_weight!=dec($('#txtMount').val())){
+					alert('※表頭【淨重】與表身【重量】合計不同!!');
+				}
+				
 				getnewuno=false;
                 check_uno=false;
                 check_ordh=false;
