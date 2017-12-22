@@ -107,6 +107,10 @@
                     	type : '5', //[23]
 						name : 'xtypea',
 						value : '#non@全部,委外代工@委外代工,來料加工@來料加工,互換@互換'.split(',')
+                    }, {
+                        type : '5',
+                        name : 'xgettypea', //[24]
+                        value : [q_getPara('report.all')].concat('1@出,2@退'.split(','))
                     }]
                 });
                 q_popAssign();

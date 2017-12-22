@@ -16,6 +16,7 @@ declare @t_estoreno nvarchar(20)
 declare @t_bxdate nvarchar(20) 
 declare @t_exdate nvarchar(20) 
 declare @t_typea nvarchar(20) = case when '#non'=[23] then '' else [23] end
+declare @t_gettypea nvarchar(20) = case when '#non'=[24] then '' else [24] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -32,7 +33,7 @@ set @t_bstoreno = case when '#non'=[16] then '' else [16] end
 set @t_estoreno = case when '#non'=[17] then char(255) else [17]  end
 set @t_bxdate = case when '#non'=[21] then '' else [21] end 
 set @t_exdate = case when '#non'=[22] then char(255) else [22] end 
-
+------------------------------------------------------------------------
 declare @tmp table(
 	gno nvarchar(1),
 	rr int,
@@ -80,6 +81,7 @@ from view_get a left join view_gets b on a.noa=b.noa
 left join cust c on a.custno=c.noa
 left join ordh d on a.idno=d.noa
 left join ucc e on b.product=e.product
+outer apply (select count(*) xtype from view_gets where noa=a.noa and (mount>0 or weight>0)) f
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like isnull(b.product,'')) and
@@ -91,6 +93,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 	  and (b.storeno between @t_bstoreno and @t_estoreno)
 	  and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 	  and exists (select * from view_gets where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
+	  and (len(@t_gettypea)=0 or case when f.xtype>0 then '1' else '2' end=@t_gettypea)
 
 --小計
 insert @tmp
