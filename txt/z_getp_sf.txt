@@ -43,7 +43,7 @@ declare @tmp1 table(
 if (LEN(@t_xaddr2)!=0)
 begin
 	insert into @tmp1
-	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr,a.namea,a.idno,sum(a.tweight),sum(cast(a.transtyle as float)),sum(a.mount),'','',
+	select '0',case when @t_bxnoa=@t_exnoa then @t_bxnoa else '' end,a.datea,a.custno,a.comp,a.addr,a.namea,a.idno,sum(a.tweight),sum(cast(replace(a.transtyle,',','') as float)),sum(a.mount),'','',
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,sum(b.mount),sum(b.weight),
 		   a.trantype,'','','','',a.memo
 	from view_get a
@@ -54,7 +54,7 @@ end
 else
 begin
 	insert into @tmp1
-	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.namea,a.idno,a.tweight,cast(REPLACE(transtyle, ',','') as float),a.mount,'','',
+	select '0',a.noa,a.datea,a.custno,a.comp,a.addr,a.namea,a.idno,a.tweight,cast(REPLACE(replace(a.transtyle,',',''), ',','') as float),a.mount,'','',
 		   b.ucolor,b.spec,b.product,b.memo,b.size,b.lengthb,b.mount,b.weight,
 		   a.trantype,a.transtart,a.cardeal,b.store,a.carno,a.memo
 	from view_get a
