@@ -21,6 +21,7 @@
             var t_qno='';
             var xclassItem ='';
             var xuccItem ='';
+            var xcustItem = '';
             var t_first=true;
 
             if (location.href.indexOf('?') < 0) {
@@ -52,11 +53,20 @@
                         type : '1', //[4][5]//1
                         name : 'date'
                     }, {
-                        type : '2', //[6][7]//4
+                        //106/12/28 換成下拉單選 楊
+                        type : '5',
+                        name : 'bcust', //[6]
+                        value : xcustItem.split(',')
+                        
+                        /*type : '2', //[6][7]//4
                         name : 'cust',
                         dbf : 'cust',
                         index : 'noa,comp',
-                        src : 'cust_b.aspx'
+                        src : 'cust_b.aspx'*/
+                    }, {
+                        type : '0', //[7] //106/12/28 在不影響txt選項變動下增加選項0
+                        name : 'ecust',
+                        value : 'char(255)'
                     }, {
                         type : '5',
                         name : 'xproduct', //[8]
@@ -165,27 +175,58 @@
                 selectbox.style.cssText ="width:20px;font-size: medium;";
                 tmp.parentNode.appendChild(selectbox,tmp);
                 
+				$('#txtCust1a').focusout(function() {
+                    //變動合約
+                    $('#combQno').empty();
+                    if (!emp($('#txtCust1a').val()) && !emp($('#txtCust2a').val())) {
+                        var t_where = "where=^^ custno between '" + $('#txtCust1a').val() + "' and case when isnull('" + $('#txtCust2a').val() + "','')='' then char(255) else '" + $('#txtCust2a').val() + "' end order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    } else {
+                        var t_where = "where=^^datea between '" + $('#txtDate1').val() + "' and '" + $('#txtDate2').val() + "' and custno between '" + $('#txtCust1a').val() + "' and case when isnull('" + $('#txtCust2a').val() + "','')='' then char(255) else '" + $('#txtCust2a').val() + "' end order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    }
+                });
+
+                $('#txtCust2a').focusout(function() {
+                    //變動合約
+                    $('#combQno').empty();
+                    $('#combXaddr2').empty();
+                    if (!emp($('#txtCust1a').val()) && !emp($('#txtCust2a').val())) {
+                        var t_where = "where=^^ custno between '" + $('#txtCust1a').val() + "' and case when isnull('" + $('#txtCust2a').val() + "','')='' then char(255) else '" + $('#txtCust2a').val() + "' end order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    } else {
+                        var t_where = "where=^^datea between '" + $('#txtDate1').val() + "' and '" + $('#txtDate2').val() + "' and custno between '" + $('#txtCust1a').val() + "' and case when isnull('" + $('#txtCust2a').val() + "','')='' then char(255) else '" + $('#txtCust2a').val() + "' end order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    }
+                    q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                });
                 
-				var t_where="where=^^datea between '"+$('#txtDate1').val()+"' and '"+$('#txtDate2').val()+
-								"' and custno between '"+$('#txtCust1a').val()+"' and case when isnull('"+$('#txtCust2a').val()+"','')='' then char(255) else '"+$('#txtCust2a').val()+"' end order by datea desc,noa desc  --^^ stop=999 "
-				q_gt('view_quat',t_where, 0, 0, 0, "view_quat");
-            
-                 $('.c3.text').change(function(){
-                 	var t_where="where=^^datea between '"+$('#txtDate1').val()+"' and '"+$('#txtDate2').val()+
-								"' and custno between '"+$('#txtCust1a').val()+"' and case when isnull('"+$('#txtCust2a').val()+"','')='' then char(255) else '"+$('#txtCust2a').val()+"' end order by datea desc,noa desc  --^^ stop=999 "
-					q_gt('view_quat',t_where, 0, 0, 0, "view_quat");               
-                 });
-                  $('.c2.text').change(function(){
-                 	var t_where="where=^^datea between '"+$('#txtDate1').val()+"' and '"+$('#txtDate2').val()+
-								"' and custno between '"+$('#txtCust1a').val()+"' and case when isnull('"+$('#txtCust2a').val()+"','')='' then char(255) else '"+$('#txtCust2a').val()+"' end order by datea desc,noa desc  --^^ stop=999 "
-					q_gt('view_quat',t_where, 0, 0, 0, "view_quat");               
-                 });
+                $('#Bcust select').change(function() {
+                	//變動合約
+                    $('#combQno').empty();
+                    $('#combXaddr2').empty();
+                    var t_custno=$('#Bcust select').val();
+                    
+                    if (!emp(t_custno)) {
+                        var t_where = "where=^^datea between '" + $('#txtDate1').val() + "' and '" + $('#txtDate2').val() + "' and custno='"+t_custno+"' order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    } else {
+                        var t_where = "where=^^datea between '" + $('#txtDate1').val() + "' and '" + $('#txtDate2').val() + "' order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    }
+                    q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    
+                    if (!emp(t_custno)) {
+	                    var t_where = "where=^^noa = '" + t_custno + "' ^^ "
+	                    q_gt('custms', t_where, 0, 0, 0, "getcustm");
+	                }
+                });
                  
-                 $('#combQno').click(function() {
+                 /*$('#combQno').click(function() {
                  	var t_where="where=^^datea between '"+$('#txtDate1').val()+"' and '"+$('#txtDate2').val()+
 								"' and custno between '"+$('#txtCust1a').val()+"' and case when isnull('"+$('#txtCust2a').val()+"','')='' then char(255) else '"+$('#txtCust2a').val()+"' end order by datea desc,noa desc  --^^ stop=999 "
 					q_gt('view_quat',t_where, 0, 0, 0, "view_quat");
-                 });
+                 });*/
                  
                  $('#txtQno').change(function() {
 					changeaddr2();
@@ -235,7 +276,8 @@
 				$('#chkXatax span').css('width','180px')
 								
 				$('#lblQno').css('font-size','12px');
-
+				
+				$('#lblBcust').text('客戶編號');
             }
 			function changeaddr2() {
 				if(q_getPara('sys.project').toUpperCase()=='SF' && !emp($('#txtQno').val())
@@ -279,7 +321,15 @@
 						for ( i = 0; i < as.length; i++) {
 							xuccItem+=","+as[i].product;
 						}
-						break;  
+						q_gt('cust', '1=1 ', 0, 0, 0, "cust");
+						break;
+					case 'cust':
+                        xcustItem = " @全部";
+                        var as = _q_appendData("cust", "", true);
+                        for ( i = 0; i < as.length; i++) {
+                            xcustItem += ","+as[i].noa+"@" + as[i].nick+"  "+as[i].noa;
+                        }
+                        break;
 					case 'view_quat':
                 		var as = _q_appendData("view_quat", "", true);
                 		if(as != undefined){
@@ -308,7 +358,7 @@
                 		break;
                 	               			
                 }
-                if (xuccItem.length>0 && !gfrun) {
+                if (xcustItem.length>0 && !gfrun) {
                     gfrun = true;
                     q_gf('', 'z_get_sf');
                 }

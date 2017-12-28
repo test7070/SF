@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" >
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title></title>
+		<title> </title>
 		<script src="/../script/jquery.min.js" type="text/javascript"></script>
 		<script src='../script/qj2.js' type="text/javascript"></script>
 		<script src='qset.js' type="text/javascript"></script>
@@ -21,6 +21,7 @@
             var t_qno = '';
             var xclassItem = '';
             var xuccItem = '';
+            var xcustItem = '';
             var t_first = true;
 
             if (location.href.indexOf('?') < 0) {
@@ -53,12 +54,19 @@
                     }, {
                         type : '1', //[6][7]//2
                         name : 'mon'
-                    }, {
-                        type : '2', //[8][9]//4
+                    }, { //106/12/28 換成下拉單選 楊
+                        type : '5',
+                        name : 'bcust', //[8]
+                        value : xcustItem.split(',')
+                        /*type : '2', //[8][9]//4
                         name : 'cust',
                         dbf : 'cust',
                         index : 'noa,comp',
-                        src : 'cust_b.aspx'
+                        src : 'cust_b.aspx'*/
+                    }, {
+                        type : '0', //[9] //106/12/28 在不影響txt選項變動下增加選項0
+                        name : 'ecust',
+                        value : 'char(255)'
                     }, {
                         type : '5',
                         name : 'vcctypea', //[10]//1000
@@ -217,6 +225,27 @@
 	                    q_gt('custms', t_where, 0, 0, 0, "getcustm");
 	                }
                 });
+                
+                $('#Bcust select').change(function() {
+                	//變動合約
+                    $('#combQno').empty();
+                    $('#combXaddr2').empty();
+                    var t_custno=$('#Bcust select').val();
+                    
+                    if (!emp(t_custno)) {
+                        var t_where = "where=^^datea between '" + $('#txtDate1').val() + "' and '" + $('#txtDate2').val() + "' and custno='"+t_custno+"' order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    } else {
+                        var t_where = "where=^^datea between '" + $('#txtDate1').val() + "' and '" + $('#txtDate2').val() + "' order by datea desc,noa desc  --^^ stop=999 "
+                        q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    }
+                    q_gt('view_quat', t_where, 0, 0, 0, "view_quat");
+                    
+                    if (!emp(t_custno)) {
+	                    var t_where = "where=^^noa = '" + t_custno + "' ^^ "
+	                    q_gt('custms', t_where, 0, 0, 0, "getcustm");
+	                }
+                });
 
                 if (window.parent.q_name == "z_quatp_vu") {
                     $('#txtQno').val(q_getHref()[1]);
@@ -252,6 +281,8 @@
                 $('#chkXnoshowget').css('width', '220px').css('margin-top', '5px');
                 $('#chkXnoshowget span').css('width', '180px')
                 $('#chkXnoshowget').children('input').attr('checked', 'checked');
+                
+                $('#lblBcust').text('客戶編號');
             }
 
             function q_boxClose(s2) {
@@ -288,6 +319,14 @@
                         var as = _q_appendData("ucc", "", true);
                         for ( i = 0; i < as.length; i++) {
                             xuccItem += "," + as[i].product;
+                        }
+                        q_gt('cust', '1=1 ', 0, 0, 0, "cust");
+                        break;
+					case 'cust':
+                        xcustItem = " @全部";
+                        var as = _q_appendData("cust", "", true);
+                        for ( i = 0; i < as.length; i++) {
+                            xcustItem += ","+as[i].noa+"@" + as[i].nick+"  "+as[i].noa;
                         }
                         break;
                     case 'view_quat':
@@ -349,7 +388,7 @@
                         break;
 
                 }
-                if (xuccItem.length > 0 && !gfrun) {
+                if (xcustItem.length > 0 && !gfrun) {
                     gfrun = true;
                     q_gf('', 'z_vcc_sf');
                 }
