@@ -83,8 +83,7 @@ left join ordh d on a.idno=d.noa
 left join ucc e on b.product=e.product
 outer apply (select count(*) xtype from view_gets where noa=a.noa and (mount>0 or weight>0)) f
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-	  --(a.custno between @t_bcustno and @t_ecustno) and
-	  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like isnull(b.product,'')) and
 	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
 	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
@@ -123,15 +122,16 @@ from (select ROW_NUMBER()over(partition by gno order by noa)rx,rr from @tmp wher
 
 --合計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '3',CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal)
+select '3',CHAR(255),SUM(case when transtyle='收費' then tranmoney else 0 end),SUM(tmount),sum(ttotal)
 from @tmp where gno='1'
 
 --統計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
-	select noa,tranmoney,SUM(case when ucolor='其他' then 0 else mount end)tmount,sum(total)ttotal
+	select noa,case when transtyle='收費' then tranmoney else 0 end tranmoney
+	,SUM(case when ucolor='其他' then 0 else mount end)tmount,sum(total)ttotal
 	from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
-	group by noa,tranmoney
+	group by noa,case when transtyle='收費' then tranmoney else 0 end
 )tmpz
 
 --插空白行
@@ -255,8 +255,7 @@ from view_get a left join view_gets b on a.noa = b.noa and a.accy = b.accy
 left join cust c on a.custno = c.noa 
 left join ordh d on a.idno=d.noa
 where (a.datea between @t_bdate and @t_edate) and 
-	  --(a.custno between @t_bcustno and @t_ecustno)  and
-	  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+	  (a.custno between @t_bcustno and @t_ecustno)  and
 	  (len(@t_product)=0 or @t_product like b.product)and
 	  (len(@t_spec)=0 or @t_spec like b.spec) and
 	  (len(@t_size)=0 or @t_size like b.size) and
@@ -382,8 +381,7 @@ declare @result table(
 	left join cust c on a.custno = c.noa 
 	left join ordh d on a.idno=d.noa
 	where (a.datea between @t_bdate and @t_edate) and 
-	--(a.custno between @t_bcustno and @t_ecustno) and
-	(len(@t_bcustno)=0 or a.custno=@t_bcustno) and 
+	(a.custno between @t_bcustno and @t_ecustno) and
 	(len(@t_product)=0 or @t_product like b.product)and
 	(len(@t_spec)=0 or @t_spec like b.spec) and
 	(len(@t_size)=0 or @t_size like b.size) and
@@ -491,8 +489,7 @@ from view_get a left join view_gets b on a.noa = b.noa
 left join cust c on a.custno = c.noa
 left join ordh d on a.idno=d.noa 
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@t_product)=0 or @t_product like b.product) and
 (len(@t_spec)=0 or @t_spec like b.spec) and
 (len(@t_size)=0 or @t_size like b.size) and
@@ -639,8 +636,7 @@ from view_gets b left join view_get a on a.noa = b.noa
 left join cust c on a.custno = c.noa
 left join ordh d on a.idno=d.noa
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@t_spec)=0 or @t_spec like b.spec) and
 (len(@t_size)=0 or @t_size like b.size) and
@@ -746,8 +742,7 @@ select '0',a.custno,(case when isnull(c.nick,'') = '' then c.comp else c.nick en
 from view_get a left join view_gets b on a.noa = b.noa 
 left join cust c on a.custno = c.noa left join ordh d on a.idno=d.noa 
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno) and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno) and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@t_spec)=0 or @t_spec like b.spec) and
 (len(@t_size)=0 or @t_size like b.size) and
@@ -856,8 +851,7 @@ left join cust c on a.custno = c.noa
 left join view_ucaucc d on b.productno = d.noa 
 left join ordh e on a.idno=e.noa
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@t_spec)=0 or @t_spec like b.spec) and
 (len(@t_size)=0 or @t_size like b.size) and
@@ -963,8 +957,7 @@ select '0',b.product+' '+isnull(b.size,'')+' '+isnull(b.spec,'')+' '+case when (
 from view_get a left join view_gets b on a.noa = b.noa and a.accy = b.accy 
 left join ordh d on a.idno=d.noa
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@t_spec)=0 or @t_spec like b.spec) and
 (len(@t_size)=0 or @t_size like b.size) and
@@ -1093,8 +1086,7 @@ from view_get a left join view_gets b on a.noa=b.noa
 left join ordh d on a.idno=d.noa
 left join ucc e on b.product=e.product
 where (a.datea between @t_bdate and @t_edate) and 
-	  --(a.custno between @t_bcustno and @t_ecustno) and
-	  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
 	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
@@ -1214,8 +1206,7 @@ from view_get a left join view_gets b on a.noa = b.noa and a.accy = b.accy
 left join cust c on a.custno = c.noa
 left join ordh d on a.idno=d.noa 
 where (a.datea between @t_bdate and @t_edate) and 
-	  --(a.custno between @t_bcustno and @t_ecustno) and
-	  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like b.product)and
 	  (len(@t_spec)=0 or @t_spec like b.spec) and
 	  (len(@t_size)=0 or @t_size like b.size) and
@@ -1315,8 +1306,7 @@ from view_get a left join view_gets b on a.noa=b.noa
 left join cust c on a.custno=c.noa
 left join ordh d on a.idno=d.noa
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-	  --(a.custno between @t_bcustno and @t_ecustno) and
-	  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
 	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and

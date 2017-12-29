@@ -55,18 +55,11 @@
                         type : '1', //[6][7]//2
                         name : 'mon'
                     }, { //106/12/28 換成下拉單選 楊
-                        type : '5',
-                        name : 'bcust', //[8]
-                        value : xcustItem.split(',')
-                        /*type : '2', //[8][9]//4
+                        type : '2', //[8][9]
                         name : 'cust',
                         dbf : 'cust',
                         index : 'noa,comp',
-                        src : 'cust_b.aspx'*/
-                    }, {
-                        type : '0', //[9] //106/12/28 在不影響txt選項變動下增加選項0
-                        name : 'ecust',
-                        value : 'char(255)'
+                        src : 'cust_b.aspx'
                     }, {
                         type : '5',
                         name : 'vcctypea', //[10]//1000
@@ -282,7 +275,36 @@
                 $('#chkXnoshowget span').css('width', '180px')
                 $('#chkXnoshowget').children('input').attr('checked', 'checked');
                 
-                $('#lblBcust').text('客戶編號');
+                $('#txtCust1b').hide();
+                $('#btnCust1').hide();
+                $('#txtCust2b').hide();
+                $('#btnCust2').hide();
+                
+                $('#txtCust1a').after("<select id='combbcust' style='width:120px;font-size: medium;float:left;'></select>");
+                $('#txtCust2a').after("<select id='combecust' style='width:120px;font-size: medium;float:left;'></select>");
+                
+                $('#combbcust').change(function() {
+                	$('#txtCust1a').val($(this).val());
+                	$('#txtCust2a').val($(this).val());
+                	$('#combecust').val($(this).val());
+				});
+				$('#combecust').change(function() {
+                	$('#txtCust2a').val($(this).val());
+				});
+				
+				$('#txtCust1a').change(function() {
+                	$('#combbcust').val($(this).val());
+                	$('#combecust').val($(this).val());
+				});
+				
+				$('#txtCust2a').change(function() {
+                	$('#combecust').val($(this).val());
+				});
+                
+                if (xcustItem.length != 0) {
+					q_cmbParse("combbcust", xcustItem);
+					q_cmbParse("combecust", xcustItem);
+				}
             }
 
             function q_boxClose(s2) {

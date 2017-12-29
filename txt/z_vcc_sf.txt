@@ -86,8 +86,7 @@ begin
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-		  --(a.custno between @t_bcustno and @t_ecustno)  and
-		  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+		  (a.custno between @t_bcustno and @t_ecustno)  and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
 		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
@@ -116,8 +115,7 @@ begin
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-		  --(a.custno between @t_bcustno and @t_ecustno)  and
-		  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+		  (a.custno between @t_bcustno and @t_ecustno)  and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
 		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
@@ -312,8 +310,7 @@ declare @result table(
 	from view_vccs b left join view_vcc a on a.noa = b.noa 
 	left join cust c on a.custno = c.noa left join view_ucaucc d on b.productno = d.noa left join sss s on isnull(a.salesno,'')=s.noa 
 	where (a.datea between @t_bdate and @t_edate) and 
-	--(a.custno between @t_bcustno and @t_ecustno) and 
-	(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+	(a.custno between @t_bcustno and @t_ecustno) and 
 	(len(@vcctypea)=0 or @vcctypea=a.typea) and
 	(len(@t_product)=0 or @t_product like b.product)and
 	(len(@t_spec)=0 or @t_spec like b.spec) and
@@ -421,8 +418,7 @@ select '9'
 	   ,b.price,case when len(dbo.get_num(size))=1 then '0'+dbo.get_num(size) else dbo.get_num(size) end
 from view_vcc a left join view_vccs b on a.noa = b.noa and a.accy = b.accy left join cust c on a.custno = c.noa 
 where (a.datea between @t_bdate and @t_edate) and 
-	  --(a.custno between @t_bcustno and @t_ecustno)  and
-	  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+	  (a.custno between @t_bcustno and @t_ecustno)  and
 	  (len(@vcctypea)=0 or @vcctypea=a.typea) and
 	  (len(@t_product)=0 or @t_product like b.product)and
 	  (len(@t_spec)=0 or @t_spec like b.spec) and
@@ -555,8 +551,7 @@ select '0' gno, a.typea, a.noa noa, b.noq noq, a.datea datea, a.mon mon
 ,a.carno,case when len(dbo.get_num(size))=1 then '0'+dbo.get_num(size) else dbo.get_num(size) end
 from view_vccs b left join view_vcc a on a.noa = b.noa left join cust c on a.custno = c.noa left join sss s on isnull(a.salesno,'')=s.noa 
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@vcctypea)=0 or @vcctypea=a.typea) and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@t_spec)=0 or @t_spec like b.spec) and
@@ -675,8 +670,7 @@ select '9',b.product+' '+isnull(b.size,'')+' '+isnull(b.spec,'')+' '+case when (
 ,0,0,case when len(dbo.get_num(size))=1 then '0'+dbo.get_num(size) else dbo.get_num(size) end
 from view_vcc a left join view_vccs b on a.noa = b.noa left join cust c on a.custno = c.noa 
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@vcctypea)=0 or @vcctypea=a.typea) and
 (len(@t_product)=0 or @t_product like b.product) and
 (len(@t_spec)=0 or @t_spec like b.spec) and
@@ -822,8 +816,7 @@ left join cust c on a.custno = c.noa
 left join view_ucaucc d on b.productno = d.noa 
 left join sss s on isnull(a.salesno,'')=s.noa 
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@vcctypea)=0 or @vcctypea=a.typea) and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@t_spec)=0 or @t_spec like b.spec) and
@@ -930,8 +923,7 @@ case when isnull(a.mon,'')!='' then a.mon else left(a.datea,7) end
 ,sum((case when a.typea='1' then 1 else -1 end)*(round((a.tax*(case when a.money=0 then 0 else (b.total/a.money) end)),0)+b.total)) 
 from view_vcc a left join view_vccs b on a.noa = b.noa left join cust c on a.custno = c.noa 
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@vcctypea)=0 or @vcctypea=a.typea) and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@t_spec)=0 or @t_spec like b.spec) and
@@ -1029,8 +1021,7 @@ select '0',b.product+' '+isnull(b.size,'')+' '+isnull(b.spec,'')+' '+case when (
 ,case when len(dbo.get_num(size))=1 then '0'+dbo.get_num(size) else dbo.get_num(size) end
 from view_vcc a left join view_vccs b on a.noa = b.noa and a.accy = b.accy 
 where (a.datea between @t_bdate and @t_edate) and 
---(a.custno between @t_bcustno and @t_ecustno)  and
-(len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+(a.custno between @t_bcustno and @t_ecustno)  and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@vcctypea)=0 or @vcctypea=a.typea) and
 (len(@t_spec)=0 or @t_spec like b.spec) and
@@ -1168,8 +1159,7 @@ begin
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
-		  --(a.custno between @t_bcustno and @t_ecustno)  and
-		  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+		  (a.custno between @t_bcustno and @t_ecustno) and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
 		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
@@ -1200,8 +1190,7 @@ begin
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
-		  --(a.custno between @t_bcustno and @t_ecustno)  and
-		  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+		  (a.custno between @t_bcustno and @t_ecustno) and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
 		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
@@ -1335,8 +1324,7 @@ select '9',a.custno,(case when isnull(c.nick,'') = '' then c.comp else c.nick en
 		,(case when a.typea='1' then 1 else -1 end)*b.weight*b.price
 from view_vcc a left join view_vccs b on a.noa = b.noa and a.accy = b.accy left join cust c on a.custno = c.noa 
 where (a.datea between @t_bdate and @t_edate) and 
-	  --(a.custno between @t_bcustno and @t_ecustno)  and
-	  (len(@t_bcustno)=0 or a.custno=@t_bcustno) and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@vcctypea)=0 or @vcctypea=a.typea) and
 	  (len(@t_product)=0 or @t_product like b.product)and
 	  (len(@t_spec)=0 or @t_spec like b.spec) and
