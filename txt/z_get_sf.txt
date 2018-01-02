@@ -1073,7 +1073,7 @@ declare @tmp table(
 insert @tmp
 select '2','','','',a.noa,a.datea,a.custno,a.comp,a.addr
 ,SUBSTRING(isnull(a.idno,''),0,CHARINDEX('@',isnull(a.idno,''))) 
-,case when a.kind='收費' or a.kind='含運' then a.tranmoney else 0 end,a.tax
+,case when a.kind='收費' then a.tranmoney else 0 end,a.tax
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
 ,case when len(b.ucolor)=0 then ''
 else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
@@ -1297,7 +1297,7 @@ declare @tmp table(
 insert @tmp
 select '9','',a.datea,a.noa,a.custno,c.nick,a.addr
 ,SUBSTRING(idno,0,CHARINDEX('@',idno))
-,case when kind='收費' or kind='含運' then a.tranmoney else 0 end
+,case when kind='收費' then a.tranmoney else 0 end
 ,ROW_NUMBER()over(partition by a.noa order by a.noa),b.productno
 ,case when isnull(ucolor,'')!='' then CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+b.product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 ,b.mount,b.mweight,b.lengthc,case when b.product='鋼筋' then b.mount else 0 end,b.lengthc
