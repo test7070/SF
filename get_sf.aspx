@@ -170,7 +170,7 @@
 						var t_weight=dec($('#txtMount').val());
 						if(t_weight!=0){
 							for (var i = 0; i < q_bbsCount; i++) {
-								if(dec($('#txtWeight_'+i).val())!=0){//&& !emp($('#txtProduct_'+i).val())
+								if(!emp($('#txtProduct_'+i).val())){
 									t_weight=q_sub(t_weight,dec($('#txtWeight_'+i).val()));
 								}
 							}
@@ -178,7 +178,7 @@
 						if(t_weight!=0){
 							var t_n=-1;
 							for (var i = 0; i < q_bbsCount; i++) {
-								if(emp($('#txtProduct_'+i).val()) && dec($('#txtWeight_'+i).val())==0){
+								if(emp($('#txtProduct_'+i).val())){
 									t_n=i;
 									break;
 								}
@@ -190,7 +190,7 @@
 							$('#txtWeight_'+t_n).val(t_weight);
 						}else{
 							for (var i = 0; i < q_bbsCount; i++) {
-								if(emp($('#txtProduct_'+i).val()) && dec($('#txtWeight_'+i).val())==0){
+								if(emp($('#txtProduct_'+i).val())){
 									t_n=i;
 									$('#txtWeight_'+t_n).val(0);
 									break;
