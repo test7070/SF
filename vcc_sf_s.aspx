@@ -77,14 +77,18 @@
 				
 				var t_where = " 1=1 "
 				+ q_sqlPara2("cno", t_cno)
-				+q_sqlPara2("typea", t_typea)
-				+q_sqlPara2("stype", t_stype)
+				+ q_sqlPara2("typea", t_typea)
+				+ q_sqlPara2("stype", t_stype)
 				+ q_sqlPara2("noa", t_noa)
 				+ q_sqlPara2("mon", t_mon)
 				+ q_sqlPara2("datea", t_bdate, t_edate)
 				+ q_sqlPara2("accno", t_accno)
-				+ q_sqlPara2("custno", t_custno)
+				//+ q_sqlPara2("custno", t_custno)
 				+ q_sqlPara2("invono", t_invono);
+				
+				//107/01/29 楊
+				if(t_custno.length>0)
+					t_where += " and (custno='"+t_custno+"') ";
 				
 				if(t_salesno.length>0)
 					t_where += " and (salesno='"+t_salesno+"' or salesno2='"+t_salesno+"') ";
