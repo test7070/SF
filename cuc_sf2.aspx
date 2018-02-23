@@ -1779,8 +1779,8 @@
 	                        		q_func( 'barvu.gen1', func_cubno+','+$('#combMechno').val());
 	                        	//}
 	                        	
-	                        	//等待1秒
-	                        	sleep(1000);
+	                        	//等待1秒 //107/02/22 遞延3秒
+	                        	sleep(3000);
 	                        	//106/11/06 增加完工才入庫-暫不入庫
 	                        	q_func('qtxt.query.spec_cubs', 'cuc_sf.txt,spec_cubs,' + encodeURI(r_accy) + ';' + encodeURI(func_cubno)+ ';' + encodeURI($('#combMechno').val())+ ';' + encodeURI(r_userno.toUpperCase())+ ';' + encodeURI(r_name));
 	                        	
