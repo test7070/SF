@@ -143,13 +143,15 @@
 				$('#lblTranmoney').text('應收運費');
 				
 				$('#txtTranadd').change(function() {
-					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')))
-					$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
+					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
+					$('#txtWeight').change();
+					//$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
 				});
 				
 				$('#txtBenifit').change(function() {
-					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')))
-					$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
+					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
+					$('#txtWeight').change();
+					//$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
 				});
 				
 				//限制帳款月份的輸入 只有在備註的第一個字為*才能手動輸入					
@@ -326,6 +328,38 @@
 				
 				$('#txtWeight').change(function() {
 					if(q_cur==1 || q_cur==2){
+						//107/01/10 重新開放
+						var t_weight=dec($('#txtWeight').val());
+						if(t_weight!=0){
+							for (var i = 0; i < q_bbsCount; i++) {
+								if(!emp($('#txtProduct_'+i).val())){
+									t_weight=q_sub(t_weight,dec($('#txtWeight_'+i).val()));
+								}
+							}
+						}
+						if(t_weight!=0){
+							var t_n=-1;
+							for (var i = 0; i < q_bbsCount; i++) {
+								if(emp($('#txtProduct_'+i).val())){
+									t_n=i;
+									break;
+								}
+							}
+							if(t_n==-1){
+								t_n=q_bbsCount;
+								$('#btnPlus').click();
+							}
+							$('#txtWeight_'+t_n).val(t_weight);
+						}else{
+							for (var i = 0; i < q_bbsCount; i++) {
+								if(emp($('#txtProduct_'+i).val())){
+									t_n=i;
+									$('#txtWeight_'+t_n).val(0);
+									break;
+								}
+							}
+						}
+						
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0))
 						sum();
 					}
@@ -1357,6 +1391,15 @@
 					$('#txtCartrips').val(0);
 				}
 				
+				//106/12/18 判斷淨重與表身重量
+				var tt_weight=0;
+				for (var i = 0; i < q_bbsCount; i++) {
+					tt_weight=q_add(tt_weight,dec($('#txtWeight_'+i).val()));
+				}
+				if(tt_weight!=dec($('#txtWeight').val())){
+					alert('※表頭【淨重】與表身【重量】合計不同!!');
+				}
+				
 				if (q_cur == 1){
 					$('#txtWorker').val(r_name);
 					if($('#txtPaydate').val().length==0 || $('#txtPaydate').val()=='AUTO'){
@@ -1576,7 +1619,7 @@
 								}else{
 									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
 								}
-								sum();
+								$('#txtWeight').change();
 							}
 							sum();
 							bbssum();

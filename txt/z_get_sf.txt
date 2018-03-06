@@ -16,6 +16,7 @@ declare @t_estoreno nvarchar(20)
 declare @t_bxdate nvarchar(20) 
 declare @t_exdate nvarchar(20) 
 declare @t_typea nvarchar(20) = case when '#non'=[23] then '' else [23] end
+declare @t_gettypea nvarchar(20) = case when '#non'=[24] then '' else [24] end
 ------------------------------------------------- 
 set @t_bdate = case when '#non'=[4] then '' else [4] end 
 set @t_edate = case when '#non'=[5] then char(255) else [5] end 
@@ -32,7 +33,7 @@ set @t_bstoreno = case when '#non'=[16] then '' else [16] end
 set @t_estoreno = case when '#non'=[17] then char(255) else [17]  end
 set @t_bxdate = case when '#non'=[21] then '' else [21] end 
 set @t_exdate = case when '#non'=[22] then char(255) else [22] end 
-
+------------------------------------------------------------------------
 declare @tmp table(
 	gno nvarchar(1),
 	rr int,
@@ -57,16 +58,17 @@ declare @tmp table(
 	ghref nvarchar(max),
 	carno nvarchar(50),
 	ucolor nvarchar(50),
-	memo nvarchar(max)
+	memo nvarchar(max),
+	amemo nvarchar(MAX)
 )
 
 --106/07/20 根據品名的單位去顯示 (*最後一次調整)
-
+--106/12/28 換成下拉單選客戶 楊
 --明細
 insert @tmp
 select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),'','',a.datea,a.noa,a.custno,c.nick,a.addr
 ,SUBSTRING(idno,0,CHARINDEX('@',idno)),kind
-,case when kind='收費' then a.tranmoney else 0 end
+,case when kind='收費' or kind='含運' then a.tranmoney else 0 end
 ,b.noq,b.productno
 ,case when len(b.ucolor)=0 then ''
 else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
@@ -74,11 +76,12 @@ else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case whe
 ,case when UPPER(isnull(e.unit,''))='KG' then b.weight else b.mount end
 ,b.mweight,b.lengthc,null,null
 ,'get_sf?noa=$noa?'+a.accy,a.carno
-,case when UPPER(isnull(e.unit,''))='KG' then b.ucolor else '其他' end,b.memo
+,case when UPPER(isnull(e.unit,''))='KG' then b.ucolor else '其他' end,b.memo,a.memo
 from view_get a left join view_gets b on a.noa=b.noa
 left join cust c on a.custno=c.noa
 left join ordh d on a.idno=d.noa
 left join ucc e on b.product=e.product
+outer apply (select count(*) xtype from view_gets where noa=a.noa and (mount>0 or weight>0)) f
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
 	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like isnull(b.product,'')) and
@@ -90,24 +93,27 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 	  and (b.storeno between @t_bstoreno and @t_estoreno)
 	  and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 	  and exists (select * from view_gets where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
+	  and (len(@t_gettypea)=0 or case when f.xtype>0 then '1' else '2' end=@t_gettypea)
 
 --小計
 insert @tmp
-select '1',0,'','',MAX(datea),noa,custno,MAX(nick),MAX(addr2),ordeno,MAX(transtyle)
+select '1',0,0,0,MAX(datea),noa,custno,MAX(nick),MAX(addr2),ordeno,MAX(transtyle)
 ,MAX(tranmoney),'','','',null,null,null
 ,SUM(case when ucolor='其他' then 0 else mount end)
-,SUM(total),MAX(ghref),MAX(carno),'',''
+,SUM(total),MAX(ghref),MAX(carno),'','',''
 from @tmp
 where datea between @t_bdate and @t_edate and gno='9'
 group by noa,custno,ordeno
 
 --顯示明細
 insert @tmp
-select '2','','',rr,datea,noa,custno,nick,addr2,ordeno,transtyle
-,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo
+select '2',rr,0,0,datea,noa,custno,nick,addr2,ordeno,transtyle
+,tranmoney,noq,productno,product,mount,price,total,tmount,ttotal,ghref,carno,ucolor,memo,replace(amemo,'chr(10)',' ')
 from @tmp where datea between @t_bdate and @t_edate and gno ='9'
 
-update @tmp set ordeno='' where gno='2' and rr>1
+update @tmp set ordeno='',amemo='' where gno='2' and rr>1
+
+update @tmp set memo=case when len(memo)>0 and len(amemo)>0 then amemo+','+memo else amemo+memo end where gno='2' and rr=1
 
 --項次
 update a
@@ -116,15 +122,16 @@ from (select ROW_NUMBER()over(partition by gno order by noa)rx,rr from @tmp wher
 
 --合計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '3',CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal)
+select '3',CHAR(255),SUM(case when transtyle='收費' then tranmoney else 0 end),SUM(tmount),sum(ttotal)
 from @tmp where gno='1'
 
 --統計
 insert @tmp(gno,noa,tranmoney,tmount,ttotal)
 select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
-	select noa,tranmoney,SUM(case when ucolor='其他' then 0 else mount end)tmount,sum(total)ttotal
+	select noa,case when transtyle='收費' then tranmoney else 0 end tranmoney
+	,SUM(case when ucolor='其他' then 0 else mount end)tmount,sum(total)ttotal
 	from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
-	group by noa,tranmoney
+	group by noa,case when transtyle='收費' then tranmoney else 0 end
 )tmpz
 
 --插空白行
@@ -169,7 +176,7 @@ from (select page,recno from @tmp)a
 	  
 select 
 @t_bxdate bxdate,@t_exdate exdate
-,case when @t_bdate=@t_edate then '互換出貨日報表' else '互換出貨月報表' end title
+,case when @t_bdate=@t_edate then '來料加工出貨日報表' else '來料加工出貨月報表' end title
 ,dbo.getComma(total,0) total
 ,dbo.getComma(ttotal,0) ttotal
 ,dbo.getComma(price,3) price
@@ -220,6 +227,7 @@ declare @weight_decimal int = 4
 declare @price_decimal int = 4 
 declare @total_decimal int = 4 
 -------------------------------------------------- 
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table( 
 	gno nvarchar(1), 
 	products nvarchar(MAX), 
@@ -335,7 +343,7 @@ declare @total_decimal int = 4
 -------------------------------------------------- 
 set @qhref_acomp='_sf'
 --*********************************************************************************** 
-
+--106/12/28 換成下拉單選客戶 楊
 declare @result table( 
 	gno nvarchar(1), 
 	typea nvarchar(4), 
@@ -373,7 +381,7 @@ declare @result table(
 	left join cust c on a.custno = c.noa 
 	left join ordh d on a.idno=d.noa
 	where (a.datea between @t_bdate and @t_edate) and 
-	(a.custno between @t_bcustno and @t_ecustno) and 
+	(a.custno between @t_bcustno and @t_ecustno) and
 	(len(@t_product)=0 or @t_product like b.product)and
 	(len(@t_spec)=0 or @t_spec like b.spec) and
 	(len(@t_size)=0 or @t_size like b.size) and
@@ -453,6 +461,7 @@ declare @weight_decimal int = 0
 declare @price_decimal int = 0 
 declare @total_decimal int = 0 
 -------------------------------------------------- 
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table(
 	gno nvarchar(1), 
 	products nvarchar(MAX),
@@ -586,7 +595,7 @@ declare @total_decimal int = 4
 -------------------------------------------------- 
 set @qhref_acomp='_sf'
 ------------------------------------------------- 
-
+--106/12/28 換成下拉單選客戶 楊
 declare @result table( 
 	gno nvarchar(1),  
 	noa nvarchar(30), 
@@ -713,6 +722,7 @@ declare @weight_decimal int = 4
 declare @price_decimal int = 0 
 declare @total_decimal int = 4 
 -------------------------------------------------- 
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table( 
 	gno nvarchar(1), 
 	custno nvarchar(30), 
@@ -732,7 +742,7 @@ select '0',a.custno,(case when isnull(c.nick,'') = '' then c.comp else c.nick en
 from view_get a left join view_gets b on a.noa = b.noa 
 left join cust c on a.custno = c.noa left join ordh d on a.idno=d.noa 
 where (a.datea between @t_bdate and @t_edate) and 
-(a.custno between @t_bcustno and @t_ecustno)  and
+(a.custno between @t_bcustno and @t_ecustno) and
 (len(@t_product)=0 or @t_product like b.product)and
 (len(@t_spec)=0 or @t_spec like b.spec) and
 (len(@t_size)=0 or @t_size like b.size) and
@@ -808,7 +818,7 @@ declare @total_decimal int = 4
 -------------------------------------------------- 
 set @qhref_acomp='_sf' 
 ------------------------------------------------- 
-
+--106/12/28 換成下拉單選客戶 楊
 declare @result table( 
 	gno nvarchar(1), 
 	noa nvarchar(15), 
@@ -926,6 +936,7 @@ declare @price_decimal int = 4
 declare @total_decimal int = 4 
 
 -------------------------------------------------- 
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table( 
 	gno nvarchar(1), 
 	products nvarchar(MAX), 
@@ -1029,7 +1040,8 @@ set @t_estoreno = case when '#non'=[17] then char(255) else [17]  end
 set @t_bxdate = case when '#non'=[21] then '' else [21] end 
 set @t_exdate = case when '#non'=[22] then char(255) else [22] end 
 set @t_addr2 = case when '#non'=[20] then '' else [20]  end
- 
+
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table(
 	gno nvarchar(1),
 	rr int,
@@ -1074,7 +1086,7 @@ from view_get a left join view_gets b on a.noa=b.noa
 left join ordh d on a.idno=d.noa
 left join ucc e on b.product=e.product
 where (a.datea between @t_bdate and @t_edate) and 
-	  (a.custno between @t_bcustno and @t_ecustno)  and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
 	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and
@@ -1177,6 +1189,7 @@ set @t_qno = case when '#non'=[15] then '' else [15] end
 set @t_bstoreno = case when '#non'=[16] then '' else [16] end 
 set @t_estoreno = case when '#non'=[17] then char(255) else [17]  end
 --***********************************************************************************
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table( 
 	gno nvarchar(1), 
 	custno nvarchar(30), 
@@ -1193,7 +1206,7 @@ from view_get a left join view_gets b on a.noa = b.noa and a.accy = b.accy
 left join cust c on a.custno = c.noa
 left join ordh d on a.idno=d.noa 
 where (a.datea between @t_bdate and @t_edate) and 
-	  (a.custno between @t_bcustno and @t_ecustno)  and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like b.product)and
 	  (len(@t_spec)=0 or @t_spec like b.spec) and
 	  (len(@t_size)=0 or @t_size like b.size) and
@@ -1216,8 +1229,9 @@ select
 dbo.getComma(price,-1)price 
 ,dbo.getComma(mount,0)mount
 ,dbo.getComma(weight,0)weight  
+,price xpriec
 ,*
-from @tmp order by custno,price
+from @tmp order by custno,xpriec
 ;
 --------------------------------------------------------------------------------------------------
 z_get_sf11:--z_get_sf11
@@ -1254,7 +1268,8 @@ set @t_bstoreno = case when '#non'=[16] then '' else [16] end
 set @t_estoreno = case when '#non'=[17] then char(255) else [17]  end
 set @t_bxdate = case when '#non'=[21] then '' else [21] end 
 set @t_exdate = case when '#non'=[22] then char(255) else [22] end 
- 
+
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table(
 	gno nvarchar(1),
 	rr int,
@@ -1291,7 +1306,7 @@ from view_get a left join view_gets b on a.noa=b.noa
 left join cust c on a.custno=c.noa
 left join ordh d on a.idno=d.noa
 where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
-	  (a.custno between @t_bcustno and @t_ecustno)  and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 	  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
 	  (len(@t_size)=0 or @t_size like isnull(b.size,'')) and

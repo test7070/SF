@@ -63,11 +63,13 @@ declare @tmp table(
 	ghref nvarchar(max), 
 	carno nvarchar(50), 
 	ucolor nvarchar(50), 
-	memo nvarchar(max) 
+	memo nvarchar(max),
+	amemo nvarchar(MAX)
 ) 
 
 --106/07/20 根據品名的單位去顯示 (*最後一次調整)
 --106/07/27 月報表 收費和含運要顯示運費要跟對帳 付給司機 但在小計和總計 只需計算收費的運費
+--106/12/28 換成下拉單選客戶 楊
 if(@t_noshowget='1')
 begin
 	insert @tmp
@@ -80,7 +82,7 @@ begin
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,a.carno
-	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo
+	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo,a.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
@@ -109,7 +111,7 @@ begin
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
 	,'vcc_sf?noa=$noa?'+a.accy,a.carno
-	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo
+	,case when UPPER(isnull(d.unit,''))='KG' then b.ucolor else '其他' end,b.memo,a.memo
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate end and case when @t_edate>@t_exdate then @t_edate else @t_exdate end) and 
@@ -131,18 +133,20 @@ insert @tmp
 select '1',0,0,0,max(datea),noa,custno,max(nick),addr2,ordeno,max(transtyle)
 ,max(tranmoney),'','',null,null,null
 ,SUM(case when ucolor='其他' then 0 else mount end)
-,sum(total),'',MAX(ghref),MAX(carno),'',''
+,sum(total),'',MAX(ghref),MAX(carno),'','',''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
 group by noa,custno,addr2,ordeno
 
 insert @tmp
 select '2',rr,0,0,datea,noa,custno,nick,addr2,ordeno,transtyle
-,tranmoney,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno,ucolor,memo
+,tranmoney,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno,ucolor,memo,replace(amemo,'chr(10)',' ')
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
 
-update @tmp set ordeno='' where gno='2' and rr>1
+update @tmp set ordeno='',amemo='' where gno='2' and rr>1
+
+update @tmp set memo=case when len(memo)>0 and len(amemo)>0 then isnull(amemo,'')+','+isnull(memo,'') else isnull(amemo,'')+isnull(memo,'') end where gno='2' and rr=1
 
 --項次
 update a
@@ -264,6 +268,7 @@ set @qhref_acomp='_vu'
 if(left(@t_acomp,2)='三泰')
 	set @qhref_acomp='_sf' 
 --*********************************************************************************** 
+--106/12/28 換成下拉單選客戶 楊
 declare @result table( 
 	gno nvarchar(1), 
 	typea nvarchar(4), 
@@ -387,7 +392,7 @@ declare @price_decimal int = 4
 declare @total_decimal int = 4 
 
 -------------------------------------------------- 
-
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table( 
 	gno nvarchar(1), 
 	products nvarchar(MAX), 
@@ -504,6 +509,7 @@ set @qhref_acomp='_vu'
 if(left(@t_acomp,2)='三泰')
 	set @qhref_acomp='_sf' 
 ------------------------------------------------- 
+--106/12/28 換成下拉單選客戶 楊
 declare @result table( 
 	gno nvarchar(1), 
 	typea nvarchar(4), 
@@ -638,7 +644,7 @@ declare @weight_decimal int = 0
 declare @price_decimal int = 0 
 declare @total_decimal int = 0 
 -------------------------------------------------- 
-
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table(
 	gno nvarchar(1), 
 	products nvarchar(MAX),
@@ -773,7 +779,7 @@ set @qhref_acomp='_vu'
 if(left(@t_acomp,2)='三泰')
 	set @qhref_acomp='_sf' 
 ------------------------------------------------- 
-
+--106/12/28 換成下拉單選客戶 楊
 declare @result table( 
 	gno nvarchar(1), 
 	typea nvarchar(4), 
@@ -894,6 +900,7 @@ declare @weight_decimal int = 4
 declare @price_decimal int = 0 
 declare @total_decimal int = 4 
 -------------------------------------------------- 
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table( 
 	gno nvarchar(1), 
 	custno nvarchar(30), 
@@ -991,6 +998,7 @@ declare @price_decimal int = 4
 declare @total_decimal int = 4 
 
 -------------------------------------------------- 
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table( 
 	gno nvarchar(1), 
 	products nvarchar(MAX), 
@@ -1131,6 +1139,7 @@ declare @tmp table(
 )
 
 --106/07/20 根據品名的單位去顯示 (*最後一次調整)
+--106/12/28 換成下拉單選客戶 楊
 --明細
 if(@t_noshowget='1')
 begin
@@ -1150,7 +1159,7 @@ begin
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
-		  (a.custno between @t_bcustno and @t_ecustno)  and
+		  (a.custno between @t_bcustno and @t_ecustno) and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
 		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
@@ -1181,7 +1190,7 @@ begin
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
-		  (a.custno between @t_bcustno and @t_ecustno)  and
+		  (a.custno between @t_bcustno and @t_ecustno) and
 		  (len(@vcctypea)=0 or @vcctypea=a.typea)and
 		  (len(@t_product)=0 or @t_product like isnull(b.product,''))and
 		  (len(@t_spec)=0 or @t_spec like isnull(b.spec,'')) and
@@ -1294,6 +1303,7 @@ set @t_qno = case when '#non'=[18] then '' else [18] end
 set @t_bstoreno = case when '#non'=[19] then '' else [19] end 
 set @t_estoreno = case when '#non'=[20] then char(255) else [20]  end
 --***********************************************************************************
+--106/12/28 換成下拉單選客戶 楊
 declare @tmp table( 
 	gno nvarchar(1), 
 	custno nvarchar(30), 
@@ -1314,7 +1324,7 @@ select '9',a.custno,(case when isnull(c.nick,'') = '' then c.comp else c.nick en
 		,(case when a.typea='1' then 1 else -1 end)*b.weight*b.price
 from view_vcc a left join view_vccs b on a.noa = b.noa and a.accy = b.accy left join cust c on a.custno = c.noa 
 where (a.datea between @t_bdate and @t_edate) and 
-	  (a.custno between @t_bcustno and @t_ecustno)  and
+	  (a.custno between @t_bcustno and @t_ecustno) and
 	  (len(@vcctypea)=0 or @vcctypea=a.typea) and
 	  (len(@t_product)=0 or @t_product like b.product)and
 	  (len(@t_spec)=0 or @t_spec like b.spec) and

@@ -145,19 +145,19 @@
 				
 				$('#txtTranadd').change(function() {
 					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
-					//$('#txtWeight').change();
+					$('#txtWeight').change();
 				});
 				$('#txtBenifit').change(function() {
 					q_tr('txtWeight',q_sub(q_float('txtBenifit'),q_float('txtTranadd')));
-					//$('#txtWeight').change();
+					$('#txtWeight').change();
 				});
 				
 				$('#txtWeight').change(function() {
-					//105/12/07 增加 //106/06/08 功能取消
-					/*var t_weight=dec($('#txtWeight').val());
+					//105/12/07 增加 //106/06/08 功能取消 107/01/10 重新開放
+					var t_weight=dec($('#txtWeight').val());
 					if(t_weight!=0){
 						for (var i = 0; i < q_bbsCount; i++) {
-							if(dec($('#txtWeight_'+i).val())!=0){
+							if(!emp($('#txtProduct_'+i).val())){
 								t_weight=q_sub(t_weight,dec($('#txtWeight_'+i).val()));
 							}
 						}
@@ -165,7 +165,7 @@
 					if(t_weight!=0){
 						var t_n=-1;
 						for (var i = 0; i < q_bbsCount; i++) {
-							if(dec($('#txtWeight_'+i).val())==0){
+							if(emp($('#txtProduct_'+i).val())){
 								t_n=i;
 								break;
 							}
@@ -175,7 +175,15 @@
 							$('#btnPlus').click();
 						}
 						$('#txtWeight_'+t_n).val(t_weight);
-					}*/
+					}else{
+						for (var i = 0; i < q_bbsCount; i++) {
+							if(emp($('#txtProduct_'+i).val())){
+								t_n=i;
+								$('#txtWeight_'+t_n).val(0);
+								break;
+							}
+						}
+					}
 					$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtWeight').val())),0));
 				});
 				
@@ -942,6 +950,15 @@
 					}
 				}
 				
+				//106/12/18 判斷淨重與表身重量
+				var tt_weight=0;
+				for (var i = 0; i < q_bbsCount; i++) {
+					tt_weight=q_add(tt_weight,dec($('#txtWeight_'+i).val()));
+				}
+				if(tt_weight!=dec($('#txtWeight').val())){
+					alert('※表頭【淨重】與表身【重量】合計不同!!');
+				}
+				
 				if (q_cur == 1)
 					$('#txtWorker').val(r_name);
 				if (q_cur == 2)
@@ -1069,6 +1086,7 @@
 								}else{
 									$('#txtTotal_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
 								}
+								$('#txtWeight').change();
 								sum();
 							}
 						});

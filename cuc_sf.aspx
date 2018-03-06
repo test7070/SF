@@ -989,6 +989,22 @@
                 	}
 				});
 				
+				$('#btnMechCopy').click(function() {
+                	if(q_cur==1 || q_cur==2){
+                		var t_tmp=$('#txtMechno_0').val();
+                		var t_tmp2=$('#txtMech_0').val();
+                		for (var i = 1; i < q_bbsCount; i++) {
+                			if(emp($('#txtMechno_'+i).val())){
+	                			$('#txtMechno_'+i).val(t_tmp);
+	                			$('#txtMech_'+i).val(t_tmp2);
+	                		}else{
+	                			t_tmp=$('#txtMechno_'+i).val();
+	                			t_tmp2=$('#txtMech_'+i).val();
+	                		}
+                		}
+                	}
+				});
+				
 				$('#btnOrdeCopy').click(function() {
 					if(q_cur==1 || q_cur==2){
                 		if(!emp($('#txtOrdeno_0').val())){
@@ -1527,7 +1543,10 @@
 							<a id='lblEtime_s'> </a>
 							<input class="btn" id="btnEtimeCopy" type="button" value='≡' style="font-weight: bold;"  />
 						</td>
-						<td style="width:150px;"><a id='lblMech_s'>剪裁機台</a></td>
+						<td style="width:150px;">
+							<a id='lblMech_s'>剪裁機台</a>
+							<input class="btn" id="btnMechCopy" type="button" value='≡' style="font-weight: bold;"  />
+						</td>
 						<!--<td style="width:150px;"><a id='lblMech2_s'>成型機台</a></td>-->
 						<!--<td style="width:40px;"><a id='lblRadius_s'> </a></td>
 						<td style="width:40px;"><a id='lblWidth_s'> </a></td>

@@ -63,7 +63,18 @@
                 t_edate = t_edate.length > 0 && t_edate.indexOf("_") > -1 ? t_edate.substr(0, t_edate.indexOf("_")) : t_edate;
                 /// 100.  .
 
-                var t_where = " 1=1 " + q_sqlPara2("noa", t_noa) + q_sqlPara2("cno", t_cno) + q_sqlPara2("datea", t_bdate, t_edate) + q_sqlPara2("mon", t_mon) + q_sqlPara2("tggno", t_tggno) + q_sqlPara2("invono", t_invono) + q_sqlPara2("accno", t_accno);
+                var t_where = " 1=1 " 
+                + q_sqlPara2("noa", t_noa) 
+                + q_sqlPara2("cno", t_cno) 
+                + q_sqlPara2("datea", t_bdate, t_edate) 
+                + q_sqlPara2("mon", t_mon) 
+                //+ q_sqlPara2("tggno", t_tggno) 
+                + q_sqlPara2("invono", t_invono) 
+                + q_sqlPara2("accno", t_accno);
+                
+                //107/01/29 楊
+				if(t_tggno.length>0)
+					t_where += " and (tggno='"+t_tggno+"') ";
 				
 				if(t_ordcno.length>0)
                 	t_where += " and (dbo.split(dbo.split(transtart,'##',0),'@',0)='"+t_ordcno+"' or dbo.split(dbo.split(transtart,'##',1),'@',0)='"+t_ordcno+"')";	

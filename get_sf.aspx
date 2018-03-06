@@ -151,19 +151,53 @@
 				$('#txtTweight').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtMount').val(q_sub(dec($('#txtTweight').val()),dec($('#txtTranstyle').val())));
-						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
+						$('#txtMount').change();
+						//$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0))
 						sum();
 					}
 				});
 				$('#txtTranstyle').change(function() {
 					if(q_cur==1 || q_cur==2){
 						$('#txtMount').val(q_sub(dec($('#txtTweight').val()),dec($('#txtTranstyle').val())));
-						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0));
+						$('#txtMount').change();
+						//$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0));
 						sum();
 					}
 				});
 				$('#txtMount').change(function() {
 					if(q_cur==1 || q_cur==2){
+						//107/01/10 重新開放
+						var t_weight=dec($('#txtMount').val());
+						if(t_weight!=0){
+							for (var i = 0; i < q_bbsCount; i++) {
+								if(!emp($('#txtProduct_'+i).val())){
+									t_weight=q_sub(t_weight,dec($('#txtWeight_'+i).val()));
+								}
+							}
+						}
+						if(t_weight!=0){
+							var t_n=-1;
+							for (var i = 0; i < q_bbsCount; i++) {
+								if(emp($('#txtProduct_'+i).val())){
+									t_n=i;
+									break;
+								}
+							}
+							if(t_n==-1){
+								t_n=q_bbsCount;
+								$('#btnPlus').click();
+							}
+							$('#txtWeight_'+t_n).val(t_weight);
+						}else{
+							for (var i = 0; i < q_bbsCount; i++) {
+								if(emp($('#txtProduct_'+i).val())){
+									t_n=i;
+									$('#txtWeight_'+t_n).val(0);
+									break;
+								}
+							}
+						}
+						
 						$('#txtTranmoney').val(round(q_mul(dec($('#txtPrice').val()),dec($('#txtMount').val())),0));
 						sum();
 					}
@@ -632,6 +666,15 @@
 					$('#txtWaste').val(0);
 				}
 				
+				//106/12/18 判斷淨重與表身重量
+				var tt_weight=0;
+				for (var i = 0; i < q_bbsCount; i++) {
+					tt_weight=q_add(tt_weight,dec($('#txtWeight_'+i).val()));
+				}
+				if(tt_weight!=dec($('#txtMount').val())){
+					alert('※表頭【淨重】與表身【重量】合計不同!!');
+				}
+				
                 if (q_cur == 1){
                     $('#txtWorker').val(r_name);
                 }else
@@ -874,6 +917,7 @@
 								}else{
 									$('#txtLengthc_' + b_seq).val(round(q_mul(t_price, t_mount), 0));
 								}
+								$('#txtMount').change();
 								sum();
 							}
 						});
