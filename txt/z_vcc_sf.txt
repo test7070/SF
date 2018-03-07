@@ -1135,7 +1135,8 @@ declare @tmp table(
 	money float,
 	store2 nvarchar(max),
 	ghref nvarchar(max),
-	memo nvarchar(max)
+	memo nvarchar(max),
+	couplers bit --分續接
 )
 
 --106/07/20 根據品名的單位去顯示 (*最後一次調整)
@@ -1155,7 +1156,7 @@ begin
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
 	,case when a.typea='2' then -1 else 1 end*b.total,case when a.typea='2' then -1 else 1 end*a.total
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-	,'vcc_sf?noa=$noa?'+a.accy,b.memo
+	,'vcc_sf?noa=$noa?'+a.accy,b.memo,0
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
@@ -1186,7 +1187,7 @@ begin
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else 0 end
 	,case when a.typea='2' then -1 else 1 end*b.total,case when a.typea='2' then -1 else 1 end*a.total
 	,case when b.product like '%續接%' then '<img src="'+store2+'" style="width:90px'+char(59)+'height:30px'+char(59)+'"/>' else '' end
-	,'vcc_sf?noa=$noa?'+a.accy,b.memo
+	,'vcc_sf?noa=$noa?'+a.accy,b.memo,0
 	from view_vcc a left join view_vccs b on a.noa=b.noa
 	left join ucc d on b.product=d.product
 	where (a.datea between @t_bdate and @t_edate) and 
@@ -1203,23 +1204,25 @@ begin
 		  and exists (select * from view_vccs where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
 end
 
-if(@t_couplers='1')
-begin
-	delete @tmp where product not like '%續接%'
-end
-else
-begin
-	delete  @tmp  where product like '%續接%'
-end
+update @tmp set couplers=1 where product like '%續接%'
+
+--if(@t_couplers='1')
+--begin
+--	delete @tmp where product not like '%續接%'
+--end
+--else
+--begin
+--	delete  @tmp  where product like '%續接%'
+--end
 
 insert @tmp
 select '1',0,0,0,noa,MAX(datea),custno,MAX(comp),MAX(addr2),ordeno
 ,MAX(tranmoney),MAX(tax),'','','',null,null,null
 ,SUM(tmount)
-,sum(total),max(money),'',MAX(ghref),''
+,sum(total),max(money),'',MAX(ghref),'',couplers
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='2'
-group by noa,custno,ordeno
+group by noa,custno,ordeno,couplers
 
 --請款金額 106/07/24 運費放入應收金額
 --update @tmp
@@ -1229,18 +1232,18 @@ group by noa,custno,ordeno
 --項次
 update a
 set rr=rx
-from (select ROW_NUMBER()over(partition by gno,custno order by noa)rx,rr from @tmp where gno='1')a
+from (select ROW_NUMBER()over(partition by gno,custno,couplers order by noa)rx,rr from @tmp where gno='1')a
 
 --合計
-insert @tmp(gno,custno,ordeno,noa,tranmoney,tmount,ttotal,money,tax)
-select '3',custno,ordeno,CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal),SUM(tranmoney)+SUM(tax)+SUM(ttotal),sum(tax)
+insert @tmp(gno,custno,ordeno,noa,tranmoney,tmount,ttotal,money,tax,couplers)
+select '3',custno,ordeno,CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal),SUM(tranmoney)+SUM(tax)+SUM(ttotal),sum(tax),couplers
 from @tmp where gno='1'
-group by custno,ordeno
+group by custno,ordeno,couplers
 
 --重新排序
 update a
 set recno=recno2
-from (select recno,ROW_NUMBER()over (partition by custno,ordeno order by noa,gno,rr)recno2 from @tmp)a
+from (select recno,ROW_NUMBER()over (partition by custno,ordeno,couplers order by noa,gno,rr)recno2 from @tmp)a
 
 --插入換頁
 declare @pageline float=36
@@ -1252,10 +1255,10 @@ set page=ceiling(cast(recno as float)/@pageline)
 from (select page,recno from @tmp)a
 
 --分頁
-insert @tmp(gno,custno,ordeno,page,noa)
-select '4',custno,ordeno,page,CHAR(255)
+insert @tmp(gno,custno,ordeno,couplers,page,noa)
+select '4',custno,ordeno,couplers,page,CHAR(255)
 from @tmp 
-group by custno,ordeno,page 
+group by custno,ordeno,couplers,page 
 	  
 select 
 dbo.getComma(total,0) total
@@ -1266,7 +1269,7 @@ dbo.getComma(total,0) total
 ,dbo.getComma(tranmoney,0) tranmoney
 ,dbo.getComma(tax,0) tax
 ,dbo.getComma(money,0) money
-,* from @tmp order by custno,ordeno,page,noa,gno
+,* from @tmp order by custno,ordeno,couplers,page,noa,gno
 ;
 ---------------------------------------------------------------------------------------------------------
 z_vcc_sf10:--z_vcc_sf10
