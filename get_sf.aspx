@@ -1565,11 +1565,14 @@
 						var as = _q_appendData("tmp0", "", true, true);
 						if (as[0] != undefined) {
 							t_vccno=as[0].vccno;
+							t_noa=as[0].noa;
 							//vcc.post內容
 							if(as[0].err.length>0){
 								alert('轉出貨單錯誤，請聯絡工程師!!');
 							}else if(!emp(t_vccno)){
-								$('#txtTranstartno').val(t_vccno);
+								if(t_noa==$('#txtNoa').val()){ //107/03/13 避免電腦寫入太慢 造成太慢寫入
+									$('#txtTranstartno').val(t_vccno);
+								}
 								q_func('vcc_post.post.get2vcc11', r_accy + ',' + t_vccno + ',1');
 							}
 						}
@@ -1591,11 +1594,14 @@
 						var as = _q_appendData("tmp0", "", true, true);
 						if (as[0] != undefined) {
 							t_vccno=as[0].vccno;
+							t_noa=as[0].noa;
 							//vcc.post內容
 							if(as[0].err.length>0){
 								alert('轉出貨單錯誤，請聯絡工程師!!');
 							}else if(!emp(t_vccno)){
-								$('#txtTranstartno').val(t_vccno);
+								if(t_noa==$('#txtNoa').val()){ //107/03/13 避免電腦寫入太慢 造成太慢寫入
+									$('#txtTranstartno').val(t_vccno);
+								}
 								q_func('vcc_post.post.get2vcc23', r_accy + ',' + t_vccno + ',1');
 							}
 						}
