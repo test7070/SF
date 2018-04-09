@@ -15,6 +15,7 @@ declare @t_bstoreno nvarchar(20)
 declare @t_estoreno nvarchar(20)
 declare @t_bxdate nvarchar(20) 
 declare @t_exdate nvarchar(20) 
+declare @t_addr2 nvarchar(100)
 declare @t_typea nvarchar(20) = case when '#non'=[23] then '' else [23] end
 declare @t_gettypea nvarchar(20) = case when '#non'=[24] then '' else [24] end
 ------------------------------------------------- 
@@ -33,6 +34,7 @@ set @t_bstoreno = case when '#non'=[16] then '' else [16] end
 set @t_estoreno = case when '#non'=[17] then char(255) else [17]  end
 set @t_bxdate = case when '#non'=[21] then '' else [21] end 
 set @t_exdate = case when '#non'=[22] then char(255) else [22] end 
+set @t_addr2 = case when '#non'=[20] then '' else [20]  end
 ------------------------------------------------------------------------
 declare @tmp table(
 	gno nvarchar(1),
@@ -94,6 +96,7 @@ where (a.datea between case when @t_bxdate<@t_bdate then @t_bxdate else @t_bdate
 	  and (len(@t_typea)=0 or isnull(d.typea,'')=@t_typea)
 	  and exists (select * from view_gets where noa=a.noa) --106/10/20 表身要有資料才會顯示(案號扣料隱藏)
 	  and (len(@t_gettypea)=0 or case when f.xtype>0 then '1' else '2' end=@t_gettypea)
+	  and (len(@t_addr2)=0 or a.addr like '%'+@t_addr2+'%')
 
 --小計
 insert @tmp
