@@ -348,7 +348,9 @@
 				}
 				if(t_imgorg.length==0)
 					return;
-				$('#imgPic_'+n).attr('src',t_imgorg);
+				//$('#imgPic_'+n).attr('src',t_imgorg);
+				var image = document.getElementById('imgPic_'+n);
+				image.src=t_imgorg;
                 var imgwidth = 300;
                 var imgheight = 100;
                 $('#canvas_'+n).width(imgwidth).height(imgheight);
@@ -356,35 +358,106 @@
 				var ctx = c.getContext("2d");		
 				c.width = imgwidth;
 				c.height = imgheight;
-				ctx.drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight);
-				var t_length = 0;
-				for(var i=0;i<t_para.length;i++){
-					value = $('#txtPara'+t_para[i].key.toLowerCase()+'_'+n).val();
-					if(value!=0){
-						t_length += value;
-						ctx.font = t_para[i].fontsize+"px Arial";
-						ctx.fillStyle = 'black';
-						ctx.textAlign="center";
-						ctx.fillText(value+'',t_para[i].left,t_para[i].top);
-					}
+				image.onload = function() {
+					ctx.drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight);
+					var t_length = 0;
+					createImg2(n);
 				}
-				//------------------------------
+			};
+			
+			function createImg2(n){
+				var t_picno = $('#txtPicno_'+n).val();
+				var t_para = $('#txtPara_'+n).val();
+                var t_imgorg = $('#txtImgorg_'+n).val();
+				try{
+					t_para = JSON.parse(t_para);
+				}catch(e){
+					console.log('createImg:'+t_para);
+				}
+				if(t_imgorg.length==0)
+					return;
+				var image = document.getElementById('imgPic_'+n)
+                var imgwidth = 300;
+                var imgheight = 100;
+                var c = document.getElementById("canvas_"+n);
 				$('#imgPic_'+n).attr('src',c.toDataURL());
-				//條碼用圖形
-				xx_width = 355;
-				xx_height = 119;						
-				$('#canvas_'+n).width(xx_width).height(xx_height);
-				c.width = xx_width;
-				c.height = xx_height;
-				$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,xx_width,xx_height);
-				$('#txtImgbarcode_'+n).val(c.toDataURL());
-				//報表用圖形 縮放為150*50
-				$('#canvas_'+n).width(150).height(50);
-				c.width = 150;
-				c.height = 50;
-				$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,150,50);
-				$('#txtImgdata_'+n).val(c.toDataURL());	
-				//------------------------------
+				image.onload = function() {
+					//條碼用圖形
+					xx_width = 355;
+					xx_height = 119;						
+					$('#canvas_'+n).width(xx_width).height(xx_height);
+					c.width = xx_width;
+					c.height = xx_height;
+					$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,xx_width,xx_height);
+					
+					$('#txtImgbarcode_'+n).val(c.toDataURL());
+					createImg3(n);
+				}
+			};
+			
+			function createImg3(n){
+				var t_picno = $('#txtPicno_'+n).val();
+				var t_para = $('#txtPara_'+n).val();
+                var t_imgorg = $('#txtImgorg_'+n).val();
+				try{
+					t_para = JSON.parse(t_para);
+				}catch(e){
+					console.log('createImg:'+t_para);
+				}
+				if(t_imgorg.length==0)
+					return;
+				var image = document.getElementById('imgPic_'+n);
+				image.src=t_imgorg;
+                var imgwidth = 300;
+                var imgheight = 100;
+                $('#canvas_'+n).width(imgwidth).height(imgheight);
+                var c = document.getElementById("canvas_"+n);
+				var ctx = c.getContext("2d");		
+				c.width = imgwidth;
+				c.height = imgheight;
+				image.onload = function() {
+					ctx.drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight);
+					var t_length = 0;
+					//106/05/10 參數不劃入圖中
+					for(var i=0;i<t_para.length;i++){
+						value = $('#txtPara'+t_para[i].key.toLowerCase()+'_'+n).val();
+						if(value!=0){
+							t_length += value;
+							ctx.font = t_para[i].fontsize+"px Arial";
+							ctx.fillStyle = 'black';
+							ctx.textAlign="center";
+							ctx.fillText(value+'',t_para[i].left,t_para[i].top);
+						}
+					}
+					createImg4(n);
+				}
+			};
+			
+			function createImg4(n){
+				var t_picno = $('#txtPicno_'+n).val();
+				var t_para = $('#txtPara_'+n).val();
+                var t_imgorg = $('#txtImgorg_'+n).val();
+				try{
+					t_para = JSON.parse(t_para);
+				}catch(e){
+					console.log('createImg:'+t_para);
+				}
+				if(t_imgorg.length==0)
+					return;
+				var image = document.getElementById('imgPic_'+n)
+                var imgwidth = 300;
+                var imgheight = 100;
+                var c = document.getElementById("canvas_"+n);
+				$('#imgPic_'+n).attr('src',c.toDataURL());
+				image.onload = function() {
+					//報表用圖形 縮放為150*50
+					$('#canvas_'+n).width(150).height(50);
+					c.width = 150;
+					c.height = 50;
+					$('#canvas_'+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,150,50);
+					$('#txtImgdata_'+n).val(c.toDataURL());	
+					//------------------------------
+				}
 			};
 
             function btnOk() {
@@ -438,9 +511,7 @@
                 for (var j = 0; j < q_bbsCount; j++) {
                 	if($('#canvas_'+j).length>0){
 						$('#imgPic_'+j).attr('src', $('#txtImgdata_'+j).val());
-						var imgwidth = $('#imgPic_'+j).width();
-                        var imgheight = $('#imgPic_'+j).height();
-						$("#canvas_"+j)[0].getContext("2d").drawImage($('#imgPic_'+j)[0],0,0,imgwidth,imgheight,0,0,150,50);
+						showimg(j);
                 	}
                 	
                     if (!$('#btnMinus_' + j).hasClass('isAssign')) {
@@ -877,6 +948,23 @@
                 		}
                 	}
 				});
+				
+				for (var j = 0; j < q_bbsCount; j++) {
+                	if($('#canvas_'+j).length>0){
+						$('#imgPic_'+j).attr('src', $('#txtImgdata_'+j).val());
+						showimg(j)
+                	}
+                }
+            }
+            
+            function showimg(n){
+            	var image = document.getElementById('imgPic_'+n);
+            	image.onload = function() {
+					var imgwidth = $('#imgPic_'+n).width();
+	                var imgheight = $('#imgPic_'+n).height();
+	                if($("#canvas_"+n)[0]!=undefined)
+						$("#canvas_"+n)[0].getContext("2d").drawImage($('#imgPic_'+n)[0],0,0,imgwidth,imgheight,0,0,150,50);
+				}
             }
             
             function q_bbsLenShow( t_start, t_end){
