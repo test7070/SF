@@ -44,6 +44,7 @@ declare @tmp table(
 	rr int, 
 	recno int,
 	page int, 
+	typea nvarchar(10),
 	datea nvarchar(10), 
 	noa nvarchar(50), 
 	custno nvarchar(50), 
@@ -73,7 +74,7 @@ declare @tmp table(
 if(@t_noshowget='1')
 begin
 	insert @tmp
-	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,0,a.datea,a.noa,a.custno,nick,addr2
+	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,0,a.typea,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' or transtyle='含運' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0  then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
@@ -102,7 +103,7 @@ end
 else
 begin
 	insert @tmp
-	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,0,a.datea,a.noa,a.custno,nick,addr2
+	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,0,a.typea,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' or transtyle='含運' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0 then ''
 	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
@@ -130,16 +131,16 @@ end
 
 --小計	  
 insert @tmp
-select '1',0,0,0,max(datea),noa,custno,max(nick),addr2,ordeno,max(transtyle)
+select '1',0,0,0,typea,max(datea),noa,custno,max(nick),addr2,ordeno,max(transtyle)
 ,max(tranmoney),'','',null,null,null
 ,SUM(case when ucolor='其他' then 0 else mount end)
 ,sum(total),'',MAX(ghref),MAX(carno),'','',''
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
-group by noa,custno,addr2,ordeno
+group by noa,typea,custno,addr2,ordeno
 
 insert @tmp
-select '2',rr,0,0,datea,noa,custno,nick,addr2,ordeno,transtyle
+select '2',rr,0,0,typea,datea,noa,custno,nick,addr2,ordeno,transtyle
 ,tranmoney,productno,product,mount,price,total,tmount,ttotal,store2,ghref,carno,ucolor,memo,replace(amemo,'chr(10)',' ')
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='9'
@@ -154,13 +155,13 @@ set rr=rx
 from (select ROW_NUMBER()over(partition by gno order by noa)rx,rr from @tmp where gno='1')a
 
 --合計
-insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '3',CHAR(255),SUM(case when transtyle='收費' then tranmoney else 0 end),SUM(tmount),sum(ttotal)
+insert @tmp(gno,noa,typea,tranmoney,tmount,ttotal)
+select '3',CHAR(255),CHAR(255),SUM(case when transtyle='收費' then tranmoney else 0 end),SUM(tmount),sum(ttotal)
 from @tmp where gno='1'
 
 --統計
-insert @tmp(gno,noa,tranmoney,tmount,ttotal)
-select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
+insert @tmp(gno,noa,typea,tranmoney,tmount,ttotal)
+select '4',CHAR(255),CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
 	select noa,case when transtyle='收費' then tranmoney else 0 end tranmoney
 	,SUM(case when ucolor='其他' then 0 else mount end)tmount
 	,sum(total)ttotal
@@ -169,29 +170,29 @@ select '4',CHAR(255),sum(tranmoney),sum(tmount),sum(ttotal) from (
 )tmpz
 
 --插空白行
-insert @tmp(gno,noa)
-select '5',CHAR(255)
+insert @tmp(gno,noa,typea)
+select '5',CHAR(255),CHAR(255)
 
-insert @tmp(gno,noa)
-select '5',CHAR(255)
+insert @tmp(gno,noa,typea)
+select '5',CHAR(255),CHAR(255)
 
 --類別小計
-insert @tmp(gno,noa,ucolor,tmount,ttotal)
-select '6',CHAR(255),ucolor
+insert @tmp(gno,noa,typea,ucolor,tmount,ttotal)
+select '6',CHAR(255),CHAR(255),ucolor
 ,SUM(case when ucolor='其他' then 0 else mount end)
 ,sum(total)
 from @tmp where gno='9' and(datea between @t_bxdate and @t_exdate)
 and ucolor!=''
 group by ucolor
 
-insert into @tmp(gno,noa) select '7',CHAR(255)
+insert into @tmp(gno,noa,typea) select '7',CHAR(255),CHAR(255)
 
 delete @tmp where gno='9'
 
 --重新排序
 update a
 set recno=recno2
-from (select recno,ROW_NUMBER()over (order by noa,gno,rr,case when ucolor='其他' then 9 else 0 end)recno2 from @tmp)a
+from (select recno,ROW_NUMBER()over (order by typea,noa,gno,rr,case when ucolor='其他' then 9 else 0 end)recno2 from @tmp)a
 
 --插入換頁
 declare @pageline float=37
@@ -1116,6 +1117,7 @@ declare @tmp table(
 	rr int,
 	recno int,
 	page int,
+	typea nvarchar(50),
 	noa nvarchar(50),
 	datea nvarchar(10),
 	custno nvarchar(50),
@@ -1145,9 +1147,10 @@ declare @tmp table(
 if(@t_noshowget='1')
 begin
 	insert @tmp
-	select '2','','','',a.noa,a.datea,a.custno,comp,addr2
+	select '2','','','',a.typea,a.noa,a.datea,a.custno,comp,addr2
 	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
-	,case when transtyle='收費' then a.tranmoney else 0 end,tax
+	,case when transtyle='收費' then a.tranmoney else 0 end
+	,case when a.typea='2' then -1 else 1 end*tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
@@ -1176,9 +1179,10 @@ end
 else
 begin
 	insert @tmp
-	select '2','','','',a.noa,a.datea,a.custno,comp,addr2
+	select '2','','','',a.typea,a.noa,a.datea,a.custno,comp,addr2
 	,SUBSTRING(isnull(apvmemo,''),0,CHARINDEX('@',isnull(apvmemo,''))) 
-	,case when transtyle='收費' then a.tranmoney else 0 end,tax
+	,case when transtyle='收費' then a.tranmoney else 0 end
+	,case when a.typea='2' then -1 else 1 end*tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
 	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
@@ -1216,13 +1220,13 @@ update @tmp set couplers=1 where product like '%續接%'
 --end
 
 insert @tmp
-select '1',0,0,0,noa,MAX(datea),custno,MAX(comp),MAX(addr2),ordeno
+select '1',0,0,0,typea,noa,MAX(datea),custno,MAX(comp),MAX(addr2),ordeno
 ,MAX(tranmoney),MAX(tax),'','','',null,null,null
 ,SUM(tmount)
 ,sum(total),max(money),'',MAX(ghref),'',couplers
 from @tmp
 where datea between @t_bdate and @t_edate and gno ='2'
-group by noa,custno,ordeno,couplers
+group by noa,typea,custno,ordeno,couplers
 
 --請款金額 106/07/24 運費放入應收金額
 --update @tmp
@@ -1235,15 +1239,15 @@ set rr=rx
 from (select ROW_NUMBER()over(partition by gno,custno,couplers order by noa)rx,rr from @tmp where gno='1')a
 
 --合計
-insert @tmp(gno,custno,ordeno,noa,tranmoney,tmount,ttotal,money,tax,couplers)
-select '3',custno,ordeno,CHAR(255),SUM(tranmoney),SUM(tmount),sum(ttotal),SUM(tranmoney)+SUM(tax)+SUM(ttotal),sum(tax),couplers
+insert @tmp(gno,custno,ordeno,noa,typea,tranmoney,tmount,ttotal,money,tax,couplers)
+select '3',custno,ordeno,CHAR(255),char(255),SUM(tranmoney),SUM(tmount),sum(ttotal),SUM(tranmoney)+SUM(tax)+SUM(ttotal),sum(tax),couplers
 from @tmp where gno='1'
 group by custno,ordeno,couplers
 
 --重新排序
 update a
 set recno=recno2
-from (select recno,ROW_NUMBER()over (partition by custno,ordeno,couplers order by noa,gno,rr)recno2 from @tmp)a
+from (select recno,ROW_NUMBER()over (partition by custno,ordeno,couplers order by typea,noa,gno,rr)recno2 from @tmp)a
 
 --插入換頁
 declare @pageline float=36
@@ -1255,8 +1259,8 @@ set page=ceiling(cast(recno as float)/@pageline)
 from (select page,recno from @tmp)a
 
 --分頁
-insert @tmp(gno,custno,ordeno,couplers,page,noa)
-select '4',custno,ordeno,couplers,page,CHAR(255)
+insert @tmp(gno,custno,ordeno,couplers,page,noa,typea,recno)
+select '4',custno,ordeno,couplers,page,CHAR(255),char(255),MAX(recno)
 from @tmp 
 group by custno,ordeno,couplers,page 
 	  
@@ -1269,7 +1273,7 @@ dbo.getComma(total,0) total
 ,dbo.getComma(tranmoney,0) tranmoney
 ,dbo.getComma(tax,0) tax
 ,dbo.getComma(money,0) money
-,* from @tmp order by custno,ordeno,couplers,page,noa,gno
+,* from @tmp order by custno,ordeno,couplers,page,recno,gno
 ;
 ---------------------------------------------------------------------------------------------------------
 z_vcc_sf10:--z_vcc_sf10
