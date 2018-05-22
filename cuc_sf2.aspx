@@ -241,6 +241,12 @@
 	                    alert(t_err);
 	                    return;
 	                }
+	                
+	                var x_edate=$('#textDatea').val();
+	                if(x_edate>q_cdn(q_date(),6) || x_edate<q_cdn(q_date(),-6)){
+	                	alert('加工日不符合可加工區間(前後一周)!!');//107/05/22
+	                    return;
+	                }
                 	
 					if(chk_cucs.length==0){
 						alert('無選取加工。');
@@ -473,6 +479,13 @@
 	                    alert(t_err);
 	                    return;
 	                }
+	                
+	                var x_edate=$('#textDatea').val();
+	                if(x_edate>q_cdn(q_date(),6) || x_edate<q_cdn(q_date(),-6)){
+	                	alert('加工日不符合可加工區間(前後一周)!!');//107/05/22
+	                    return;
+	                }
+	                
 	                //判斷庫存
 	                var bbtrow=document.getElementById("cuct_table").rows.length-1;
 	                var has_get=false;
@@ -730,6 +743,13 @@
 	                    alert(t_err);
 	                    return;
 	                }
+	                
+	                var x_edate=$('#textDatea').val();
+	                if(x_edate>q_cdn(q_date(),6) || x_edate<q_cdn(q_date(),-6)){
+	                	alert('加工日不符合可加工區間(前後一周)!!');//107/05/22
+	                    return;
+	                }
+	                
 	                //入庫
 	                t_err='';
 	                var ts_bbu='';
