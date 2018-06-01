@@ -651,6 +651,11 @@
 					return;
 				}
 				
+				//107/06/01避免出現產生自動帶入問題單號
+				if(q_cur==1){
+					$('#txtTranstartno').val('');
+				}
+				
 				if(!check_ordh && !emp($('#txtIdno').val())){
 					var t_where = "where=^^ noa='"+$('#txtIdno').val()+"'^^";
 					q_gt('ordh', t_where, 0, 0, 0, "ordh_btnOk", r_accy);
@@ -1072,6 +1077,7 @@
 				//105/12/08空白倉庫預設A //SF 106/08/17 取消批號入庫 因此倉庫區分互換入庫
 				//106/09/30 大部分都是委外加工 預設A2
 				$('#txtStoreno').val('A2').change();
+				$('#txtTranstartno').val('');
 			}
 
 			function btnModi() {
