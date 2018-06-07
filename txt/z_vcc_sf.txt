@@ -77,7 +77,10 @@ begin
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,0,a.typea,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' or transtyle='含運' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0  then ''
-	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	else CONVERT(nvarchar,b.ucolor) 
+	--+replicate('　',(4-len(b.ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
@@ -106,7 +109,10 @@ begin
 	select '9',ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),0,0,a.typea,a.datea,a.noa,a.custno,nick,addr2
 	,SUBSTRING(apvmemo,0,CHARINDEX('@',apvmemo)),transtyle,case when transtyle='收費' or transtyle='含運' then a.tranmoney else 0 end,productno
 	,case when len(b.ucolor)=0 then ''
-	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	else CONVERT(nvarchar,b.ucolor) 
+	--+replicate('　',(4-len(b.ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
@@ -1152,7 +1158,10 @@ begin
 	,case when transtyle='收費' then a.tranmoney else 0 end
 	,case when a.typea='2' then -1 else 1 end*tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) 
+	--+replicate('　',(4-len(b.ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total
@@ -1184,7 +1193,10 @@ begin
 	,case when transtyle='收費' then a.tranmoney else 0 end
 	,case when a.typea='2' then -1 else 1 end*tax
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) 
+	--+replicate('　',(4-len(b.ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total

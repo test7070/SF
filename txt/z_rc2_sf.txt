@@ -68,7 +68,10 @@ begin
 	select '9','',a.datea,a.noa,a.tggno,c.nick
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,case when isnull(ucolor,'')!='' then CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+	,case when isnull(ucolor,'')!='' then CONVERT(nvarchar,ucolor) 
+	--+replicate('　',(4-len(ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
 	,'rc2_sf?noa=$noa?'+a.accy,b.memo,ucolor,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
@@ -91,7 +94,10 @@ begin
 	select '9','',a.datea,a.noa,a.tggno,c.nick
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa),productno
-	,case when isnull(ucolor,'')!='' then CONVERT(nvarchar,ucolor) +replicate('　',(4-len(ucolor)))+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
+	,case when isnull(ucolor,'')!='' then CONVERT(nvarchar,ucolor) 
+	--+replicate('　',(4-len(ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' ' else '' end+case when isnull(spec,'')!='' then spec+' ' else '' end+product+size+case when isnull(lengthb,0)!=0 then ' '+cast(lengthb as nvarchar(20))+'M' else '' end
 	,b.mount,b.price,b.total,case when product='鋼筋' then b.mount else 0 end,b.total
 	,'rc2_sf?noa=$noa?'+a.accy,a.memo,ucolor,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end
 	from view_rc2 a left join view_rc2s b on a.noa=b.noa 
@@ -242,7 +248,10 @@ begin
 	,case when ISNULL(tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,b.noq,productno
 	,case when len(b.ucolor)=0 then ''
-	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	else CONVERT(nvarchar,b.ucolor) 
+	--+replicate('　',(4-len(b.ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
@@ -272,7 +281,10 @@ begin
 	,case when ISNULL(a.tranmoney,0)!=0 then '含運' else '自運' end,tranmoney
 	,b.noq,productno
 	,case when len(b.ucolor)=0 then ''
-	else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	else CONVERT(nvarchar,b.ucolor) 
+	--+replicate('　',(4-len(b.ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total,null,null
@@ -928,7 +940,10 @@ begin
 	select '2','','','',a.datea,a.noa,a.tggno,a.tgg
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
-	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) 
+	--+replicate('　',(4-len(b.ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total
@@ -955,7 +970,10 @@ begin
 	select '2','','','',a.datea,a.noa,a.tggno,a.tgg
 	,SUBSTRING(a.transtart,0,CHARINDEX('@',a.transtart)),tax,tranmoney
 	,ROW_NUMBER()over(partition by a.noa order by a.noa,b.noq),productno
-	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) +replicate('　',(4-len(b.ucolor)))+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
+	,case when len(b.ucolor)=0 then '' else CONVERT(nvarchar,b.ucolor) 
+	--+replicate('　',(4-len(b.ucolor)))
+	+case when 4-len(b.ucolor)>0 then replicate('　',(4-len(b.ucolor))) else '' end
+	+' '+case when isnull(b.spec,'')!='' then b.spec+' ' else '' end end
 	+b.product+b.size+case when isnull(b.lengthb,0)!=0 then ' '+cast(b.lengthb as nvarchar(20))+'M' else '' end
 	,case when a.typea='2' then -1 else 1 end*case when UPPER(isnull(d.unit,''))='KG' then b.weight else b.mount end
 	,b.price,case when a.typea='2' then -1 else 1 end*b.total
