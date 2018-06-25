@@ -31,6 +31,25 @@
             $(document).ready(function() {
                 q_getId();
                 q_gt('spec', '1=1 ', 0, 0, 0, "spec");
+                
+                $('#q_report').click(function(e) {
+                	if(window.parent.q_name=="z_quatp_vu"){
+                		for(var i=0;i<$('#q_report').data().info.reportData.length;i++){
+							if($('#q_report').data().info.reportData[i].report!='z_vcc_sf9')
+								$('#q_report div div').eq(i).hide();
+						}
+						$('#q_report div div .radio').parent().each(function(index) {
+							if(!$(this).is(':hidden') && t_first){
+								$(this).children().removeClass('nonselect').addClass('select');
+								t_first=false;
+							}
+							if($(this).is(':hidden') && t_first){
+								$(this).children().removeClass('select').addClass('nonselect');
+							}
+						});
+						
+                	}
+                });
             });
 
             function q_gfPost() {
@@ -304,6 +323,10 @@
                 if (xcustItem.length != 0) {
 					q_cmbParse("combbcust", xcustItem);
 					q_cmbParse("combecust", xcustItem);
+				}
+				
+				if(window.parent.q_name=="z_quatp_vu"){
+					$('#btnOk').click();	
 				}
             }
 
