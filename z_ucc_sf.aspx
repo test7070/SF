@@ -196,6 +196,19 @@
 				});
 				
 				$('#Yorder select').css('width','65%')
+				
+				$('#q_report').click(function(e) {
+					var tindex=$('#q_report').data().info.radioIndex;
+					var txtreport=$('#q_report').data().info.reportData[tindex].report;
+					if(txtreport=='z_ucc_sf03'){
+						$('#combUcolor').text('');
+						q_cmbParse("combUcolor", t_color+',續接器'); 
+					}else{
+						$('#combUcolor').text('');
+						q_cmbParse("combUcolor", t_color); 
+					}
+				});
+				
             }
 
             function q_popPost(s1) {
