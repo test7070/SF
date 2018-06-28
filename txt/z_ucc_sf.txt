@@ -806,7 +806,7 @@ declare @today nvarchar(20)= replace(convert(varchar(19),getdate(),20),'-','/')
 select ROW_NUMBER() over (partition by storeno,product,spec,size,gno order by storeno,product,cast(dbo.get_num(size) as int),spec,cast(gno as int),ucolor,lengthb,class) rr
 ,dbo.getComma(mount,0)mount
 ,dbo.getComma(weight,0)weight
-,dbo.getComma(avgweight,[3])avgweight
+,case when gno='2' and product like '%續接器%' then dbo.getComma(avgweight,-1) else dbo.getComma(avgweight,[3]) end avgweight
 ,@today today
 ,@totpage totpage
 ,isnull((select top 1 store from store where noa=a.storeno),'') store
