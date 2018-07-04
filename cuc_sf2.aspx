@@ -338,7 +338,7 @@
 							q_cmbParse("combProduct_"+n, ',鋼筋,鐵線');
 						}
 						if(objname=='combUcolor'){
-							q_cmbParse("combUcolor_"+n, ',板料');
+							q_cmbParse("combUcolor_"+n, ',板料,定尺品,亂尺,籃料');//107/07/04 黃
 						}
 						if(objname=='combSpec'){
 							q_cmbParse("combSpec_"+n, t_spec);
@@ -959,7 +959,7 @@
 							var objname=$(this).attr('id').split('_')[0];
 							if(objname=='combUcolor'){
 								$(this).text(''); //清空資料
-								q_cmbParse("combUcolor_"+n, ',板料');
+								q_cmbParse("combUcolor_"+n, ',板料,定尺品,亂尺,籃料');//107/07/04 黃
 							}
 						});
 						$('#cucu_table .comb').each(function(index) {
