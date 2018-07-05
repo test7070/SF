@@ -62,7 +62,8 @@
                 }
     			
     			$('#txtXdate1').mask(r_picd);
-                $('#txtXdate1').val(q_date().substr(0, r_lenm)+'/01');
+                //$('#txtXdate1').val(q_date().substr(0, r_lenm)+'/01');
+                $('#txtXdate1').val('2017/07/01');//20180705 固定
                 $('#txtXdate2').mask(r_picd);
                 $('#txtXdate2').val(q_cdn(q_cdn(q_date().substr(0,r_lenm)+'/01',35).substr(0,r_lenm)+'/01',-1));
                 $('#txtYdate1').mask(r_picd);
